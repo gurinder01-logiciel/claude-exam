@@ -1,0 +1,1049 @@
+{
+  "key": "scenario",
+  "name": "Scenario Practice",
+  "desc": "Production scenarios and exam-trap drills across all five domains — the 'best decision' items that decide pass or fail",
+  "ready": true,
+  "count": 60,
+  "blueprint": [
+    {
+      "label": "Claude Code Config & Workflows",
+      "pct": 17
+    },
+    {
+      "label": "Tool Design & MCP",
+      "pct": 15
+    },
+    {
+      "label": "Agentic Architecture",
+      "pct": 15
+    },
+    {
+      "label": "Structured Output & Prompting",
+      "pct": 21
+    },
+    {
+      "label": "Context Management",
+      "pct": 12
+    },
+    {
+      "label": "CI/CD & Multi-Agent",
+      "pct": 20
+    }
+  ],
+  "questions": [
+    {
+      "domain": "CI/CD",
+      "d": 2,
+      "q": "A team wires a nightly security scan into GitHub Actions with the step: claude \"scan the codebase for hardcoded secrets\". The job hangs until the workflow timeout fires, then fails with no output. What's wrong?",
+      "options": [
+        "The ANTHROPIC_API_KEY secret is missing",
+        "The command is missing the -p flag, so Claude Code launches an interactive session that waits for input on a non-attached terminal",
+        "The runner needs more memory",
+        "You must add CLAUDE_HEADLESS=1 to the environment"
+      ],
+      "correct": 1,
+      "explain": "Without -p, Claude Code opens an interactive session and waits for input/permission — on a CI runner there's no attached terminal, so it hangs until timeout. The fix is the -p (--print) flag for non-interactive execution. CLAUDE_HEADLESS and --batch are not real features (distractors)."
+    },
+    {
+      "domain": "CI/CD",
+      "d": 2,
+      "q": "Your CI pipeline runs Claude Code to generate code, then in the SAME session asks it to review that code for bugs. Reviews consistently miss obvious issues. What's the architectural flaw?",
+      "options": [
+        "The model temperature is too low",
+        "The session that wrote the code is the wrong session to review it — generator and reviewer must be isolated sessions",
+        "You need a bigger context window",
+        "Reviews should use plan mode"
+      ],
+      "correct": 1,
+      "explain": "Session-context isolation: an agent reviewing its own work in the same session is biased toward confirming its output. Always run the reviewer as an independent session/instance so it evaluates the code fresh."
+    },
+    {
+      "domain": "CI/CD",
+      "d": 2,
+      "q": "You want an overnight technical-debt report across the whole repo (not time-sensitive), and separately a blocking pre-merge check that must return fast. Which API choice for each?",
+      "options": [
+        "Batch API for both",
+        "Real-time API for both",
+        "Message Batches API for the overnight report (≈50% cheaper), real-time API for the blocking pre-merge check",
+        "Batch API for the pre-merge gate, real-time for the overnight report"
+      ],
+      "correct": 2,
+      "explain": "Non-urgent, high-volume jobs (overnight reports) suit the Message Batches API for the cost savings; a blocking pre-merge gate needs an immediate answer, so it must be a real-time call."
+    },
+    {
+      "domain": "CI/CD",
+      "d": 2,
+      "q": "An automated PR review posts many false-positive comments, annoying developers. Which approach best reduces false positives?",
+      "options": [
+        "Tell Claude in the prompt to 'be careful and only flag real issues'",
+        "Define explicit, categorical review criteria (e.g. specific rule categories with severity) rather than vague instructions, and feed prior findings back to suppress duplicates",
+        "Lower the model temperature to 0",
+        "Only review 5 files per PR"
+      ],
+      "correct": 1,
+      "explain": "Vague instructions like 'be careful' are probabilistic and unreliable. Explicit categorical criteria (what counts as P0/P1, specific rule types) plus feeding back prior findings to avoid duplicates is the deterministic, exam-preferred approach."
+    },
+    {
+      "domain": "Multi-Agent",
+      "d": 2,
+      "q": "A coordinator agent delegates research to subagents. Follow-up summarization queries take 40+ seconds because the coordinator spawns a synthesis subagent each time, passing 80,000 tokens of findings it ALREADY holds in its own context. Best fix?",
+      "options": [
+        "Compress findings before passing to the synthesis subagent",
+        "Increase the synthesis subagent's context window",
+        "Handle the summarization directly using the coordinator's existing context",
+        "Cache synthesis subagent responses"
+      ],
+      "correct": 2,
+      "explain": "The coordinator already has the findings in context. Spawning a subagent and re-passing 80k tokens is wasteful. Doing the summary directly in the coordinator eliminates both the spawn overhead and the token re-transfer — the root cause."
+    },
+    {
+      "domain": "Multi-Agent",
+      "d": 2,
+      "q": "A Claude Agent SDK multi-agent research pipeline crashes after processing 12 of 18 documents, each subagent partially done. Which design best handles this class of failure?",
+      "options": [
+        "Restart the entire pipeline from scratch every time",
+        "Persist per-document state/checkpoints so completed work is preserved and only unfinished documents are resumed",
+        "Increase the timeout so it never crashes",
+        "Run all 18 in a single agent to avoid coordination"
+      ],
+      "correct": 1,
+      "explain": "Resilient orchestration checkpoints completed work so a crash resumes only the remaining items rather than redoing everything. Deterministic state persistence beats hoping it won't crash."
+    },
+    {
+      "domain": "Multi-Agent",
+      "d": 1,
+      "q": "When a subagent fails to complete its task in a multi-agent system, what should it return to the coordinator?",
+      "options": [
+        "Nothing — silently drop the failure so the pipeline continues",
+        "A structured error reporting what was attempted, the error type, and whether it was an access failure vs. an empty result",
+        "The full raw stack trace pasted into the coordinator's context",
+        "Retry silently forever until it succeeds"
+      ],
+      "correct": 1,
+      "explain": "Silently dropping failures is always wrong on this exam. Subagents should propagate structured errors (what was attempted, error type, access-failure vs empty-result) so the coordinator can make an informed decision."
+    },
+    {
+      "domain": "Multi-Agent",
+      "d": 1,
+      "q": "How much context should a coordinator pass to each specialized subagent?",
+      "options": [
+        "The full accumulated context, so subagents have maximum information",
+        "Only the scoped, relevant slice each subagent needs for its specific task",
+        "No context at all — subagents should figure it out",
+        "All subagents should share one merged context window"
+      ],
+      "correct": 1,
+      "explain": "Sharing full context with subagents is a classic wrong answer — it bloats context, raises cost, and hurts focus. Pass only the scoped slice relevant to each subagent's task (context isolation)."
+    },
+    {
+      "domain": "Structured Output",
+      "d": 2,
+      "q": "An extraction system must always return customer name, account number, and a cancellation date that may not exist, all as valid JSON. Best approach?",
+      "options": [
+        "Ask the prompt for 'clean JSON output'",
+        "Use tool_use / structured output with an explicit JSON schema: required fields plus nullable types for fields that may be absent",
+        "Parse free-form text with regex afterward",
+        "Raise temperature so it's more creative with formatting"
+      ],
+      "correct": 1,
+      "explain": "Schema-backed output with required fields and nullable types is deterministic and prevents hallucinated values for absent data. Asking for 'clean output' in a prompt is probabilistic and not production-grade."
+    },
+    {
+      "domain": "Structured Output",
+      "d": 1,
+      "q": "Does using tool_use with a JSON schema guarantee the extracted data is correct?",
+      "options": [
+        "Yes — schema validation guarantees both structure and correctness",
+        "No — tool_use guarantees STRUCTURE (valid types/shape) only; semantic correctness (does the source actually support the value) must be validated separately with business rules",
+        "Yes, as long as temperature is 0",
+        "No — tool_use guarantees nothing at all"
+      ],
+      "correct": 1,
+      "explain": "A schema can confirm attendee_count is an integer; it cannot confirm the document actually stated one. Structure ≠ semantics — validate business/semantic rules (e.g. line items sum to total) separately."
+    },
+    {
+      "domain": "Structured Output",
+      "d": 3,
+      "q": "A Claude-based invoice extraction pipeline using tool_use with a JSON schema sometimes returns output where line items don't sum to the stated total. Best architectural fix for this semantic error?",
+      "options": [
+        "Add 'be accurate' to the prompt",
+        "Add a calculated_total field alongside the stated_total, compare them programmatically, and flag mismatches for human review",
+        "Increase the context window",
+        "Switch to a larger model and hope for fewer errors"
+      ],
+      "correct": 1,
+      "explain": "This is a semantic error a schema can't catch. Capturing both a calculated and stated total, comparing them in code, and routing mismatches to human review is the deterministic, provenance-aware solution."
+    },
+    {
+      "domain": "Structured Output",
+      "d": 1,
+      "q": "In a validation-retry loop, when JSON schema validation fails, what should the retry request include?",
+      "options": [
+        "Just re-send the original prompt unchanged",
+        "The document, the failed extraction, AND the specific validation error, so Claude can correct that exact problem",
+        "A demand to 'try harder this time'",
+        "Only the error, without the original document"
+      ],
+      "correct": 1,
+      "explain": "An effective retry gives Claude the document, its previous failed output, and the exact validation error — targeted feedback lets it fix the specific issue rather than blindly re-guessing."
+    },
+    {
+      "domain": "Tool Design",
+      "d": 1,
+      "q": "A customer support agent must never issue a refund over $500 without human approval. Where should this rule be enforced?",
+      "options": [
+        "In the system prompt: 'never refund more than $500 without approval'",
+        "As a programmatic hook/gate in the tool's execution path that blocks or escalates refunds over $500",
+        "In a few-shot example showing a declined large refund",
+        "In the tool description text"
+      ],
+      "correct": 1,
+      "explain": "Prompt instructions are probabilistic and can be bypassed. Critical financial/safety rules need programmatic enforcement — a hook/gate in code that deterministically blocks or escalates, regardless of what the model decides."
+    },
+    {
+      "domain": "Tool Design",
+      "d": 1,
+      "q": "You have several extraction tools (one per document type) and want Claude to always use one of them, without you pre-choosing which. Which setting?",
+      "options": [
+        "tool_choice: auto with a prompt saying 'please use a tool'",
+        "tool_choice: any — guarantees a tool call without you selecting which schema in advance",
+        "tool_choice: none",
+        "Disable tools and parse text output"
+      ],
+      "correct": 1,
+      "explain": "tool_choice: 'any' guarantees Claude calls one of the available tools without you picking which. 'auto' plus prompt instructions can still emit conversational text in edge cases; 'any' cannot."
+    },
+    {
+      "domain": "Dev Productivity",
+      "d": 1,
+      "q": "For a new engineer navigating an unfamiliar codebase, which combination of Claude Code built-in tools is most appropriate for exploration?",
+      "options": [
+        "Only Bash, running arbitrary shell commands",
+        "Read, Grep, and Glob to search and inspect files without modifying them",
+        "Write and Edit to refactor as they explore",
+        "MCP servers exclusively"
+      ],
+      "correct": 1,
+      "explain": "Codebase exploration is a read/search task — Read, Grep, and Glob let the engineer inspect and locate code safely. Write/Edit are for modification, not exploration."
+    },
+    {
+      "domain": "Context Mgmt",
+      "d": 2,
+      "q": "A long-running Claude agent's answer quality degrades on facts that appeared in the middle of a very large context. This is the 'lost in the middle' effect. Best mitigation?",
+      "options": [
+        "Just keep adding more context",
+        "Summarize and restructure context so critical information is surfaced (e.g. near the start/end) rather than buried, and prune irrelevant bulk",
+        "Lower the temperature",
+        "Switch transports"
+      ],
+      "correct": 1,
+      "explain": "Models attend less reliably to the middle of very long contexts. Summarizing, pruning irrelevant bulk, and positioning critical facts prominently mitigates 'lost in the middle' — not simply stuffing more in."
+    },
+    {
+      "domain": "Multi-Agent",
+      "d": 2,
+      "q": "A research coordinator gets conflicting facts from two subagents: Agent A says a company's revenue was $4M, Agent B says $6M. Both cite sources. What's the best design principle for resolving this?",
+      "options": [
+        "Always trust the agent that responded last",
+        "Average the two values to $5M",
+        "Preserve provenance — track each claim's source so the coordinator (or a human) can resolve conflicts based on source reliability, not guesswork",
+        "Discard both and re-run the whole pipeline"
+      ],
+      "correct": 2,
+      "explain": "Ignoring provenance is a key trap. Conflicts should be resolvable by tracing each claim to its source and weighing reliability — averaging or trusting-the-latest destroys the information needed to resolve correctly."
+    },
+    {
+      "domain": "Structured Output",
+      "d": 2,
+      "q": "A document genuinely does not contain a shipping date, but your extraction schema marks shipping_date as required. Claude keeps inventing plausible dates. Best fix?",
+      "options": [
+        "Add a few-shot example telling it to guess conservatively",
+        "Make the field nullable/optional in the schema so 'not present' is a valid, representable outcome — retry cannot invent information that isn't in the source",
+        "Increase max_tokens",
+        "Lower temperature to 0 to stop hallucination"
+      ],
+      "correct": 1,
+      "explain": "Retry helps with format errors, but when information is simply ABSENT from the source, no retry or temperature change conjures it. The schema must allow null so 'absent' is representable — forcing a required field causes hallucination."
+    },
+    {
+      "domain": "CI/CD",
+      "d": 3,
+      "q": "A CI job runs claude -p with a review prompt, exits with code 0, but the review output is empty/irrelevant (a pattern affecting a meaningful fraction of runs). It's for an authentication module. What's the honest architectural stance?",
+      "options": [
+        "Exit code 0 means success — ship it",
+        "Treat headless output as a first automated check, NOT final approval for sensitive changes; gate auth/payment changes behind human review and verify the output is non-empty and relevant",
+        "Re-run until it produces non-empty output, then ship",
+        "Disable the review step since it's unreliable"
+      ],
+      "correct": 1,
+      "explain": "A clean exit code doesn't guarantee useful output. Headless review is a strong first pass, but sensitive changes (auth, payments) need human approval, plus a check that output is actually non-empty and on-topic before trusting it."
+    },
+    {
+      "domain": "Claude Code",
+      "d": 3,
+      "q": "Your team wants a critical compliance rule enforced for every Claude Code session, no exceptions, across all developers. Two options seem viable: a strongly-worded CLAUDE.md rule, or a hook. Which, and why is the other a trap?",
+      "options": [
+        "CLAUDE.md — it's simpler and always loaded, so it's reliable enough",
+        "A hook — it's deterministic code-level enforcement; CLAUDE.md is guidance the model can probabilistically fail to follow, so it's the trap answer for critical/compliance rules",
+        "Either works equally well",
+        "Neither — use a prompt instruction"
+      ],
+      "correct": 1,
+      "explain": "The trap is assuming 'always loaded' means 'always obeyed.' CLAUDE.md is probabilistic guidance. Compliance-critical, no-exception rules require programmatic hooks/gates that enforce deterministically."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 2,
+      "q": "You're architecting on the Claude Agent SDK and deciding between a single Claude agent with tools vs. a multi-agent orchestrator-worker system for a moderately complex task. Which principle should drive the choice?",
+      "options": [
+        "Always use multi-agent — more agents means better results",
+        "Prefer the simplest architecture that meets the need; only add multi-agent when tasks genuinely benefit from parallelism or specialized isolated contexts — unnecessary orchestration adds cost, latency, and failure modes",
+        "Always use a single agent to save money",
+        "Base it purely on the model version"
+      ],
+      "correct": 1,
+      "explain": "A common trap is over-engineering with multi-agent when a single agent suffices. Multi-agent is justified by real parallelism or context isolation needs — otherwise it just adds coordination overhead, latency, and new failure points."
+    },
+    {
+      "domain": "Structured Output",
+      "d": 3,
+      "q": "For a production pipeline feeding a database, a teammate proposes prompting Claude to 'respond only with JSON' and parsing the text. Why is this the technically-possible-but-wrong-for-production answer?",
+      "options": [
+        "It's actually the best approach",
+        "Prompt-only JSON works for low-risk prototypes but isn't reliable for production; schema-backed structured output / strict tool use is required for pipelines feeding databases, workflows, or audits",
+        "JSON can't be stored in databases",
+        "It's wrong because JSON is slower than XML"
+      ],
+      "correct": 1,
+      "explain": "Prompt-only 'looks like JSON' can drift or break. Production pipelines that feed downstream systems need schema-backed output (structured outputs or strict tool use) for reliability, provenance, and auditability."
+    },
+    {
+      "domain": "Claude Code",
+      "d": 3,
+      "q": "A Claude Code generator session in CI produces a 14-file PR. You want Claude to review it thoroughly. What's the best review architecture, and what's the tempting wrong answer?",
+      "options": [
+        "Feed all 14 files to one review pass in the generator's session (tempting but wrong)",
+        "Split into per-file review passes plus a final integration pass, run in a session isolated from the generator",
+        "Only review the largest file to save cost",
+        "Trust the generator's self-assessment"
+      ],
+      "correct": 1,
+      "explain": "Cramming all 14 files into one pass in the generating session (the tempting answer) risks 'lost in the middle' and self-review bias. Per-file passes plus an integration pass, in an isolated reviewer session, is the robust design."
+    },
+    {
+      "domain": "Tool Design",
+      "d": 2,
+      "q": "Two MCP tools are named 'search_records' and 'find_records' with near-identical descriptions. Claude frequently calls the wrong one. Best fix?",
+      "options": [
+        "Add a prompt telling Claude which to use when",
+        "Rewrite the tool descriptions to be distinct and unambiguous about when each applies (or consolidate them), so the model can route deterministically from the schema",
+        "Increase temperature",
+        "Add a third similar tool for more options"
+      ],
+      "correct": 1,
+      "explain": "Tool misrouting is a design problem, not a prompting problem. Distinct, precise descriptions (or consolidating redundant tools) let Claude route correctly from the tool definitions themselves — the deterministic fix."
+    },
+    {
+      "domain": "Context Mgmt",
+      "d": 2,
+      "q": "A verbose subagent returns 20,000 tokens of reasoning, but the coordinator only needs the final 3 extracted facts. What's the best practice for the handoff?",
+      "options": [
+        "Pass all 20,000 tokens so nothing is lost",
+        "Have the subagent return a structured, distilled result (just the facts in a defined schema), keeping raw reasoning out of the coordinator's context",
+        "Truncate to the first 3,000 tokens arbitrarily",
+        "Store everything in the coordinator's context for safety"
+      ],
+      "correct": 1,
+      "explain": "Handoffs should pass distilled, structured results — not raw reasoning dumps. This keeps the coordinator's context lean and focused, avoiding bloat while preserving the actual needed output."
+    },
+    {
+      "domain": "CI/CD",
+      "d": 2,
+      "q": "You need machine-parseable review findings from claude -p so a downstream script can post inline PR comments. Which flags?",
+      "options": [
+        "--verbose alone",
+        "--output-format json (optionally with --json-schema) so findings are structured and programmatically parseable",
+        "--bare only",
+        "No flags — parse the plain text with regex"
+      ],
+      "correct": 1,
+      "explain": "--output-format json (paired with --json-schema for a guaranteed shape) yields structured findings downstream scripts can reliably parse, instead of brittle regex over free text."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 3,
+      "q": "A developer's agent sometimes terminates prematurely when Claude returns text alongside a tool call. Their loop checks response.content[0].type == 'text' to decide if the agent is finished. Users report incomplete responses on complex queries. What should the developer change?",
+      "options": [
+        "Add an iteration cap of 15 loops to ensure the agent runs long enough for complex queries",
+        "Set tool_choice to 'any' so Claude always calls a tool instead of returning text",
+        "Check the stop_reason field instead of content type — continue when stop_reason is 'tool_use', terminate when 'end_turn'",
+        "Parse the assistant text for completion phrases like 'I have finished' before terminating"
+      ],
+      "correct": 2,
+      "explain": "stop_reason is the only authoritative loop-control signal. Claude can return text alongside tool_use blocks, so content-type checks fail. Iteration caps (A) are a safety net, not primary control. tool_choice 'any' (B) forces tool use even when finished, causing infinite loops. Parsing text (D) is the ambiguous anti-pattern stop_reason exists to eliminate."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 2,
+      "q": "In an agentic loop, after Claude requests a tool with stop_reason 'tool_use', you execute it but the agent seems unable to reason about the result on the next iteration. What's the most likely mistake?",
+      "options": [
+        "The tool result was not appended to the conversation history before the next request",
+        "The temperature is set too high",
+        "You should have used tool_choice: 'any'",
+        "stop_reason should be checked only once at the start"
+      ],
+      "correct": 0,
+      "explain": "Tool results MUST be appended to conversation history as a new message. Miss that and Claude never sees what the tool returned — it has nothing new to act on. This is the single most common place agentic loops break."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 2,
+      "q": "You're building a coordinator that delegates to subagents via the Task tool, but subagents behave as if they know nothing about the research context the coordinator has. Why?",
+      "options": [
+        "Subagents automatically inherit the coordinator's full conversation history, so this is a bug",
+        "Subagents operate with isolated context and do NOT inherit parent context — it must be explicitly provided in the subagent's prompt",
+        "The coordinator's allowedTools is missing 'Bash'",
+        "Subagents share memory only after the first invocation"
+      ],
+      "correct": 1,
+      "explain": "Subagents run with isolated context and don't inherit the coordinator's history automatically. Complete findings must be passed explicitly in each subagent's prompt. (Also, the coordinator's allowedTools must include 'Task' to spawn them.)"
+    },
+    {
+      "domain": "Tool Design",
+      "d": 3,
+      "q": "An MCP tool returns an empty array after a customer lookup. Claude retries 3 times, then escalates to a human. Analysis shows the customer's account simply does not exist. What's the root cause of this wasted effort?",
+      "options": [
+        "The retry limit is too low — increasing to 5 retries would resolve it",
+        "The tool doesn't distinguish between access failures and valid empty results, so the agent treats 'no matches' as a retriable failure",
+        "The escalation threshold is too aggressive",
+        "The system prompt should instruct the agent not to retry customer lookups"
+      ],
+      "correct": 1,
+      "explain": "A valid empty result (query succeeded, found nothing) must look structurally different from an access failure (couldn't reach the data source). Empty result should be isError:false with resultCount:0; access failure isError:true + retryable. Confusing the two causes wasted retries and wrong escalations — tested directly on the exam."
+    },
+    {
+      "domain": "Tool Design",
+      "d": 2,
+      "q": "An MCP tool rejects a refund because it exceeds the £500 policy limit. How should this error be structured so the agent responds correctly?",
+      "options": [
+        "errorCategory: 'transient', isRetryable: true — so the agent retries",
+        "errorCategory: 'business', isRetryable: false — with a description telling the agent to escalate to a human",
+        "A generic 'Operation failed' message",
+        "isError: false, since it's a valid business outcome"
+      ],
+      "correct": 1,
+      "explain": "Policy-limit violations are business errors — they never resolve through retry (isRetryable:false). The structured description should guide the agent to an alternative path (escalation). Marking it transient/retryable wastes calls; a generic message gives the agent nothing to reason with."
+    },
+    {
+      "domain": "Tool Design",
+      "d": 2,
+      "q": "A Claude agent has 18 MCP tools available and frequently selects the wrong one; a synthesis-focused subagent even attempts web searches. What principle best addresses this?",
+      "options": [
+        "Add more detailed system-prompt instructions listing all 18 tools",
+        "Give every agent all tools so nothing is ever unavailable",
+        "Scope each agent's tool set to only what its role needs (e.g., 4-5 tools), preventing cross-specialization misuse",
+        "Increase the model's context window"
+      ],
+      "correct": 2,
+      "explain": "Too many tools (18 vs 4-5) degrades selection reliability by increasing decision complexity, and agents misuse tools outside their specialization. Restrict each agent to role-relevant tools, adding limited scoped cross-role tools only for high-frequency needs."
+    },
+    {
+      "domain": "Claude Code",
+      "d": 2,
+      "q": "You want a custom /review slash command available to every developer automatically when they clone or pull the repo. Where do you put it?",
+      "options": [
+        "~/.claude/commands/review.md in each developer's home directory",
+        "In .claude/commands/ in the project repository (version-controlled)",
+        "In the root CLAUDE.md file",
+        "In a .claude/config.json commands array"
+      ],
+      "correct": 1,
+      "explain": "Project-scoped commands in .claude/commands/ are version-controlled and auto-available to everyone on clone/pull. User-level (~/.claude/commands/) isn't shared. CLAUDE.md is for context, not command definitions. The config.json commands array doesn't exist."
+    },
+    {
+      "domain": "Claude Code",
+      "d": 2,
+      "q": "Test files are spread throughout the codebase (e.g., Button.test.tsx next to Button.tsx) and you want all tests to follow the same conventions regardless of location, applied automatically. Best mechanism?",
+      "options": [
+        ".claude/rules/ files with YAML frontmatter glob patterns (e.g., paths: ['**/*.test.tsx'])",
+        "One big root CLAUDE.md with a section per area, relying on Claude to infer which applies",
+        "A skill per code type with conventions in SKILL.md",
+        "A separate CLAUDE.md in every subdirectory"
+      ],
+      "correct": 0,
+      "explain": "Path-scoped rules in .claude/rules/ with glob patterns load automatically when editing matching files regardless of directory — ideal for scattered test files. CLAUDE.md inference is unreliable; skills need manual invocation; per-directory CLAUDE.md can't handle files spread everywhere."
+    },
+    {
+      "domain": "Claude Code",
+      "d": 2,
+      "q": "A skill produces very verbose codebase-analysis output that pollutes the main conversation context. Which frontmatter option fixes this?",
+      "options": [
+        "allowed-tools",
+        "context: fork — runs the skill in an isolated sub-agent context so its output doesn't pollute the main session",
+        "argument-hint",
+        "description"
+      ],
+      "correct": 1,
+      "explain": "context: fork runs a skill in an isolated sub-agent context, keeping verbose or exploratory output out of the main conversation. allowed-tools restricts tools; argument-hint prompts for parameters; description is metadata."
+    },
+    {
+      "domain": "Claude Code",
+      "d": 3,
+      "q": "A new team member reports they're not getting the coding-standard instructions everyone else follows. The rules were placed in ~/.claude/CLAUDE.md by another dev. What's the diagnosis?",
+      "options": [
+        "The new member needs to restart Claude Code",
+        "User-level (~/.claude/CLAUDE.md) settings aren't shared via version control — the rules must be at project level (.claude/CLAUDE.md or root) to reach teammates",
+        "CLAUDE.md files don't support coding standards",
+        "They need to run /compact"
+      ],
+      "correct": 1,
+      "explain": "User-level CLAUDE.md applies only to that user and isn't shared via version control. Team-wide standards belong at project level so they reach everyone on clone/pull. Use /memory to verify which files are loaded."
+    },
+    {
+      "domain": "Prompt Eng",
+      "d": 2,
+      "q": "An extraction schema marks shipping_date as required, but some source documents genuinely lack a shipping date, and Claude keeps fabricating plausible dates. Best fix?",
+      "options": [
+        "Add a few-shot example telling it to guess conservatively",
+        "Make the field nullable/optional so 'not present' is representable — the model no longer needs to fabricate a value to satisfy a required field",
+        "Lower temperature to 0",
+        "Increase max_tokens"
+      ],
+      "correct": 1,
+      "explain": "Forcing a required field when the info may be absent pushes the model to hallucinate. Nullable/optional fields let 'absent' be a valid output. Retries and temperature changes can't conjure information that isn't in the source."
+    },
+    {
+      "domain": "Prompt Eng",
+      "d": 3,
+      "q": "Your automated Claude Code review in CI posts many false positives, eroding developer trust. Which approach most effectively improves precision?",
+      "options": [
+        "Add 'be conservative' and 'only report high-confidence findings' to the prompt",
+        "Write explicit categorical criteria defining exactly which issues to report (bugs, security) versus skip (minor style), with concrete examples per severity",
+        "Lower the temperature to 0",
+        "Have the model self-rate confidence and hide low-confidence findings"
+      ],
+      "correct": 1,
+      "explain": "Vague instructions like 'be conservative' don't improve precision. Explicit categorical criteria with concrete examples produce consistent classification. Self-reported confidence is poorly calibrated. You can also temporarily disable high-false-positive categories to restore trust while refining them."
+    },
+    {
+      "domain": "Prompt Eng",
+      "d": 2,
+      "q": "You have several extraction tools (one per document type) and the document type is unknown ahead of time, but you must guarantee Claude calls one of them rather than replying with text. Which tool_choice setting?",
+      "options": [
+        "tool_choice: 'auto' with a prompt saying 'please use a tool'",
+        "tool_choice: 'any' — guarantees a tool call while letting the model choose which schema fits",
+        "tool_choice: 'none'",
+        "Forced single tool: {type:'tool', name:'extract_x'}"
+      ],
+      "correct": 1,
+      "explain": "tool_choice 'any' guarantees a tool call but lets the model pick which — right when the document type is unknown. 'auto' can still return text. 'none' forbids tools. Forcing one specific tool is wrong when you don't know the type in advance."
+    },
+    {
+      "domain": "Context Mgmt",
+      "d": 3,
+      "q": "SCENARIO — Customer Support Resolution Agent. Claude's answer quality degrades on important details (amounts, dates, order numbers) buried in the middle of a long conversation. What's the best mitigation?",
+      "options": [
+        "Keep appending everything so nothing is lost",
+        "Extract transactional facts (amounts, dates, order numbers, statuses) into a persistent 'case facts' block included in each prompt, outside the summarized history, and place key info at the start/end",
+        "Lower temperature",
+        "Switch to stdio transport"
+      ],
+      "correct": 1,
+      "explain": "The 'lost in the middle' effect means models attend less reliably to the middle of long inputs. Persisting a structured 'case facts' block in every prompt and positioning key info at the start/end preserves critical values that progressive summarization would otherwise blur."
+    },
+    {
+      "domain": "Context Mgmt",
+      "d": 3,
+      "q": "SCENARIO — Multi-Agent Research System. While Claude synthesises findings from multiple sources, two credible sources report conflicting revenue figures ($4M vs $6M). How should the synthesis handle this?",
+      "options": [
+        "Pick the higher figure since it's more recent",
+        "Average them to $5M",
+        "Annotate the conflict with source attribution for each value rather than arbitrarily selecting one, preserving claim-source mappings",
+        "Drop both figures to avoid confusion"
+      ],
+      "correct": 2,
+      "explain": "Conflicting values from credible sources should be annotated with their source attribution, not silently resolved. Preserving claim-source mappings (and publication dates) lets the reader or coordinator judge — averaging or arbitrary selection destroys the provenance needed to resolve correctly."
+    },
+    {
+      "domain": "Context Mgmt",
+      "d": 2,
+      "q": "During a long codebase-exploration session, the agent starts giving inconsistent answers and referencing 'typical patterns' instead of the specific classes it found earlier. Best countermeasure?",
+      "options": [
+        "Keep going — the model will self-correct",
+        "Have the agent maintain a scratchpad file recording key findings and reference it for later questions, and use /compact when context fills with verbose discovery",
+        "Restart from scratch every 10 minutes",
+        "Raise max_tokens"
+      ],
+      "correct": 1,
+      "explain": "Context degradation in extended sessions makes models drift toward generic 'typical patterns.' Scratchpad files persist key findings across context boundaries, and /compact reduces bloat from verbose discovery — both counteract degradation without losing what was learned."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 3,
+      "q": "An unattended Agent SDK job in production occasionally runs for hours and burns a large bill before anyone notices. Which combination best bounds it?",
+      "options": [
+        "Lower the temperature and shorten the system prompt",
+        "Set max_turns and max_budget_usd so the loop has hard termination ceilings, and read total_cost_usd off each ResultMessage for observability",
+        "Rely on the model deciding to stop when the task is done",
+        "Run it in bypassPermissions so it finishes faster"
+      ],
+      "correct": 1,
+      "explain": "The loop ends when the model returns no tool calls, max_turns is hit, the max_budget_usd ceiling trips, or context forces compaction. For unattended work you want the explicit ceilings plus cost telemetry — hoping the model stops on its own is not a control."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 3,
+      "q": "A long orchestrator session gets progressively more expensive per turn even though individual tasks stay the same size. What explains this, and what's the mitigation?",
+      "options": [
+        "The model degrades over time and needs a restart to restore pricing",
+        "Every call carries the full conversation history plus all subagent descriptions, so cost grows with session length — cap it with max_turns, cheaper models for subagents, and session resets",
+        "Subagent transcripts are billed twice by design",
+        "Token prices increase during long sessions"
+      ],
+      "correct": 1,
+      "explain": "The orchestrator re-sends accumulated history and all subagent descriptions on every call, so cost compounds with session length. Mitigate with turn caps, routing subagents to cheaper models, and resetting the session once context stops earning its keep."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 2,
+      "q": "A subagent was partway through a long analysis when the orchestrator's context was compacted. You need to continue that subagent's work rather than restart it. What's true?",
+      "options": [
+        "The subagent's work is lost — compaction discards subagent state",
+        "Subagent transcripts persist independently of the main conversation and survive its compaction; the Agent tool result carries an agentId you can resume against",
+        "You must re-run the whole orchestration from the first turn",
+        "Only the final summary survives, never the working transcript"
+      ],
+      "correct": 1,
+      "explain": "Subagent transcripts are stored separately and outlive main-conversation compaction. The Agent tool result includes an agentId — resume the session and reference it to pick up where the subagent stopped (transcripts are cleaned up after cleanupPeriodDays, 30 by default)."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 2,
+      "q": "Why is plan mode implemented using a separate read-only Plan subagent rather than letting the main session explore directly, and why does ExitPlanMode require permission?",
+      "options": [
+        "Purely a performance optimisation with no architectural significance",
+        "The read-only Plan subagent handles research while preventing infinite subagent nesting, and requiring permission on ExitPlanMode makes the planning-to-execution transition an explicit, enforced confirmation step",
+        "Because plan mode runs on a different API endpoint",
+        "To allow plan mode to write files safely"
+      ],
+      "correct": 1,
+      "explain": "The read-only Plan subagent both isolates research and avoids the nesting problem that would arise if the main session spawned subagents that spawn more. Gating ExitPlanMode behind permission means moving from planning to editing is a deliberate, permission-enforced boundary — not something the model can slip past."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 2,
+      "q": "A job needs hundreds of coordinated agents rather than a handful of delegations per turn. Using the Task tool from the orchestrator becomes unmanageable. What's the appropriate mechanism?",
+      "options": [
+        "Raise max_turns and keep using Task delegation",
+        "Use the TypeScript SDK's Workflow tool, which moves orchestration into a script running outside the conversation context",
+        "Give each subagent the Task tool so they can subdivide further",
+        "Run hundreds of separate CLI processes and merge output manually"
+      ],
+      "correct": 1,
+      "explain": "Task delegation suits a few sub-conversations per turn. At the scale of dozens-to-hundreds of coordinated agents, the Workflow tool lifts orchestration out of the conversation context entirely — subagents still can't nest, so pushing Task down to them isn't an option."
+    },
+    {
+      "domain": "Claude Code",
+      "d": 2,
+      "q": "A team sets defaultMode: 'auto' in .claude/settings.json so everyone gets auto mode on clone. It has no effect for anyone. What's the explanation?",
+      "options": [
+        "auto mode was removed from Claude Code",
+        "auto mode is ignored when set in project or local settings — it must come from user or managed settings",
+        "The key should be permissionMode, not defaultMode",
+        "They need to restart their machines for it to apply"
+      ],
+      "correct": 1,
+      "explain": "As of recent versions, auto mode is deliberately ignored from project or local settings; it only takes effect from user or managed settings. This trips up teams trying to standardise it via committed project config."
+    },
+    {
+      "domain": "Claude Code",
+      "d": 2,
+      "q": "You want a hard definition-of-done gate: Claude must not end its turn until the test suite passes. Which hook and mechanism?",
+      "options": [
+        "A PostToolUse hook that runs the tests and logs failures",
+        "A Stop hook that runs the tests and exits 2 (or returns decision 'block') to refuse the turn ending and send control back to the model with a reason",
+        "A PreToolUse hook matched to Bash",
+        "A SessionEnd hook that reports the result afterwards"
+      ],
+      "correct": 1,
+      "explain": "The Stop event fires when the model finishes responding and is one of the blocking-capable events: exit 2 (or decision 'block') prevents the turn from ending and feeds the reason back, forcing Claude to keep working. PostToolUse can only observe; SessionEnd is far too late."
+    },
+    {
+      "domain": "Claude Code",
+      "d": 2,
+      "q": "A developer runs `claude` from /tmp while working on a repo elsewhere and reports that none of the project's MCP servers or project settings load. What's the cause?",
+      "options": [
+        "A corrupt ~/.claude.json that needs deleting",
+        "Project-scope configuration resolves relative to the working directory — Claude Code must be launched from the repo root or a subdirectory for .mcp.json and project settings to load",
+        "MCP servers require an explicit --scope flag on every session",
+        "Project settings only load after the first tool call"
+      ],
+      "correct": 1,
+      "explain": "Project-scope discovery is directory-based. Launch from outside the repo and .mcp.json plus .claude/settings.json simply aren't found, even though they exist on disk. This is a common 'it works for everyone but me' diagnosis."
+    },
+    {
+      "domain": "Claude Code",
+      "d": 2,
+      "q": "You want to trial a new hook on your own machine before proposing it to the team, without affecting teammates or committing anything. Where does it go?",
+      "options": [
+        ".claude/settings.json in the project so it's testable in context",
+        "~/.claude/settings.json so it applies to all your projects",
+        " .claude/settings.local.json — project-scoped to this repo, higher precedence than project settings, and gitignored so teammates are unaffected",
+        "managed-settings.json so it's enforced consistently"
+      ],
+      "correct": 2,
+      "explain": "settings.local.json is the experimentation layer: it sits above project settings in precedence, stays scoped to this repo, and Claude Code gitignores it automatically. Project settings would push the untested hook onto teammates; managed settings is for enforced org policy."
+    },
+    {
+      "domain": "Structured Output",
+      "d": 2,
+      "q": "A programmatic consumer needs machine-readable results from an Agent SDK run, not prose. What's the correct mechanism?",
+      "options": [
+        "Ask the model in the prompt to end with a JSON block and regex it out of the text",
+        "Pass a JSON Schema as outputFormat and read the structured_output field from the result",
+        "Set temperature to 0 so the prose format becomes predictable",
+        "Parse the ResultMessage's cost fields"
+      ],
+      "correct": 1,
+      "explain": "The SDK supports outputFormat with a JSON Schema, exposing the parsed result as structured_output. Prompting for a JSON block and regexing the prose is the brittle prototype approach that breaks under drift."
+    },
+    {
+      "domain": "Structured Output",
+      "d": 2,
+      "q": "A Claude extraction pipeline validates every tool_use response against its JSON Schema and all responses pass, yet downstream reports contain wrong figures. What kind of validation is missing?",
+      "options": [
+        "Nothing — schema validation is sufficient by definition",
+        "Semantic validation: the schema confirms shape and types, not that the source actually supports the values. Add business-rule checks (cross-field maths, provenance) and route mismatches to review",
+        "Stricter type coercion in the schema",
+        "A larger model"
+      ],
+      "correct": 1,
+      "explain": "Structure and semantics are different guarantees. A schema can confirm total is a number; it cannot confirm the document said that number or that line items sum to it. Production pipelines need business-rule validation layered on top of schema validation."
+    },
+    {
+      "domain": "Prompt Eng",
+      "d": 2,
+      "q": "You must extract from exactly one known document type and want to eliminate any chance the model picks a different tool or replies conversationally. Which tool_choice setting?",
+      "options": [
+        "tool_choice: 'auto' with a firmly worded prompt",
+        "tool_choice: 'any' so it must call some tool",
+        "A forced single tool: {type: 'tool', name: 'extract_invoice'} — removing both the text-response path and the tool-selection decision",
+        "tool_choice: 'none' with schema instructions in the prompt"
+      ],
+      "correct": 2,
+      "explain": "When the type is known, forcing the specific tool removes two failure modes at once: conversational replies and wrong-tool selection. 'any' is right only when the type is unknown and the model must choose; 'auto' can still emit text."
+    },
+    {
+      "domain": "Prompt Eng",
+      "d": 2,
+      "q": "A Claude reviewer agent's findings vary run to run on identical input — sometimes flagging a pattern, sometimes not. Which change most improves consistency?",
+      "options": [
+        "Run it three times and report only findings appearing twice",
+        "Replace subjective instructions with explicit categorical criteria and severity definitions, with concrete examples of what belongs in each category",
+        "Increase max_tokens so it has room to be thorough",
+        "Raise temperature so it explores more possibilities"
+      ],
+      "correct": 1,
+      "explain": "Inconsistency usually traces to underspecified criteria, not sampling. Explicit categories with worked examples give the model a deterministic rubric. Consensus-of-three (A) suppresses genuine intermittently-caught bugs rather than fixing the rubric."
+    },
+    {
+      "domain": "Tool Design",
+      "d": 2,
+      "q": "After connecting a database MCP server, sessions start hitting context limits quickly and Claude warns about oversized tool output. What's the right response?",
+      "options": [
+        "Increase the context window and continue",
+        "Narrow what the tool returns (specific fields, row limits, pagination) — a chatty server burns the context you needed for the task, and output is capped anyway",
+        "Disable the warning",
+        "Move the server from project to user scope"
+      ],
+      "correct": 1,
+      "explain": "MCP output is warned about around 10,000 tokens and hard-capped by default near 25,000. Beyond the cap you lose data; below it you still lose working context. The fix is tool-side: return scoped fields and paginate rather than dumping wide result sets."
+    },
+    {
+      "domain": "Tool Design",
+      "d": 2,
+      "q": "A team's .mcp.json is committed to a public repo and includes an Authorization header for a remote server. What's the correct remediation?",
+      "options": [
+        "Leave it — .mcp.json is only read locally",
+        "Rotate the leaked credential, then keep secrets out of the committed file by using environment-variable expansion in .mcp.json, or move the sensitive server to local/user scope",
+        "Rename the file to .mcp.local.json",
+        "Encrypt the repository"
+      ],
+      "correct": 1,
+      "explain": "A committed .mcp.json is as public as the repo. Rotate first — the secret is already exposed — then reference credentials via env-var expansion, or keep genuinely sensitive servers in local/user scope which live in ~/.claude.json and are never committed."
+    },
+    {
+      "domain": "Tool Design",
+      "d": 2,
+      "q": "Connection errors appear on a remote MCP server configured with --transport sse. What's the current guidance?",
+      "options": [
+        "Add retry logic around the SSE connection",
+        "SSE is deprecated in favour of streamable HTTP — switch to --transport http",
+        "Downgrade to stdio and run the server locally",
+        "Increase MCP_TOOL_TIMEOUT and retry"
+      ],
+      "correct": 1,
+      "explain": "SSE has been deprecated in favour of streamable HTTP for remote MCP servers. Switching the transport to http is the fix rather than papering over connection failures with retries."
+    },
+    {
+      "domain": "Context Mgmt",
+      "d": 3,
+      "q": "After automatic compaction in a long Agent SDK session, an agent starts violating project conventions it had been following. Why does this happen and what handles it?",
+      "options": [
+        "Compaction corrupts the system prompt permanently",
+        "Compaction summarises older messages and can blur instruction detail — the SDK re-reads CLAUDE.md instruction files after compacting, so durable conventions belong in CLAUDE.md rather than only in an early conversational turn",
+        "Conventions must be repeated in every user message",
+        "Compaction should be disabled in all production agents"
+      ],
+      "correct": 1,
+      "explain": "Instructions given once in an early turn can be summarised away. Because CLAUDE.md is re-read after compaction, durable conventions survive there — and anything that must never be violated belongs in a hook, not in prose at all."
+    },
+    {
+      "domain": "Context Mgmt",
+      "d": 2,
+      "q": "A coordinator must decide what a research subagent returns. The subagent produced 25,000 tokens of exploration to reach four conclusions. What should cross the boundary?",
+      "options": [
+        "The full transcript, so the coordinator can audit the reasoning",
+        "Only a distilled structured result — the four conclusions in a defined schema with source attribution — since the raw transcript persists separately if it's ever needed for audit",
+        "A truncated first 5,000 tokens",
+        "A model-written prose summary with no schema"
+      ],
+      "correct": 1,
+      "explain": "Handoffs should pass distilled, schema-shaped results, keeping the coordinator's context lean. The audit trail isn't lost: subagent transcripts persist independently and can be resumed or inspected via their agentId."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 2,
+      "q": "A Claude research agent must fetch three independent data sources before it can synthesise. Latency is dominated by round trips. What's the correct architectural response?",
+      "options": [
+        "Spawn three subagents so each fetch runs in its own context",
+        "Configure the agentic loop so Claude emits multiple tool calls within a single response turn, letting the independent fetches execute in parallel before results are returned together",
+        "Increase max_turns so the sequential fetches have room to finish",
+        "Merge the three sources into one larger tool that fetches everything"
+      ],
+      "correct": 1,
+      "explain": "Independent subtasks with no data dependency between them should be issued as multiple tool calls in one response turn, so they execute in parallel and collapse three round trips into one. Subagents add spawn overhead and context transfer for what is really a batching problem."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 2,
+      "q": "Your loop executes tool calls one at a time even when Claude returns several tool_use blocks in a single response. What's the consequence and the fix?",
+      "options": [
+        "No consequence — tools must always run sequentially",
+        "You lose the parallelism Claude already offered: execute all tool_use blocks from that turn concurrently and return all tool_result blocks together in the next message",
+        "You should reject multi-tool responses and ask Claude to pick one",
+        "Set tool_choice to 'any' to force single-tool responses"
+      ],
+      "correct": 1,
+      "explain": "When Claude emits multiple tool_use blocks in one turn it has already determined those calls are independent. Running them serially throws away the latency win. Execute them concurrently and return all corresponding tool_result blocks in the same follow-up message."
+    },
+    {
+      "domain": "Multi-Agent",
+      "d": 2,
+      "q": "You're writing delegation instructions for a research subagent. Which approach best balances adaptive behaviour with coordinator visibility?",
+      "options": [
+        "Procedural: enumerate the exact tool calls and order the subagent must follow",
+        "Goal-oriented: state the outcome and success criteria, with the required output schema so the coordinator retains visibility, letting the subagent adapt its route",
+        "Give only the topic with no criteria, maximising autonomy",
+        "Alternate between goal-oriented and procedural at random to hedge"
+      ],
+      "correct": 1,
+      "explain": "Goal-oriented delegation lets the subagent adapt as it discovers information, while a required output contract preserves the coordinator's visibility and control. Rigid procedural scripts break the moment reality differs from the assumed path; unconstrained autonomy loses control entirely."
+    },
+    {
+      "domain": "Multi-Agent",
+      "d": 3,
+      "q": "A coordinator delegates with the instruction 'search the web, then read the top three results, then summarise'. Subagents frequently return thin findings when the top results are irrelevant. What's the flaw?",
+      "options": [
+        "The subagent needs a larger context window",
+        "The delegation is procedural — it prescribes a fixed sequence rather than the goal, so the subagent follows the script even when intermediate findings show it isn't working",
+        "Web search should be removed from the subagent's tools",
+        "The coordinator should pass its entire conversation history"
+      ],
+      "correct": 1,
+      "explain": "A fixed procedural sequence executes regardless of intermediate findings. A goal-oriented brief ('establish X with credible sources; if initial results are irrelevant, reformulate') lets the subagent adapt while still reporting against defined criteria."
+    },
+    {
+      "domain": "Multi-Agent",
+      "d": 3,
+      "q": "You define a subagent in the Agent SDK, but the coordinator never spawns it — it attempts the work itself instead. Nothing errors. What's the most likely misconfiguration?",
+      "options": [
+        "The subagent's system prompt is too short",
+        "The Task/Agent tool is missing from the coordinator's allowedTools, so it has no mechanism to delegate",
+        "The subagent needs bypassPermissions",
+        "Subagent definitions must be registered in CLAUDE.md"
+      ],
+      "correct": 1,
+      "explain": "Coordinator-to-subagent wiring is explicit: without Task (Agent) in the coordinator's allowed tool list there is no delegation mechanism, so it silently does the work inline. Diagnosing spawn failures means checking tool permissions, AgentDefinition parameters, and that wiring."
+    },
+    {
+      "domain": "Multi-Agent",
+      "d": 2,
+      "q": "A subagent spawns but immediately fails every task, reporting it cannot access the files it needs. The coordinator works fine. Where do you look first?",
+      "options": [
+        "The coordinator's system prompt",
+        "The subagent's AgentDefinition — its tool restrictions likely omit the read tools (Read/Grep/Glob) its role requires",
+        "The MCP server transport setting",
+        "The model's temperature"
+      ],
+      "correct": 1,
+      "explain": "Subagents get their own tool access, scoped by their definition. A role that must inspect files needs the read tools explicitly granted. Diagnosis order for spawn/execution failures: missing tool permissions, then AgentDefinition parameters, then coordinator wiring."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 2,
+      "q": "A Claude research pipeline is built as a fixed 5-step sequence. When early findings reveal an unexpected subtopic, the pipeline ignores it and produces incomplete coverage. What design change addresses this?",
+      "options": [
+        "Add more steps to the fixed sequence to anticipate every subtopic",
+        "Decompose into dynamically generated subtasks that adapt as new information is discovered, rather than executing a predetermined sequence regardless of intermediate findings",
+        "Run the fixed sequence three times and merge",
+        "Increase each step's max_tokens"
+      ],
+      "correct": 1,
+      "explain": "A predetermined sequence can't respond to what it learns. Dynamic decomposition lets the coordinator generate new subtasks from intermediate findings — the mechanism that produces complete coverage when the shape of the topic isn't known upfront."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 2,
+      "q": "For a task where the required subtasks genuinely cannot be known before exploration begins, which coordinator design is appropriate?",
+      "options": [
+        "Pre-generate the full subtask list at turn one so cost is predictable",
+        "Run an initial scoping pass, then generate subtasks from what it finds, re-evaluating coverage as results return",
+        "Delegate everything to a single subagent and let it decide",
+        "Use a fixed sequence and accept incomplete coverage"
+      ],
+      "correct": 1,
+      "explain": "Explore-then-decompose is the pattern: an initial pass establishes the real shape of the problem, subtasks are generated from actual findings, and coverage is re-evaluated as results arrive. Pre-generating a full plan before exploring bakes in assumptions."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 1,
+      "q": "Three independent documents each need the same analysis, and results are combined at the end. Which orchestration pattern fits, and which would be wrong?",
+      "options": [
+        "Sequential pipeline — each document's analysis informs the next",
+        "Parallel execution under a coordinator, since the tasks are independent; a sequential pipeline would serialise work that has no dependencies",
+        "A single agent processing all three in one context, to preserve continuity",
+        "Nested subagents, one spawning the next"
+      ],
+      "correct": 1,
+      "explain": "Pattern selection follows the dependency graph. Independent tasks with a merge step map to coordinator-managed parallel execution. Sequential pipelines are for genuine stage dependencies, where each stage consumes the previous stage's output."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 2,
+      "q": "A workflow must extract data, then validate it against the extracted values, then generate a report from the validated data. Which pattern, and why not parallel?",
+      "options": [
+        "Parallel execution — it's always faster",
+        "A sequential pipeline, because each stage consumes the previous stage's output; parallelising would run validation before the data it must validate exists",
+        "Coordinator-worker with three independent workers",
+        "A single tool call doing all three"
+      ],
+      "correct": 1,
+      "explain": "Each stage strictly depends on the prior stage's output, so the stages must be sequential. Parallel execution only helps where tasks are genuinely independent — forcing it here means validating data that hasn't been produced."
+    },
+    {
+      "domain": "Claude Code",
+      "d": 2,
+      "q": "Claude Code generates tests that pass but assert almost nothing meaningful (checking that a function returns 'defined'). How do you raise generation quality?",
+      "options": [
+        "Ask for more tests per file",
+        "Supply existing test files as context to establish fixture conventions, and specify criteria distinguishing meaningful behavioural assertions from trivial ones",
+        "Increase max_tokens so tests can be longer",
+        "Run test generation in bypassPermissions mode"
+      ],
+      "correct": 1,
+      "explain": "Test quality comes from concrete context and explicit criteria: existing tests show the fixture and naming conventions to follow, and stated criteria define what a meaningful behavioural assertion is versus a trivial existence check. Volume without criteria produces more trivial tests."
+    },
+    {
+      "domain": "Claude Code",
+      "d": 2,
+      "q": "Generated tests are behaviourally reasonable but don't compile — they invent fixture helpers and setup patterns your suite doesn't have. Best fix?",
+      "options": [
+        "Post-process the generated tests with a script that rewrites imports",
+        "Provide representative existing test files as context so Claude follows your actual fixture conventions and helpers rather than inventing plausible ones",
+        "Tell it in the prompt to 'use correct fixtures'",
+        "Switch to a larger model"
+      ],
+      "correct": 1,
+      "explain": "Without seeing your conventions, the model produces plausible-looking fixtures from general patterns. Concrete example files are the reliable way to transfer convention. A prompt instruction to 'use correct fixtures' doesn't tell it what yours are."
+    },
+    {
+      "domain": "CI/CD",
+      "d": 2,
+      "q": "A single Claude review prompt asks for security issues, business-logic bugs, and API design feedback at once. Recall on each concern is mediocre. What's the fix?",
+      "options": [
+        "Combine them into one longer, more emphatic prompt",
+        "Design specialised review passes that separate the concerns, each with its own focused prompt and dedicated few-shot examples, avoiding recall trade-offs between competing concerns",
+        "Only review for security, as it matters most",
+        "Raise temperature so it considers more angles"
+      ],
+      "correct": 1,
+      "explain": "Competing concerns in one prompt force recall trade-offs — attention splits and each dimension suffers. Separate passes, each with concern-specific few-shot examples, let every dimension get full attention, at the cost of more calls."
+    },
+    {
+      "domain": "CI/CD",
+      "d": 3,
+      "q": "You've split your Claude Code CI reviews into security, business-logic, and API-design passes. Each pass now needs to reach production quality. What most improves each pass individually?",
+      "options": [
+        "Using the same generic few-shot examples across all three passes",
+        "Giving each pass dedicated few-shot examples drawn from that specific concern, plus explicit inclusion and exclusion boundaries for that category",
+        "Increasing max_tokens on all three",
+        "Running each pass twice and taking the union"
+      ],
+      "correct": 1,
+      "explain": "The value of separating passes is realised only if each gets concern-specific examples and explicit inclusion/exclusion boundaries. Shared generic examples reintroduce the ambiguity that splitting was meant to remove."
+    },
+    {
+      "domain": "Structured Output",
+      "d": 2,
+      "q": "In a Claude extraction pipeline, dates arrive in mixed forms — '3/4/26', 'March 4 2026', '2026-03-04' — breaking downstream parsing. Schema validation passes each time. Best fix?",
+      "options": [
+        "Add a downstream regex normaliser for every known format",
+        "Include explicit format normalisation instructions in the extraction prompt (e.g. always ISO 8601 YYYY-MM-DD) alongside the schema, so output is consistent at source",
+        "Make the date field a plain string and handle it later",
+        "Raise temperature for more format variety"
+      ],
+      "correct": 1,
+      "explain": "A schema typing a field as string accepts any of those forms. Format normalisation belongs in the extraction instructions — specify the canonical representation (ISO 8601) so consistency is produced at source rather than repaired downstream forever."
+    },
+    {
+      "domain": "Structured Output",
+      "d": 2,
+      "q": "A status field should only ever be one of pending, shipped, delivered, cancelled, but Claude sometimes returns 'in transit' or 'on the way'. Which schema change fixes this?",
+      "options": [
+        "Describe the allowed values in the field's description text",
+        "Define the field as an enum with the four permitted values, so anything outside the set is invalid rather than merely discouraged",
+        "Make the field nullable so odd values can be dropped",
+        "Add a few-shot example for each status"
+      ],
+      "correct": 1,
+      "explain": "Enum definitions constrain a field to a fixed value set at the schema level, making out-of-set values structurally invalid. A description is only a hint; an enum is enforcement — and it pairs well with nullable when the status may genuinely be unknown."
+    },
+    {
+      "domain": "Context Mgmt",
+      "d": 3,
+      "q": "SCENARIO — Customer Support Resolution Agent. A conversation runs long and the full history no longer fits Claude's context. Which retention strategy preserves answer quality best?",
+      "options": [
+        "Truncate to the most recent N messages and discard the rest",
+        "Combine a sliding window of recent turns with a structured state object holding durable facts (order IDs, amounts, entitlements) and selective retention of decisions",
+        "Summarise everything into one paragraph and drop all detail",
+        "Start a fresh session on every long conversation"
+      ],
+      "correct": 1,
+      "explain": "A sliding window alone silently drops facts established early. Pairing it with a structured state object for durable values plus selective retention of decisions keeps what matters addressable while bounding token growth — naive truncation loses exactly the transactional details that matter."
+    },
+    {
+      "domain": "Context Mgmt",
+      "d": 1,
+      "q": "Why is a structured state object preferable to a prose running summary for tracking a Claude agent's accumulated facts across compaction cycles?",
+      "options": [
+        "It uses more tokens, giving the model more to work with",
+        "It keeps values addressable and unambiguous — fields can be read, updated, and validated individually, whereas prose summaries blur specifics and degrade with each re-summarisation",
+        "Prose summaries cannot be included in prompts",
+        "Structured state removes the need for any summarisation"
+      ],
+      "correct": 1,
+      "explain": "Each re-summarisation of prose loses precision, and specific values blur into generalities. A structured state object holds fields that can be updated and validated individually, so critical values survive repeated compaction cycles intact."
+    }
+  ]
+}

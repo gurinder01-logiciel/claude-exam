@@ -1,0 +1,31 @@
+{
+  "key": "mock",
+  "name": "Full Mock Exam",
+  "desc": "The real thing: 60 questions in 120 minutes, drawn fresh from every question bank each sitting. Pass mark 720/1000.",
+  "ready": true,
+  "pool": true,
+  "count": 60,
+  "blueprint": [
+    {
+      "label": "Agentic Architecture & Orchestration",
+      "pct": 27
+    },
+    {
+      "label": "Claude Code Config & Workflows",
+      "pct": 20
+    },
+    {
+      "label": "Prompt Engineering & Structured Output",
+      "pct": 20
+    },
+    {
+      "label": "Tool Design & MCP Integration",
+      "pct": 18
+    },
+    {
+      "label": "Context Management & Reliability",
+      "pct": 15
+    }
+  ],
+  "questions": []
+}

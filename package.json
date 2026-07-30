@@ -1,0 +1,10 @@
+{
+  "name": "ccaf-exam-simulator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CCAR-F (Claude Certified Architect - Foundations) exam simulator with a team leaderboard",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  }
+}
