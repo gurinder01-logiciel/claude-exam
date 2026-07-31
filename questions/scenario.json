@@ -82,7 +82,7 @@
         "Cap the reviewer at the five largest changed files in each PR so it has room to reason carefully and thoroughly about each one"
       ],
       "correct": 1,
-      "explain": "False positives drop when 'issue' is defined categorically with severities the reviewer must map to, and when previous findings are supplied so it stops re-reporting them. Temperature 0 is the tempting near-miss: it makes output reproducible, but a confidently wrong criterion just gets applied consistently, so the same false positives repeat."
+      "explain": "False positives drop when 'issue' is defined categorically with severities the reviewer must map to, and when previous findings are supplied so it stops re-reporting them. Temperature 0 is the tempting near-miss, and it fails twice over: the API docs state that even at temperature 0 results are not fully deterministic, and even if they were, a confidently wrong criterion would just be applied consistently."
     },
     {
       "domain": "Multi-Agent",
