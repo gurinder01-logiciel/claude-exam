@@ -3,6 +3,7 @@
   "name": "Scenario Practice",
   "desc": "Production scenarios and exam-trap drills across all five domains — the 'best decision' items that decide pass or fail",
   "ready": true,
+  "requires": "basic",
   "count": 60,
   "blueprint": [
     {

@@ -1,190 +1,158 @@
 # CCAR-F Exam Simulator — team edition
 
-A full mock of the **Claude Certified Architect – Foundations (CCAR-F)** exam:
-60 scenario questions, 120 minutes, pausable timer, and a shared team leaderboard.
+A self-hosted mock of the **Claude Certified Architect – Foundations (CCAR-F)**
+exam: 60 scenario questions in 120 minutes, with a shared team leaderboard.
 
-- **138-question bank**, all Claude-anchored (Claude Code, MCP, Agent SDK, CI/CD)
-- Papers follow a **difficulty ramp** — 15 easy, then 20 medium, then 25 hard
-- Every sitting produces a **different paper**
-- Right-click an option to cross it out as "definitely not this" — it stays crossed in review
-- **Instant feedback** (optional toggle, off by default): marks each pick right or
-  wrong immediately *without* revealing the correct option. Your first pick is
-  final in this mode, so the score stays meaningful
-- Results give a **score out of 1000**, domain breakdown, and per-question explanations
+- **138-question bank**, every question anchored to Claude — Claude Code, MCP,
+  the Agent SDK, the Messages and Batches APIs
+- Papers follow a **difficulty ramp** (15 easy → 20 medium → 25 hard) and are
+  drawn fresh each sitting, so there's nothing to memorise
+- **120-minute pausable timer** at the real exam's pace of 2 min/question
+- **Right-click to cross out** an option as "definitely not this" — it stays
+  crossed through the review
+- **Instant feedback** (optional): marks each pick right or wrong *without*
+  revealing the correct answer
+- **Score out of 1000** with a domain breakdown and per-question explanations
+- **Team leaderboard** showing each person's best score
+- **Levels unlock in order** — Basic first, then Scenario Practice, then the Full
+  Mock Exam, so nobody skips the foundations
+
+Full reference: **[DOCS.md](DOCS.md)**
 
 ---
 
 ## Deploy to Vercel
 
-### 1. Push to a Git repo
+### 1. Check the folder structure
+
+This matters — a flattened folder is the most common cause of a broken deploy:
+
+```
+.
+├── index.html
+├── questions/
+│   ├── index.json
+│   ├── mock.json
+│   ├── basic.json
+│   └── scenario.json
+├── api/
+│   └── scores.js
+├── package.json
+├── .gitignore
+├── README.md
+└── DOCS.md
+```
+
+`api/scores.js` must be inside `api/`, and the four JSON files inside
+`questions/`. Verify:
 
 ```bash
-cd ccaf-app
-git init
-git add .
+ls questions api
+```
+
+### 2. Push to GitHub
+
+```bash
+git init                       # skip if already a repo
+git add -A
 git commit -m "CCAR-F exam simulator"
 git branch -M main
 git remote add origin https://github.com/<you>/<repo>.git
 git push -u origin main
 ```
 
-### 2. Import into Vercel
+### 3. Import into Vercel
 
 1. Go to [vercel.com/new](https://vercel.com/new) and import the repo.
-2. Framework preset: **Other**. Leave build command and output directory empty.
+2. **Framework preset: Other.** Leave build command and output directory empty —
+   there's no build step.
 3. Click **Deploy**.
 
-It will deploy and work immediately — but the leaderboard will be
-*offline (this browser only)* until you finish step 3.
+The app is live at this point, but the leaderboard will say
+*"offline (this browser only)"* until step 4.
 
-### 3. Add Redis for the shared leaderboard
+> Prefer the CLI? `npm i -g vercel && vercel` from the project folder does the
+> same thing, and `vercel --prod` promotes it to production.
+
+### 4. Add Redis for the shared leaderboard
 
 The leaderboard needs storage shared across everyone's browsers.
 
-1. In your Vercel project → **Storage** → **Create Database** → pick the
-   **Upstash for Redis** integration (free tier is plenty).
-2. Connect it to this project. Vercel injects these env vars automatically:
+1. In your Vercel project → **Storage** → **Create Database**
+2. Choose the **Upstash for Redis** integration (free tier is plenty)
+3. Connect it to this project. Vercel injects these automatically:
    - `KV_REST_API_URL`
    - `KV_REST_API_TOKEN`
-3. **Redeploy** (Deployments → ⋯ → Redeploy) so the function picks them up.
+4. **Redeploy** — Deployments → ⋯ → Redeploy. Env vars are only picked up by a
+   new deployment.
 
-That's it. The sidebar will now say *"Best score per person"* without the
-"offline" note, and everyone's scores will be visible to the whole team.
+Check it worked: the sidebar heading should read *"Best score per person · pass
+mark 720"* with **no** "offline" note. Or hit `https://<your-app>/api/scores` —
+it should return `{"scores":[]}` rather than an error.
 
-> Setting the vars manually instead? Any Redis with an Upstash-compatible REST
-> endpoint works — just set the same two variable names.
+### 5. Share with the team
 
-### 4. Share with the team
+Send the deployment URL. Each person types their name once (remembered in their
+browser), picks a level, and their best score appears on the leaderboard.
 
-Send them the deployment URL. Each person types their name once (remembered in
-their browser), picks a level, and their best score appears on the leaderboard.
-
----
-
-## How the leaderboard works
-
-- Every finished exam is posted to `/api/scores`.
-- The sidebar shows the **best score per person**, ranked, with the level they took.
-- Your own row is highlighted.
-- If the API is unreachable, the app falls back to a local-only board and keeps
-  working — it never blocks the exam.
-
-## Levels
-
-| Level | Bank | Paper | Time |
-|---|---|---|---|
-| Full Mock Exam | 138 | 60 | 120 min |
-| Basic | 60 | 60 | 120 min |
-| Scenario Practice | 78 | 60 | 120 min |
-
-Basic includes the 12 official sample questions published in the CCAR-F Exam Guide.
+**Note:** the leaderboard has no authentication — anyone can submit any name and
+score. That's fine for team practice, but don't treat it as a source of truth for
+reporting.
 
 ---
 
 ## Run it locally
 
-The question banks are fetched over HTTP, so **opening `index.html` straight from
-disk will not work** — it has to be served.
-
-### Option A — full app, including the leaderboard (recommended)
+The question banks are fetched over HTTP, so **opening `index.html` from disk
+won't work**.
 
 ```bash
-npm i -g vercel        # once
-cd ccaf-app
-cp .env.example .env.local   # then paste your real Upstash values into it
+npm i -g vercel
+cp .env.example .env.local     # paste your real Upstash values
 vercel dev
 ```
 
 `vercel dev` serves the static files *and* runs `api/scores.js`, reading
-`.env.local` automatically. Open the URL it prints (usually
-`http://localhost:3000`).
+`.env.local` automatically.
 
-To get the two values: Vercel project → **Storage** → your Upstash database →
-**.env.local** tab (or the Upstash console → REST API). They look like:
-
-```
-KV_REST_API_URL=https://xxxx.upstash.io
-KV_REST_API_TOKEN=AX...
-```
-
-`.env.local` is gitignored — don't commit it.
-
-### Option B — questions only, no leaderboard
-
-```bash
-cd ccaf-app
-python3 -m http.server 3000
-```
-
-The exam works fully; the sidebar shows *"offline (this browser only)"* because
-there's no `/api/scores` in a plain static server. Fine when you're only editing
-questions.
+Only editing questions? `python3 -m http.server 3000` is enough — the exam works,
+the leaderboard just shows "offline".
 
 ---
 
-## Adding or editing questions
+## Adding questions
 
-Each level is its own JSON file, so you never have to touch `index.html`:
-
-```
-questions/
-  index.json      load order — add your new level's name here
-  mock.json       pool: true, draws from every other bank
-  basic.json      60 questions
-  scenario.json   78 questions
-```
-
-A level file looks like:
+Each level is its own JSON file, so you never touch `index.html`:
 
 ```json
 {
-  "key": "scenario",
-  "name": "Scenario Practice",
-  "desc": "Production scenarios and exam-trap drills…",
-  "ready": true,
-  "count": 60,
-  "blueprint": [{ "label": "Claude Code Config & Workflows", "pct": 17 }],
-  "questions": [
-    {
-      "domain": "CI/CD",
-      "d": 3,
-      "q": "A CI job runs claude -p …",
-      "options": ["…", "…", "…", "…"],
-      "correct": 1,
-      "explain": "Why this answer is right and the others aren't."
-    }
-  ]
+  "domain": "CI/CD",
+  "d": 3,
+  "q": "A CI job runs claude -p …",
+  "options": ["…", "…", "…", "…"],
+  "correct": 1,
+  "explain": "Why this is right and why the tempting distractor isn't."
 }
 ```
 
-Field notes:
+- `d` is difficulty: `1` easy, `2` medium, `3` hard — it drives the ramp, so tag
+  honestly
+- `correct` is the index into `options` as written; options are shuffled at runtime
 
-- **`d`** — difficulty: `1` easy, `2` medium, `3` hard. Papers are built as a ramp
-  (15 easy → 20 medium → 25 hard). If a tier is short, the shortfall is backfilled
-  from the nearest tier with spares, so tag honestly rather than inflating.
-- **`correct`** — index into `options` **as written**. Options are shuffled at
-  runtime, so there's no need to vary the position by hand.
-- **`count`** — paper length. If it's below the bank size, each sitting draws a
-  fresh subset. Omit it to use the whole bank.
-- **`pool: true`** — draw from every *other* level's bank instead of this file's
-  own `questions` (that's how Full Mock Exam works).
-- Prefix `q` with `SCENARIO — <name>.` to render a scenario context banner.
-
-### Adding a whole new level
-
-1. Create `questions/my-level.json` using the shape above.
-2. Add `"my-level"` to the `levels` array in `questions/index.json`.
-
-That's it — no code changes.
+To add a whole level: create `questions/my-level.json` and add `"my-level"` to
+the `levels` array in `questions/index.json`. See [DOCS.md](DOCS.md) §7 for the
+full schema.
 
 ---
 
-## Files
+## Troubleshooting
 
-```
-index.html         the app shell and all logic (no build step)
-questions/*.json   question banks, one file per level
-api/scores.js      serverless leaderboard endpoint
-package.json       declares the Node runtime
-.env.example       template for local Redis credentials
-```
+| Symptom | Fix |
+|---|---|
+| "Couldn't load questions" | Serve over HTTP; check `questions/` sits beside `index.html` |
+| 404 on `questions/index.json` | Files were flattened — `mkdir -p questions && mv basic.json index.json mock.json scenario.json questions/` |
+| `/api/scores` 404s on Vercel | `mkdir -p api && mv scores.js api/scores.js`, commit, redeploy |
+| Leaderboard "offline" on Vercel | Attach the Upstash integration, then **redeploy** |
+| Can't change an answer | Instant feedback is on — first pick is final by design |
+
+More in [DOCS.md](DOCS.md) §9.

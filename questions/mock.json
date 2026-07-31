@@ -3,6 +3,7 @@
   "name": "Full Mock Exam",
   "desc": "The real thing: 60 questions in 120 minutes, drawn fresh from every question bank each sitting. Pass mark 720/1000.",
   "ready": true,
+  "requires": "scenario",
   "pool": true,
   "count": 60,
   "blueprint": [

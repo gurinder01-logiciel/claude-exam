@@ -336,6 +336,7 @@ async function loadLevels() {
       name: lv.name || name,
       desc: lv.desc || '',
       ready: lv.ready !== false,
+      requires: lv.requires || null,
       pool: Boolean(lv.pool),
       count: lv.count,
       blueprint: lv.blueprint,
@@ -440,6 +441,28 @@ function loadName() {
 }
 function saveName(n) {
   try { localStorage.setItem(NAME_KEY, n); } catch {}
+}
+
+// ---- Level progression -------------------------------------------------
+// Levels can declare `requires: "<levelKey>"` in their JSON. That level stays
+// locked until the required one has been completed, so people work through the
+// foundations instead of jumping straight to the full mock.
+const PROGRESS_KEY = 'ccaf_completed';
+
+function loadProgress() {
+  try { return new Set(JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]')); }
+  catch { return new Set(); }
+}
+function markCompleted(levelKey) {
+  try {
+    const done = loadProgress();
+    done.add(levelKey);
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify([...done]));
+  } catch {}
+}
+function isUnlocked(lv) {
+  if (!lv.requires) return true;
+  return loadProgress().has(lv.requires);
 }
 
 // Falls back to an in-memory board if the API isn't reachable (e.g. opened as a
@@ -644,17 +667,27 @@ function renderStart() {
       <div class="bp-legend">
         ${bp.map((s, si) => `<span class="bp-item"><span class="bp-dot" style="background:${scenarioColors[si % scenarioColors.length]}"></span>${s.label} ${s.pct}%</span>`).join('')}
       </div>` : '';
+    const unlocked = isUnlocked(lv);
+    const available = lv.ready && unlocked;
+    const requiredName = lv.requires && LEVELS[lv.requires] ? LEVELS[lv.requires].name : lv.requires;
+    let badge, badgeClass;
+    if (!lv.ready) { badge = 'Soon'; badgeClass = 'badge-soon'; }
+    else if (!unlocked) { badge = '🔒 Locked'; badgeClass = 'badge-soon'; }
+    else { badge = (lv.count || lv.questions.length) + ' Qs · ' + Math.round(durationFor(lv)/60) + ' min'; badgeClass = 'badge-ready'; }
     return `
-    <button class="level-card" ${lv.ready ? '' : 'disabled'} data-level="${key}">
+    <button class="level-card" ${available ? '' : 'disabled'} data-level="${key}">
       <div class="lc-top">
         <div class="lc-num">${String(i+1).padStart(2,'0')}</div>
         <div style="flex:1">
           <div class="lc-title">${lv.name}</div>
           <div class="lc-desc">${lv.desc}</div>
         </div>
-        <div class="lc-badge ${lv.ready ? 'badge-ready' : 'badge-soon'}">${lv.ready ? (lv.count || lv.questions.length) + ' Qs · ' + Math.round(durationFor(lv)/60) + ' min' : 'Soon'}</div>
+        <div class="lc-badge ${badgeClass}">${badge}</div>
       </div>
-      ${lv.ready ? (() => {
+      ${!unlocked && lv.ready
+        ? `<div style="font-size:0.78rem;color:var(--text-dim);margin-top:-6px">Finish <b style="color:var(--text)">${escapeHtml(requiredName || '')}</b> to unlock this level.</div>`
+        : ''}
+      ${available ? (() => {
         const bank = lv.pool ? Object.values(LEVELS).filter(x=>!x.pool).flatMap(x=>x.questions) : lv.questions;
         const n = Math.min(lv.count || bank.length, bank.length);
         const paper = buildRampedPaper(bank, n);
@@ -883,6 +916,8 @@ function renderResults() {
   });
   const scaled = Math.round((correct / qs.length) * 1000);
   const passed = scaled >= PASS_SCORE;
+  // Completing a level unlocks anything that requires it.
+  if (state.level) markCompleted(state.level);
   // Publish this attempt to the team leaderboard (best score per person wins).
   if (user.name && !state.submitted) {
     state.submitted = true;
@@ -919,6 +954,15 @@ function renderResults() {
       <div class="score-ring ${passed ? 'pass' : 'fail'}">${scaled}<span style="font-size:1.2rem;color:var(--text-dim)">/1000</span></div>
       <div class="verdict" style="color:${passed ? 'var(--good)' : 'var(--bad)'}">${passed ? '✓ PASS' : '✗ Below passing'}</div>
       <div class="score-sub">Passing score is ${PASS_SCORE}/1000 · You got ${correct} of ${qs.length} correct</div>
+      ${(() => {
+        const justUnlocked = Object.values(LEVELS).filter(lv => lv.requires === state.level && lv.ready);
+        return justUnlocked.length
+          ? `<div style="margin-top:14px;display:inline-block;background:var(--lime-dim);color:var(--lime);
+               border-radius:20px;padding:7px 16px;font-size:0.83rem;font-weight:700">
+               🔓 Unlocked: ${justUnlocked.map(lv => escapeHtml(lv.name)).join(' · ')}
+             </div>`
+          : '';
+      })()}
       <div class="stat-row">
         <div class="stat"><div class="num" style="color:var(--good)">${correct}</div><div class="lbl">Correct</div></div>
         <div class="stat"><div class="num" style="color:var(--bad)">${incorrect}</div><div class="lbl">Wrong</div></div>
