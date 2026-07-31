@@ -1,7 +1,3 @@
 {
-  "levels": [
-    "basic",
-    "scenario",
-    "mock"
-  ]
+  "levels": ["basic", "scenario", "mock"]
 }
