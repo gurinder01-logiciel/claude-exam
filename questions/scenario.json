@@ -37,12 +37,12 @@
       "d": 2,
       "q": "A team wires a nightly security scan into GitHub Actions with the step: claude \"scan the codebase for hardcoded secrets\". The job hangs until the workflow timeout fires, then fails with no output. What's wrong?",
       "options": [
-        "The command omits the -p flag, so Claude Code starts an interactive session and waits on input from a terminal the runner never attaches",
-        "The ANTHROPIC_API_KEY secret is scoped to the repo but not exposed to the job, so the CLI silently retries auth until the timeout",
         "The API key is resolved lazily, so the CLI blocks on an interactive credential prompt that the runner has no way to display",
+        "The ANTHROPIC_API_KEY secret is scoped to the repo but not exposed to the job, so the CLI silently retries auth until the timeout",
+        "The command omits the -p flag, so Claude Code starts an interactive session and waits on input from a terminal the runner never attaches",
         "Scan-style prompts need an explicit --output-format json, and without it the CLI buffers the whole transcript and never flushes it"
       ],
-      "correct": 0,
+      "correct": 2,
       "explain": "Without -p (--print), Claude Code opens an interactive session and waits for input on a terminal that a CI runner never attaches, so it hangs to the workflow timeout. The tempting near-miss is the lazy interactive credential prompt: missing or unexposed credentials produce a fast authentication error and a non-zero exit, not a silent hang for the full timeout window."
     },
     {
@@ -128,12 +128,12 @@
       "d": 1,
       "q": "How much context should a coordinator pass to each specialized subagent?",
       "options": [
-        "Pass the full accumulated context to every subagent so each one can reason about how its piece fits the overall task",
+        "Pass only the scoped slice of context each subagent actually needs for its specific task, and nothing beyond that",
         "Give all subagents a shared, append-only context window so their intermediate findings stay mutually visible during the run",
         "Pass just the task instruction and let each subagent rediscover any background it needs through its own tool calls",
-        "Pass only the scoped slice of context each subagent actually needs for its specific task, and nothing beyond that"
+        "Pass the full accumulated context to every subagent so each one can reason about how its piece fits the overall task"
       ],
-      "correct": 3,
+      "correct": 0,
       "explain": "Each subagent should receive only the narrowly scoped context its task requires, which keeps focus high and token cost low. Passing only the bare instruction and letting subagents rediscover background is the tempting near-miss: it is admirably lean, but it forces redundant tool calls and re-derivation of context the coordinator could simply have handed over."
     },
     {
@@ -142,11 +142,11 @@
       "q": "An extraction system must always return customer name, account number, and a cancellation date that may not exist, all as valid JSON. Best approach?",
       "options": [
         "Ask in the prompt for clean JSON only with no surrounding prose, and spell out the exact key names to use in the instruction text",
-        "Have the model emit free-form text and recover the three fields afterward with regular expressions tuned to the observed output",
         "Use tool_use with a JSON schema: name and account number required, and the cancellation date typed nullable so absence is representable",
+        "Have the model emit free-form text and recover the three fields afterward with regular expressions tuned to the observed output",
         "Mark all three fields required in the schema and drop records where the cancellation date fails downstream date parsing"
       ],
-      "correct": 2,
+      "correct": 1,
       "explain": "A schema-backed tool call enforces the shape, and typing the cancellation date as nullable lets the model represent a genuinely absent date instead of inventing one. Marking all three required and discarding unparseable records is the tempting near-miss: it does yield valid JSON, but it pressures the model to fabricate dates and silently throws away otherwise good extractions."
     },
     {
@@ -155,11 +155,11 @@
       "q": "Does using tool_use with a JSON schema guarantee the extracted data is correct?",
       "options": [
         "Yes, because schema validation constrains generation at decode time, so both the shape and the field values are guaranteed sound",
-        "Yes, provided temperature is set to 0 so the extraction becomes deterministic and repeatable for a given input document",
         "No, tool_use guarantees only structure such as valid types and shape; semantic correctness must be checked separately with business rules",
+        "Yes, provided temperature is set to 0 so the extraction becomes deterministic and repeatable for a given input document",
         "No, and a schema adds nothing useful either, since the model may still return keys and types that fall outside the declared shape"
       ],
-      "correct": 2,
+      "correct": 1,
       "explain": "A schema can confirm that attendee_count is an integer; it cannot confirm the source document ever stated a number, so semantic checks like cross-field totals belong in your own validation layer. The decode-time constraint answer is the tempting near-miss: constrained generation really does lock the shape, but shape conformance says nothing about whether the value is supported by the source."
     },
     {
@@ -167,12 +167,12 @@
       "d": 3,
       "q": "A Claude-based invoice extraction pipeline using tool_use with a JSON schema sometimes returns output where line items don't sum to the stated total. Best architectural fix for this semantic error?",
       "options": [
-        "Add an instruction to the prompt requiring arithmetic to be double-checked before the tool call is emitted for each invoice",
         "Capture both a calculated_total and the stated_total, compare them in code, and route any mismatch to human review",
+        "Add an instruction to the prompt requiring arithmetic to be double-checked before the tool call is emitted for each invoice",
         "Add a line_item_count field to the schema so short or truncated extractions can be detected before the totals are used",
         "Increase max_tokens so long invoices are never truncated mid-table and every line item reaches the extraction output"
       ],
-      "correct": 1,
+      "correct": 0,
       "explain": "Extracting the stated total and an independently computed total lets code assert they agree, which turns an invisible semantic error into a caught, reviewable exception. Raising max_tokens is the tempting near-miss: truncation would indeed break sums, but it would also visibly cut the item array short, whereas here the schema is satisfied and only the arithmetic disagrees."
     },
     {
@@ -195,10 +195,10 @@
       "options": [
         "State the limit in the system prompt, requiring approval before any refund above five hundred dollars is issued to a customer",
         "Encode it in the refund tool's description text so the constraint is visible to the model every time the tool schema is read",
-        "Enforce it as a programmatic hook or gate in the refund tool's execution path that blocks or escalates any amount above the limit",
-        "Cover it with few-shot examples that show a large refund being declined and routed to a human approver for sign-off"
+        "Cover it with few-shot examples that show a large refund being declined and routed to a human approver for sign-off",
+        "Enforce it as a programmatic hook or gate in the refund tool's execution path that blocks or escalates any amount above the limit"
       ],
-      "correct": 2,
+      "correct": 3,
       "explain": "A code-level gate on the refund tool's execution path enforces the threshold regardless of what the model decides, which is what a hard financial limit requires. The tool-description answer is the tempting near-miss: descriptions do strongly steer tool use and sit closer to the call site than a system prompt, but they remain model-read guidance, not enforcement."
     },
     {
@@ -206,12 +206,12 @@
       "d": 1,
       "q": "You have several extraction tools (one per document type) and want Claude to always use one of them, without you pre-choosing which. Which setting?",
       "options": [
-        "Use tool_choice any, which guarantees a tool call while leaving Claude to pick which extraction schema fits the document",
         "Use tool_choice auto together with a prompt instruction asking Claude to always select one of the extraction tools provided",
+        "Use tool_choice any, which guarantees a tool call while leaving Claude to pick which extraction schema fits the document",
         "Use tool_choice tool with the general-purpose extractor named, so there is always a guaranteed call to fall back on",
         "Leave tool_choice unset and validate afterward that a tool_use block is present, retrying the request when one is absent"
       ],
-      "correct": 0,
+      "correct": 1,
       "explain": "tool_choice set to 'any' forces exactly one tool call while leaving the schema selection to Claude, which is the requirement here. Naming a single tool with tool_choice 'tool' is the tempting near-miss: it also guarantees a call, but it makes you pre-choose the document type, which is precisely what you wanted to avoid."
     },
     {
@@ -221,10 +221,10 @@
       "options": [
         "Grant Bash access alone so the engineer can drive familiar shell tooling like find, grep, and git log directly in the repo",
         "Use Write and Edit as they go, so notes and small clarifying refactors are captured in the code while understanding is fresh",
-        "Use Read, Grep, and Glob to locate and inspect files by pattern and content without modifying anything in the repository",
-        "Route exploration through MCP servers only, so every lookup is mediated by an auditable, explicitly configured integration"
+        "Route exploration through MCP servers only, so every lookup is mediated by an auditable, explicitly configured integration",
+        "Use Read, Grep, and Glob to locate and inspect files by pattern and content without modifying anything in the repository"
       ],
-      "correct": 2,
+      "correct": 3,
       "explain": "Exploration is a read and search task, and Read, Grep, and Glob cover locating files by name pattern, searching contents, and inspecting them without any write risk. Bash-only is the tempting near-miss because those shell utilities genuinely can search a repo, but it trades the safe read-only surface for arbitrary command execution and loses the structured file-oriented tools."
     },
     {
@@ -233,11 +233,11 @@
       "q": "A long-running Claude agent's answer quality degrades on facts that appeared in the middle of a very large context. This is the 'lost in the middle' effect. Best mitigation?",
       "options": [
         "Continue appending the relevant history so the buried facts are restated later in the conversation as it keeps growing",
-        "Summarize and restructure the context so critical facts sit near the beginning or end rather than buried, and prune irrelevant bulk",
         "Lower the temperature so retrieval from the middle of the context becomes more consistent across repeated questions",
+        "Summarize and restructure the context so critical facts sit near the beginning or end rather than buried, and prune irrelevant bulk",
         "Move the transcript into an external store and retrieve only the passages that match each incoming question by keyword"
       ],
-      "correct": 1,
+      "correct": 2,
       "explain": "Attention is least reliable over the middle of a very long context, so the fix is to compress, prune, and reposition the important material where it is attended to. External retrieval is the tempting near-miss and is a sound pattern generally, but keyword retrieval can miss the buried facts entirely and does not address a context that is simply too bloated to attend to."
     },
     {
@@ -245,12 +245,12 @@
       "d": 2,
       "q": "A research coordinator gets conflicting facts from two subagents: Agent A says a company's revenue was $4M, Agent B says $6M. Both cite sources. What's the best design principle for resolving this?",
       "options": [
-        "Accept whichever figure the more recent subagent returned, on the assumption its sources were fetched later and are fresher",
+        "Preserve provenance for every claim so the coordinator or a human can resolve conflicts by weighing source reliability",
         "Average the two figures to five million dollars so the coordinator has a single value with bounded error either way",
         "Discard both figures and re-run the research pipeline with a narrower revenue prompt until the subagents agree",
-        "Preserve provenance for every claim so the coordinator or a human can resolve conflicts by weighing source reliability"
+        "Accept whichever figure the more recent subagent returned, on the assumption its sources were fetched later and are fresher"
       ],
-      "correct": 3,
+      "correct": 0,
       "explain": "Keeping each claim tied to its source is what makes the conflict resolvable, since one figure may be an audited filing and the other a press estimate. Re-running with a narrower prompt is the tempting near-miss: it might produce agreement, but agreement without provenance is not verification, and the disagreement itself is the signal worth keeping."
     },
     {
@@ -259,11 +259,11 @@
       "q": "A document genuinely does not contain a shipping date, but your extraction schema marks shipping_date as required. Claude keeps inventing plausible dates. Best fix?",
       "options": [
         "Add a few-shot example showing a conservative inference for the shipping date when the document does not state one outright",
-        "Raise max_tokens so the model has room to scan the full document before it commits to a value for the shipping date",
         "Make shipping_date nullable in the schema so 'not present' is a representable outcome the model can return honestly",
+        "Raise max_tokens so the model has room to scan the full document before it commits to a value for the shipping date",
         "Set temperature to 0 so the model stops sampling speculative dates and returns the same value on every extraction attempt"
       ],
-      "correct": 2,
+      "correct": 1,
       "explain": "When the information is genuinely absent, a required field leaves the model no valid way to answer, so it fabricates; making the field nullable gives absence a legitimate representation. Temperature 0 is the tempting near-miss: it does suppress sampling variance, but it makes the invented date consistent rather than making it go away."
     },
     {
@@ -271,12 +271,12 @@
       "d": 3,
       "q": "A CI job runs claude -p with a review prompt, exits with code 0, but the review output is empty/irrelevant (a pattern affecting a meaningful fraction of runs). It's for an authentication module. What's the honest architectural stance?",
       "options": [
-        "Treat headless review as a first automated check, not final approval: gate auth and payment changes on human review and assert output is on-topic",
+        "Remove the review step from the pipeline, since an intermittently empty result is worse than having no automated gate there at all",
         "Trust the exit status, since a zero exit from claude -p means the review ran to completion and reported no blocking findings at all",
         "Re-run the review step until it returns non-empty output, then merge on the strength of that one successful run's reported findings",
-        "Remove the review step from the pipeline, since an intermittently empty result is worse than having no automated gate there at all"
+        "Treat headless review as a first automated check, not final approval: gate auth and payment changes on human review and assert output is on-topic"
       ],
-      "correct": 0,
+      "correct": 3,
       "explain": "A zero exit only means the process ran, so the pipeline must assert the output is substantive and relevant, and sensitive modules like authentication still need human approval. Retrying until output appears is the tempting near-miss: it patches the empty-output symptom, but it neither confirms the content is on-topic nor supplies the human sign-off an auth change warrants."
     },
     {
@@ -297,12 +297,12 @@
       "d": 2,
       "q": "You're architecting on the Claude Agent SDK and deciding between a single Claude agent with tools vs. a multi-agent orchestrator-worker system for a moderately complex task. Which principle should drive the choice?",
       "options": [
-        "Prefer the simplest architecture that meets the need; add multi-agent only when parallelism or isolated specialist contexts genuinely help.",
         "Default to orchestrator-worker because separate workers keep each context window small, which reliably raises answer quality.",
+        "Prefer the simplest architecture that meets the need; add multi-agent only when parallelism or isolated specialist contexts genuinely help.",
         "Choose by token budget: a single agent with many tools always costs less than workers, so cost modelling should settle it.",
         "Pick multi-agent whenever the task needs more than one tool, since one agent cannot reliably sequence heterogeneous tools."
       ],
-      "correct": 0,
+      "correct": 1,
       "explain": "Simplicity is the default: orchestration is justified only by real parallelism or context-isolation needs, otherwise it adds cost, latency and new failure modes. The tempting near-miss is the claim that workers keep contexts small and so always improve quality — context isolation only pays off when subtasks are genuinely independent, and this task is merely moderately complex, so coordination overhead dominates."
     },
     {
@@ -350,11 +350,11 @@
       "q": "A verbose subagent returns 20,000 tokens of reasoning, but the coordinator only needs the final 3 extracted facts. What's the best practice for the handoff?",
       "options": [
         "Pass the full 20,000 tokens but rely on prompt caching so the coordinator pays very little to re-read the reasoning each turn.",
-        "Have the subagent return a distilled structured result — just the required facts in a defined schema — keeping raw reasoning out.",
         "Keep the whole transcript and let the coordinator compact its history once the window fills, so nothing is discarded prematurely.",
+        "Have the subagent return a distilled structured result — just the required facts in a defined schema — keeping raw reasoning out.",
         "Have the coordinator summarise the subagent output with a second call, then drop the first half of the original reasoning dump."
       ],
-      "correct": 1,
+      "correct": 2,
       "explain": "Handoffs should carry distilled, schema-shaped results so the coordinator's context stays lean and focused on the three facts it needs. The tempting near-miss is keeping everything and leaning on prompt caching: caching lowers cost but the tokens still occupy the window and dilute attention, which is the actual problem here."
     },
     {
@@ -363,11 +363,11 @@
       "q": "You need machine-parseable review findings from claude -p so a downstream script can post inline PR comments. Which flags?",
       "options": [
         "Use --verbose with text output so each finding's file and line appears in the log, then parse the labelled lines in the script.",
-        "Pipe plain output through an appended system prompt asking for CSV rows, then split each returned line on commas in the script.",
+        "Use --output-format json, optionally with a JSON schema, so findings come back structured and can be parsed programmatically.",
         "Use --output-format stream-json on its own; the last emitted chunk is a clean findings object the downstream script can consume.",
-        "Use --output-format json, optionally with a JSON schema, so findings come back structured and can be parsed programmatically."
+        "Pipe plain output through an appended system prompt asking for CSV rows, then split each returned line on commas in the script."
       ],
-      "correct": 3,
+      "correct": 1,
       "explain": "--output-format json (with a schema when you need a guaranteed shape) gives the downstream script structured findings instead of brittle text parsing. The tempting near-miss is stream-json: it is structured, but it is a stream of message events that requires --verbose in print mode and yields no single findings document, so the script cannot just read one final object."
     },
     {
@@ -376,11 +376,11 @@
       "q": "A developer's agent sometimes terminates prematurely when Claude returns text alongside a tool call. Their loop checks response.content[0].type == 'text' to decide if the agent is finished. Users report incomplete responses on complex queries. What should the developer change?",
       "options": [
         "Inspect the last content block instead of the first, since Claude emits its tool_use block after any narration text in the turn.",
-        "Check the stop_reason field instead of content type — continue while it is 'tool_use' and terminate when it is 'end_turn'.",
+        "Scan the assistant text for completion phrases such as 'I have finished' and end the loop when one of them appears.",
         "Set tool_choice to 'any' so every turn contains a tool call, making a text-typed first block a reliable end-of-work signal.",
-        "Scan the assistant text for completion phrases such as 'I have finished' and end the loop when one of them appears."
+        "Check the stop_reason field instead of content type — continue while it is 'tool_use' and terminate when it is 'end_turn'."
       ],
-      "correct": 1,
+      "correct": 3,
       "explain": "stop_reason is the only authoritative loop-control signal, and it stays correct when text and tool_use blocks arrive in the same turn. The tempting near-miss is checking the last block rather than the first: block ordering is not guaranteed, a turn can carry several tool_use blocks, and it still cannot distinguish end_turn from max_tokens, which stop_reason reports directly."
     },
     {
@@ -388,12 +388,12 @@
       "d": 2,
       "q": "In an agentic loop, after Claude requests a tool with stop_reason 'tool_use', you execute it but the agent seems unable to reason about the result on the next iteration. What's the most likely mistake?",
       "options": [
-        "tool_choice was left at 'auto', so the follow-up request lets Claude answer from memory instead of reading the tool output.",
+        "The tool result was never appended to the conversation as a new user message, so Claude never sees what the tool returned.",
         "The result was appended but its tool_use_id does not match the request block, so Claude cannot bind it to the pending call.",
         "The result was put into the system prompt for the next request instead of following the assistant's tool_use turn in history.",
-        "The tool result was never appended to the conversation as a new user message, so Claude never sees what the tool returned."
+        "tool_choice was left at 'auto', so the follow-up request lets Claude answer from memory instead of reading the tool output."
       ],
-      "correct": 3,
+      "correct": 0,
       "explain": "Tool results must be appended to the message history as a user-role tool_result block; skip that and the next request contains nothing new for Claude to reason about. The tempting near-miss is a mismatched tool_use_id — that is a real bug, but it fails loudly with a 400 validation error rather than producing a model that simply seems unaware of the result."
     },
     {
@@ -401,12 +401,12 @@
       "d": 2,
       "q": "You're building a coordinator that delegates to subagents via the Task tool, but subagents behave as if they know nothing about the research context the coordinator has. Why?",
       "options": [
-        "Subagents run with isolated context and do not inherit parent history, so needed findings must be restated in each subagent prompt.",
+        "Subagent prompts are truncated to a fixed token budget, so long research context passed in is dropped before the run begins.",
         "Subagents inherit the parent transcript only up to the last compaction, so everything gathered after it is missing from their view.",
         "The coordinator's allowedTools omits Bash, so delegation silently degrades to a fresh top-level session with no research context.",
-        "Subagent prompts are truncated to a fixed token budget, so long research context passed in is dropped before the run begins."
+        "Subagents run with isolated context and do not inherit parent history, so needed findings must be restated in each subagent prompt."
       ],
-      "correct": 0,
+      "correct": 3,
       "explain": "Subagents start with isolated context and never inherit the coordinator's history, so every relevant finding has to be written into the subagent's prompt. The tempting near-miss is partial inheritance up to the last compaction — ruled out because the subagents behave as if they know nothing at all, not as if they are missing only the most recent stretch."
     },
     {
@@ -414,12 +414,12 @@
       "d": 3,
       "q": "An MCP tool returns an empty array after a customer lookup. Claude retries 3 times, then escalates to a human. Analysis shows the customer's account simply does not exist. What's the root cause of this wasted effort?",
       "options": [
-        "The retry policy lacks exponential backoff, so three rapid attempts hit the same stale cache entry and the agent gave up early.",
-        "The lookup already returns a retriable error flag, so retrying was correct and the real defect is an over-eager escalation rule.",
         "The tool does not distinguish access failures from valid empty results, so the agent treats 'no matches' as a retriable failure.",
+        "The lookup already returns a retriable error flag, so retrying was correct and the real defect is an over-eager escalation rule.",
+        "The retry policy lacks exponential backoff, so three rapid attempts hit the same stale cache entry and the agent gave up early.",
         "The tool description omits the account-number format, so the agent sent a malformed identifier that matched nothing in the store."
       ],
-      "correct": 2,
+      "correct": 0,
       "explain": "A successful query that found nothing must be structurally distinct from a failure to reach the data source (empty result: not an error, count zero; access failure: error plus retryable), otherwise the agent burns retries and escalates wrongly. The tempting near-miss is a malformed account identifier, which would also yield an empty array — but the analysis established the account genuinely does not exist, so the query itself was well formed."
     },
     {
@@ -440,12 +440,12 @@
       "d": 2,
       "q": "A Claude agent has 18 MCP tools available and frequently selects the wrong one; a synthesis-focused subagent even attempts web searches. What principle best addresses this?",
       "options": [
-        "Scope each agent's tool set to what its role needs, roughly four or five tools, so cross-specialisation misuse becomes impossible.",
-        "Keep all 18 available everywhere and rely on tool_choice 'auto' plus richer descriptions to narrow selection at request time.",
         "Keep all 18 tools but list them in the system prompt grouped by role, telling each agent which group it is expected to stay inside.",
+        "Keep all 18 available everywhere and rely on tool_choice 'auto' plus richer descriptions to narrow selection at request time.",
+        "Scope each agent's tool set to what its role needs, roughly four or five tools, so cross-specialisation misuse becomes impossible.",
         "Put the 18 tools behind one dispatcher tool taking an action name, so the model only ever has a single tool to choose from."
       ],
-      "correct": 0,
+      "correct": 2,
       "explain": "Selection reliability falls as the tool count grows, and an agent cannot misuse a tool it was never given, so scoping each role to a handful of tools is the structural fix. The tempting near-miss is grouping all 18 by role in the system prompt — the synthesis subagent still has web search available, so a soft instruction is all that stands between it and the same wrong call."
     },
     {
@@ -453,12 +453,12 @@
       "d": 2,
       "q": "You want a custom /review slash command available to every developer automatically when they clone or pull the repo. Where do you put it?",
       "options": [
-        "Put review.md in ~/.claude/commands/ and have each developer symlink it into the repo so one definition serves everyone.",
         "Commit it as .claude/commands/review.md in the project repository, so it ships with every clone and updates on pull.",
+        "Put review.md in ~/.claude/commands/ and have each developer symlink it into the repo so one definition serves everyone.",
         "Define the command as a fenced block inside the repo's root CLAUDE.md, which is version-controlled and loaded automatically.",
         "Register it in .claude/settings.json under a commands array that points at the markdown file, so the repo publishes it."
       ],
-      "correct": 1,
+      "correct": 0,
       "explain": "Project-scoped commands in .claude/commands/ are version-controlled, so cloning or pulling the repo gives every developer the command automatically. The tempting near-miss is a user-level file symlinked into the repo — the symlink can be committed but its target lives outside version control, so a fresh clone resolves to nothing on a machine that lacks the home-directory file."
     },
     {
@@ -468,10 +468,10 @@
       "options": [
         "A testing skill holding the conventions in SKILL.md, invoked whenever someone starts work on one of the test files.",
         "A single root CLAUDE.md with a per-area section, relying on Claude to infer which conventions apply to the file being edited.",
-        "Path-scoped files in .claude/rules/ with glob frontmatter such as paths ['**/*.test.tsx'], loading whenever a match is edited.",
-        "A CLAUDE.md in every directory containing tests, so the nearest file is picked up as the tree is walked upward from the file."
+        "A CLAUDE.md in every directory containing tests, so the nearest file is picked up as the tree is walked upward from the file.",
+        "Path-scoped files in .claude/rules/ with glob frontmatter such as paths ['**/*.test.tsx'], loading whenever a match is edited."
       ],
-      "correct": 2,
+      "correct": 3,
       "explain": "Glob-scoped rule files attach conventions to a filename pattern rather than a directory, so they load for every matching test file wherever it sits. The tempting near-miss is per-directory CLAUDE.md files, which really do load hierarchically — but with tests beside every component you would duplicate that file across the whole tree, and it still applies to all files in the folder rather than to test files specifically."
     },
     {
@@ -479,12 +479,12 @@
       "d": 2,
       "q": "A skill produces very verbose codebase-analysis output that pollutes the main conversation context. Which frontmatter option fixes this?",
       "options": [
-        "context: fork — the skill runs in an isolated subagent context, so its verbose output stays out of the main conversation.",
-        "allowed-tools — restricting the skill to read-only tools keeps it from producing a large analysis dump in the transcript.",
         "argument-hint — prompting the caller for a narrower target path up front keeps the analysis, and so the output, small.",
+        "allowed-tools — restricting the skill to read-only tools keeps it from producing a large analysis dump in the transcript.",
+        "context: fork — the skill runs in an isolated subagent context, so its verbose output stays out of the main conversation.",
         "disable-model-invocation — removing automatic triggering means the dump only enters context when a user asks for it."
       ],
-      "correct": 0,
+      "correct": 2,
       "explain": "context: fork executes the skill in an isolated subagent context and returns only its result, so verbose exploration never lands in the main session. The tempting near-miss is disable-model-invocation: it does cut how often the skill fires, but every explicit invocation still dumps the full verbose output into the main conversation, so the pollution is unchanged when the skill is actually used."
     },
     {
@@ -492,12 +492,12 @@
       "d": 3,
       "q": "A new team member reports they're not getting the coding-standard instructions everyone else follows. The rules were placed in ~/.claude/CLAUDE.md by another dev. What's the diagnosis?",
       "options": [
-        "The rules are at project level but excluded by the repo's ignore rules for .claude/, so they never reached the new clone.",
         "User-level ~/.claude/CLAUDE.md is not version-controlled, so team-wide standards must sit at project level to reach teammates.",
+        "The rules are at project level but excluded by the repo's ignore rules for .claude/, so they never reached the new clone.",
         "The new member's session loaded the rules but hit the CLAUDE.md size limit, so the coding-standards section was truncated.",
         "CLAUDE.md @path imports resolve only on the author's machine, so the standards file referenced from it was never loaded."
       ],
-      "correct": 1,
+      "correct": 0,
       "explain": "A user-level CLAUDE.md applies to that one user's machine and is never distributed, so shared standards belong in the project so they arrive on clone or pull; /memory shows which files loaded. The tempting near-miss blames a gitignored .claude/ directory — ruled out because the stem states the rules were placed in ~/.claude/CLAUDE.md, which was never in the repository at all."
     },
     {
@@ -506,11 +506,11 @@
       "q": "An extraction schema marks shipping_date as required, but some source documents genuinely lack a shipping date, and Claude keeps fabricating plausible dates. Best fix?",
       "options": [
         "Keep the field required but add a paired shipping_date_confidence value so downstream code can discard low-confidence dates.",
-        "Make shipping_date nullable or optional so 'not present' is representable and the model need not invent a value to satisfy it.",
         "Set temperature to 0 so the model deterministically copies the source text instead of sampling a plausible-looking date value.",
+        "Make shipping_date nullable or optional so 'not present' is representable and the model need not invent a value to satisfy it.",
         "Switch to strict tool use so schema validation rejects any date that does not literally appear in the source document text."
       ],
-      "correct": 1,
+      "correct": 2,
       "explain": "A required field with no source value pushes the model to fabricate one; making it nullable gives 'absent' a legal representation. The tempting near-miss is a paired confidence score — it still forces a date into the required field, and self-reported confidence is poorly calibrated, so fabricated dates keep flowing downstream with respectable-looking scores."
     },
     {
@@ -519,37 +519,37 @@
       "q": "Your automated Claude Code review in CI posts many false positives, eroding developer trust. Which approach most effectively improves precision?",
       "options": [
         "Have the model score each finding's confidence and suppress everything below a threshold, tightening that bar over time.",
-        "Write explicit categorical criteria naming which issues to report and which to skip, with concrete examples per severity level.",
         "Set temperature to 0 so the reviewer stops sampling speculative findings and returns the same set of findings on every run.",
+        "Write explicit categorical criteria naming which issues to report and which to skip, with concrete examples per severity level.",
         "Add 'be conservative' and 'report only high-confidence findings' to the review prompt so the model raises its own bar."
       ],
-      "correct": 1,
+      "correct": 2,
       "explain": "Explicit categories with worked examples give the model a consistent classification boundary, which is what actually raises precision; you can also mute a noisy category while you refine it. The tempting near-miss is threshold-filtering self-rated confidence — model confidence is poorly calibrated, so it hides genuine bugs while confidently-worded false positives sail through."
     },
     {
-      "domain": "Prompt Eng",
+      "domain": "Tool Design",
       "d": 2,
-      "q": "You have several extraction tools (one per document type) and the document type is unknown ahead of time, but you must guarantee Claude calls one of them rather than replying with text. Which tool_choice setting?",
+      "q": "In your research system the coordinator keeps passing web-search payloads to analyze_document instead of analyze_content. Both descriptions read \"analyzes content and returns findings\". What fixes the misrouting?",
       "options": [
-        "tool_choice 'auto' plus a prompt line requiring a tool call, since auto already selects the best-matching extractor available.",
-        "tool_choice 'none' with the schemas described in the system prompt, then parsing the JSON returned in the text response.",
-        "A forced {type:'tool', name:'extract_invoice'} call, relying on the model to leave irrelevant fields null for other document types.",
-        "tool_choice 'any' — it guarantees a tool call every turn while letting the model pick whichever extraction schema fits."
+        "Add a system prompt rule routing web results to analyze_content and documents to analyze_document, overriding both descriptions",
+        "Force analyze_content with tool_choice on any coordinator turn that immediately follows a web search step in the pipeline",
+        "Attach input_examples of web-search payloads to analyze_content so the coordinator can pattern-match on the shape of its input",
+        "Rename each tool and rewrite its description to state its purpose, expected input, and when to use it rather than the other one"
       ],
       "correct": 3,
-      "explain": "'any' is the setting that guarantees some tool call while leaving schema selection to the model, which is what an unknown document type requires. The tempting near-miss is 'auto' with a prompt instruction: it usually picks sensibly, but auto still permits a text-only reply, and the requirement here is a hard guarantee rather than a strong tendency."
+      "explain": "Tool descriptions are the primary signal Claude uses to select a tool, so near-identical wording is the actual defect; renaming and differentiating them by purpose, input format, and boundary resolves it at the source. The system prompt rule is the tempting near-miss: it can steer selection, but it leaves the ambiguous descriptions in place, so the misrouting returns wherever the rule does not explicitly reach."
     },
     {
       "domain": "Context Mgmt",
       "d": 3,
       "q": "SCENARIO — Customer Support Resolution Agent. Claude's answer quality degrades on important details (amounts, dates, order numbers) buried in the middle of a long conversation. What's the best mitigation?",
       "options": [
-        "Progressively summarise older turns into a running recap so the whole history stays short enough to be attended to reliably.",
+        "Keep transactional facts — amounts, dates, order numbers, statuses — in a persistent case-facts block placed at the prompt edges.",
         "Reverse the message order each turn so the oldest turns sit last, moving buried details into the recency window instead.",
         "Enable prompt caching on the conversation prefix so earlier turns are re-read verbatim each turn instead of being skimmed.",
-        "Keep transactional facts — amounts, dates, order numbers, statuses — in a persistent case-facts block placed at the prompt edges."
+        "Progressively summarise older turns into a running recap so the whole history stays short enough to be attended to reliably."
       ],
-      "correct": 3,
+      "correct": 0,
       "explain": "Because attention is weakest in the middle of long inputs, pinning exact transactional values into a structured facts block near the start or end keeps them reliably available. The tempting near-miss is progressive summarisation: it does shorten history, but summaries paraphrase and blur precise amounts, dates and order numbers — exactly the details the agent is getting wrong."
     },
     {
@@ -557,12 +557,12 @@
       "d": 3,
       "q": "SCENARIO — Multi-Agent Research System. While Claude synthesises findings from multiple sources, two credible sources report conflicting revenue figures ($4M vs $6M). How should the synthesis handle this?",
       "options": [
-        "Report both figures with the source attached to each rather than picking one, keeping claim-to-source mappings intact for the reader",
         "Reconcile to a single $5M midpoint and footnote that the underlying sources disagreed on the exact revenue total",
+        "Report both figures with the source attached to each rather than picking one, keeping claim-to-source mappings intact for the reader",
         "Prefer the higher figure and note that the lower source is likely reporting a pre-adjustment or net-of-returns number",
         "Withhold both figures and report only the qualitative findings the two sources agree on, flagging revenue as unresolved"
       ],
-      "correct": 0,
+      "correct": 1,
       "explain": "Conflicting values from credible sources should be surfaced with their attribution so the reader or coordinator can adjudicate using dates and methodology. The tempting answer is the footnoted midpoint, but averaging invents a figure no source reported and destroys the claim-source mapping the scenario depends on."
     },
     {
@@ -571,11 +571,11 @@
       "q": "During a long codebase-exploration session, the agent starts giving inconsistent answers and referencing 'typical patterns' instead of the specific classes it found earlier. Best countermeasure?",
       "options": [
         "Continue the session; later turns re-ground themselves on the earlier tool results once a class name comes up again",
-        "Re-read every relevant source file at the start of each question so the discovery output is always freshly in context",
+        "Record key findings in a scratchpad file the agent re-reads for later questions, and /compact once discovery output fills context",
         "Raise max_tokens so each answer has room to restate the specific classes that were discovered earlier in the session",
-        "Record key findings in a scratchpad file the agent re-reads for later questions, and /compact once discovery output fills context"
+        "Re-read every relevant source file at the start of each question so the discovery output is always freshly in context"
       ],
-      "correct": 3,
+      "correct": 1,
       "explain": "Drift toward generic 'typical patterns' is context degradation: the specific findings have aged out or been buried. A scratchpad plus /compact persists conclusions across context boundaries. Re-reading every file each question is tempting and does re-ground the model, but it re-floods the same context that is already overfull, so the degradation returns immediately."
     },
     {
@@ -584,11 +584,11 @@
       "q": "An unattended Agent SDK job in production occasionally runs for hours and burns a large bill before anyone notices. Which combination best bounds it?",
       "options": [
         "Wrap the run in an external wall-clock timeout that kills the process, and inspect the logs afterwards to see what it spent",
-        "Lower temperature and trim the system prompt so each turn carries fewer tokens and the loop converges on the task sooner",
         "Set max_turns and max_budget_usd as hard termination ceilings, and read total_cost_usd from each ResultMessage for cost observability",
+        "Lower temperature and trim the system prompt so each turn carries fewer tokens and the loop converges on the task sooner",
         "Restrict the allowed tool set so the agent has fewer actions available and therefore fewer opportunities to keep looping"
       ],
-      "correct": 2,
+      "correct": 1,
       "explain": "Unattended loops need explicit in-loop ceilings (max_turns, max_budget_usd) plus cost telemetry from ResultMessage. The external wall-clock kill is the strong near-miss: it does bound runtime, but it bounds only time, not spend, and it terminates mid-task with no cost figure, so nobody learns what the run cost."
     },
     {
@@ -607,67 +607,54 @@
     {
       "domain": "Agentic Arch",
       "d": 2,
-      "q": "A subagent was partway through a long analysis when the orchestrator's context was compacted. You need to continue that subagent's work rather than restart it. What's true?",
+      "q": "SCENARIO - Multi-Agent Research System. A long coordinator-driven analysis pipeline was interrupted partway through. The next run must pick up where it stopped instead of repeating work that already finished. How do you design for this?",
       "options": [
-        "Resuming requires the parent session id rather than any per-agent handle, so you replay the orchestration from the turn that spawned the subagent",
-        "Only the subagent's returned summary survives compaction, so continuing means re-prompting a fresh subagent with that summary as its starting context",
-        "The subagent transcript is inlined into the orchestrator transcript, so compaction summarises it along with everything else in the window",
-        "Subagent transcripts are stored separately and survive main-conversation compaction; the Agent tool result carries an agentId you can resume against"
+        "Have each subagent append findings into the final report file, then rebuild the pipeline's state by parsing that report back",
+        "Have the coordinator hold each subagent's returned summary in its own context, so a restart can replay those summaries from it",
+        "Have the coordinator re-dispatch every subagent and let each one work out from its own prior output that the work was done",
+        "Have each subagent persist its completed findings and a status marker to a shared state file the coordinator reads on restart"
       ],
       "correct": 3,
-      "explain": "Subagent transcripts persist independently of the main conversation and outlive its compaction, and the Agent tool result returns an agentId you resume against. The tempting answer is that only the returned summary survives; that is wrong because the working transcript itself is retained separately (until cleanupPeriodDays elapses), so no re-prompting from a summary is needed."
+      "explain": "Durable resumption needs state written outside any agent's context: a shared file recording per-subtask findings and completion status lets the coordinator restart and skip finished work. The near-miss is keeping summaries in the coordinator's context, which is exactly the thing an interruption or a compaction destroys."
     },
     {
       "domain": "Agentic Arch",
       "d": 2,
-      "q": "Why is plan mode implemented using a separate read-only Plan subagent rather than letting the main session explore directly, and why does ExitPlanMode require permission?",
+      "q": "SCENARIO - Multi-Agent Research System. A discovery subagent must read widely across the repository during a planning phase, and you need a guarantee that it cannot modify anything while it explores. How do you configure it?",
       "options": [
-        "A separate subagent keeps planning tokens out of the main transcript for cost reasons, and ExitPlanMode is permission-gated so the plan can be persisted to disk first",
-        "Planning needs a larger context budget than the main session, so it runs in its own window, and ExitPlanMode prompts mainly to let you edit the plan before work starts",
-        "The read-only Plan subagent isolates research and avoids subagent nesting, and gating ExitPlanMode behind permission makes the plan-to-execution transition an explicit confirmation",
-        "Read-only mode lets plan mode safely reuse the same tool allowlist as execution, and the ExitPlanMode prompt exists to pick which permission mode to resume in"
+        "Give the coordinator the write tools and have the subagent request each edit through it once the discovery pass has finished",
+        "Give the subagent the full tool set but a system prompt instructing it never to write or edit files during the discovery pass",
+        "Run the subagent first and review its transcript for writes before letting the coordinator act on anything it has reported",
+        "Give the subagent a tool set restricted to read-only tools, plus a system prompt constraining its role to reporting findings"
       ],
-      "correct": 2,
-      "explain": "The read-only Plan subagent both isolates research and prevents the nesting problem, and permission on ExitPlanMode makes moving from planning to editing a deliberate, enforced boundary. The near-miss frames it as a context-budget optimisation with a review prompt; that misses the point, because the gate exists to enforce the read-only-to-write transition, not to let you tweak wording."
+      "correct": 3,
+      "explain": "A guarantee comes from the tool allowlist: if write tools are not granted, the subagent cannot write, and the role-constraining prompt keeps its output on task. The near-miss grants everything and forbids writing in the prompt, which is instruction rather than enforcement and fails exactly when the model misreads the task."
     },
     {
-      "domain": "Agentic Arch",
+      "domain": "Claude Code",
       "d": 2,
-      "q": "A job needs hundreds of coordinated agents rather than a handful of delegations per turn. Using the Task tool from the orchestrator becomes unmanageable. What's the appropriate mechanism?",
+      "q": "SCENARIO - Developer Productivity with Claude. A lead wants every clone of the repo to pick up the same coding standards automatically, while each engineer keeps personal preferences that nobody else should inherit. How should this be split?",
       "options": [
-        "Use the TypeScript SDK's Workflow tool, which moves orchestration into a script running outside the conversation context",
-        "Grant each subagent the Task tool so the tree fans out recursively and no single orchestrator turn carries hundreds of delegations",
-        "Raise max_turns substantially and batch the Task delegations across many turns so the orchestrator drains the queue gradually",
-        "Spawn the agents as separate headless CLI processes with -p and merge their JSON output in a wrapper script afterwards"
+        "Commit the shared standards as project-level configuration, and keep personal preferences in each engineer's user-level config",
+        "Commit the shared standards as project-level configuration, and have engineers add personal preferences under their own headings",
+        "Keep everything in each engineer's user-level configuration, and circulate a copy of that file to the team whenever it changes",
+        "Keep the standards on a wiki page and ask engineers to paste the relevant section into their prompt at the start of a session"
       ],
       "correct": 0,
-      "explain": "At dozens-to-hundreds of coordinated agents, the Workflow tool lifts orchestration out of the conversation context entirely. Recursive fan-out is the tempting answer and would distribute the load neatly, but subagents cannot nest, so they never get the Task tool to subdivide with."
+      "explain": "Project-level configuration is committed and therefore shared on clone, while user-level configuration is per-machine and never travels through version control, which is precisely the split the lead wants. The near-miss keeps the project file but folds personal preferences into it, so one engineer's preferences get committed and imposed on everyone."
     },
     {
       "domain": "Claude Code",
       "d": 2,
-      "q": "A team sets defaultMode: 'auto' in .claude/settings.json so everyone gets auto mode on clone. It has no effect for anyone. What's the explanation?",
+      "q": "SCENARIO - Claude Code for Continuous Integration. CLAUDE.md tells Claude to run the test suite before it reports a task finished. It usually does, but under long sessions it sometimes skips it. You need this to happen every time.",
       "options": [
-        "Project settings load after the session initialises its permission mode, so committed defaultMode applies from the second session onward",
-        "defaultMode is only consulted for non-interactive runs, so an interactive session always starts in the default prompting mode regardless",
-        "auto mode is deliberately ignored when it comes from project or local settings; it takes effect only from user or managed settings",
-        "The correct key is permissionMode inside a permissions block, and an unrecognised top-level key is silently dropped without warning"
+        "Add the instruction to each engineer's user-level memory, so it applies in every repository where they run Claude Code locally",
+        "Repeat the instruction in the session prompt as well as CLAUDE.md, so the requirement stays close to the model at decision time",
+        "Move the instruction into a Skill, so the model loads a detailed testing procedure whenever the task looks test related to it",
+        "Configure a hook so the suite runs automatically as part of the workflow, rather than depending on the model deciding to run it"
       ],
-      "correct": 2,
-      "explain": "auto mode is intentionally not honoured from project or local settings; it must come from user or managed settings, which is why a committed value does nothing for anyone. The wrong-key answer is tempting since unknown keys do fail silently, but defaultMode is the correct key name, so a typo is not what is happening here."
-    },
-    {
-      "domain": "Claude Code",
-      "d": 2,
-      "q": "You want a hard definition-of-done gate: Claude must not end its turn until the test suite passes. Which hook and mechanism?",
-      "options": [
-        "A PreToolUse hook that intercepts the final response and denies it until a prior test run in the session has been recorded as passing",
-        "A PostToolUse hook matched on Bash that runs the suite after each command and emits failures back into the transcript as additional context",
-        "A Stop hook that runs the suite and exits 2 (or returns decision 'block'), refusing the turn ending and returning control to the model with a reason",
-        "A SubagentStop hook that runs the suite when work completes and blocks so the failing result is handed back before the turn closes"
-      ],
-      "correct": 2,
-      "explain": "Stop fires when the model finishes responding and is blocking-capable: exit 2 or decision 'block' prevents the turn ending and feeds the reason back. SubagentStop is the tempting near-miss because it blocks the same way, but it fires only at the end of a subagent's run, not on the main session's turn the gate needs to hold."
+      "correct": 3,
+      "explain": "When a step must happen deterministically, it belongs in a hook, because hooks execute as part of the workflow instead of relying on the model to choose the action. The near-miss reinforces the same instruction in the prompt: it improves the odds but leaves the step discretionary, which is the failure already being observed."
     },
     {
       "domain": "Claude Code",
@@ -688,11 +675,11 @@
       "q": "You want to trial a new hook on your own machine before proposing it to the team, without affecting teammates or committing anything. Where does it go?",
       "options": [
         ".claude/settings.json in the repo, since a hook needs project context and can be reverted before anyone pulls the change",
-        "~/.claude/settings.json, which keeps it off the repo entirely while you evaluate it across your own day-to-day work",
         ".claude/settings.local.json, which is scoped to this repo, outranks project settings, and is gitignored so teammates are unaffected",
+        "~/.claude/settings.json, which keeps it off the repo entirely while you evaluate it across your own day-to-day work",
         "managed-settings.json, so the hook is applied consistently and can be withdrawn centrally once the trial is finished"
       ],
-      "correct": 2,
+      "correct": 1,
       "explain": "settings.local.json is the experimentation layer: repo-scoped, higher precedence than project settings, and automatically gitignored. User-level settings.json is the tempting near-miss since it also avoids a commit, but it applies the untested hook to every project you touch instead of just this repo."
     },
     {
@@ -700,12 +687,12 @@
       "d": 2,
       "q": "A programmatic consumer needs machine-readable results from an Agent SDK run, not prose. What's the correct mechanism?",
       "options": [
-        "Pass a JSON Schema as outputFormat and read the parsed result from the structured_output field on the result message",
-        "Define a tool whose input schema is the result shape and treat the model's final tool_use input as the machine-readable payload",
         "Instruct the model to end with a fenced JSON block and extract it from the assistant text with a regex in the consumer",
+        "Define a tool whose input schema is the result shape and treat the model's final tool_use input as the machine-readable payload",
+        "Pass a JSON Schema as outputFormat and read the parsed result from the structured_output field on the result message",
         "Set temperature to 0 and pin the model version so the prose layout stays stable enough for a fixed field parser"
       ],
-      "correct": 0,
+      "correct": 2,
       "explain": "The SDK takes a JSON Schema via outputFormat and exposes the parsed object as structured_output, which is the supported path. The tool-schema trick is a genuinely used pattern and tempting, but it constrains a tool call rather than the run's result, so the consumer still has to dig the payload out of the transcript."
     },
     {
@@ -714,11 +701,11 @@
       "q": "A Claude extraction pipeline validates every tool_use response against its JSON Schema and all responses pass, yet downstream reports contain wrong figures. What kind of validation is missing?",
       "options": [
         "Stricter schema constraints: add enums, numeric minimums and maximums, and required fields so out-of-range values are rejected before they reach the report",
-        "Semantic validation: the schema proves shape and types, not that the source supports the values, so add business-rule and provenance checks and route mismatches to review",
         "Response-level validation: verify the stop reason was tool_use and that no max_tokens truncation occurred, since a cut-off call can still parse as valid JSON",
+        "Semantic validation: the schema proves shape and types, not that the source supports the values, so add business-rule and provenance checks and route mismatches to review",
         "Input validation: confirm each source document was fully extracted and legible first, so the model is never asked to read a partial or skewed page"
       ],
-      "correct": 1,
+      "correct": 2,
       "explain": "Schema validation guarantees structure, not truth: it cannot confirm the document said the number or that line items sum to the total, so business-rule and provenance checks are required. Tighter schema constraints are the tempting answer, but range and enum rules are still shape checks and pass cleanly on a confidently wrong figure."
     },
     {
@@ -752,12 +739,12 @@
       "d": 2,
       "q": "After connecting a database MCP server, sessions start hitting context limits quickly and Claude warns about oversized tool output. What's the right response?",
       "options": [
-        "Narrow what the tool returns using specific fields, row limits and pagination, since a chatty server burns the context the task needs",
         "Raise the MCP output token limit so large result sets are returned whole instead of being truncated part-way through a query response",
+        "Narrow what the tool returns using specific fields, row limits and pagination, since a chatty server burns the context the task needs",
         "Move the database server to user scope so its tool definitions and results load lazily rather than with every single project session",
         "Wrap the queries so results are written to a file and only the file path is returned, keeping the full result set available on disk"
       ],
-      "correct": 0,
+      "correct": 1,
       "explain": "MCP tool output is warned about near 10,000 tokens and hard-capped by default, so the fix belongs on the tool side: scoped fields, row limits and pagination. Raising the cap is tempting and removes the warning, but it just moves more tokens into the same finite context window and worsens the limit problem described."
     },
     {
@@ -766,38 +753,25 @@
       "q": "A team's .mcp.json is committed to a public repo and includes an Authorization header for a remote server. What's the correct remediation?",
       "options": [
         "Rewrite git history to purge the header from every commit, then keep the same .mcp.json so the team's shared config stays intact",
-        "Rotate the leaked credential first, then use environment-variable expansion in .mcp.json, or move that server to local or user scope",
         "Replace the inline header with a reference to a .env file listed in .gitignore, so the value is no longer stored in .mcp.json itself",
+        "Rotate the leaked credential first, then use environment-variable expansion in .mcp.json, or move that server to local or user scope",
         "Switch the server from remote http to stdio behind a local wrapper that reads the token from the OS keychain at process start"
       ],
-      "correct": 1,
-      "explain": "The credential is already public, so rotation comes first, then env-var expansion in .mcp.json or moving the server to local/user scope keeps secrets out of the commit. History rewriting is the tempting near-miss, but it does not invalidate a key that clones, forks and caches may already hold."
-    },
-    {
-      "domain": "Tool Design",
-      "d": 2,
-      "q": "Connection errors appear on a remote MCP server configured with --transport sse. What's the current guidance?",
-      "options": [
-        "Re-add the server with an explicit --scope user entry so the SSE endpoint is not re-resolved on each project session start",
-        "Raise MCP_TOOL_TIMEOUT and add reconnect handling, since SSE streams are expected to drop and be re-established mid-session",
-        "SSE is deprecated in favour of streamable HTTP for remote MCP servers, so reconfigure the server with --transport http",
-        "Run the server locally over stdio instead, since remote transports cannot maintain a long-lived connection through most proxies"
-      ],
       "correct": 2,
-      "explain": "SSE has been deprecated in favour of streamable HTTP, so switching the transport to http is the actual fix. Timeout tuning plus reconnect logic is the tempting answer, but it treats a deprecated transport's failures as ordinary flakiness rather than migrating off it."
+      "explain": "The credential is already public, so rotation comes first, then env-var expansion in .mcp.json or moving the server to local/user scope keeps secrets out of the commit. History rewriting is the tempting near-miss, but it does not invalidate a key that clones, forks and caches may already hold."
     },
     {
       "domain": "Context Mgmt",
       "d": 3,
-      "q": "After automatic compaction in a long Agent SDK session, an agent starts violating project conventions it had been following. Why does this happen and what handles it?",
+      "q": "SCENARIO - Structured Data Extraction. In a long Agent SDK run, summarisation of older turns has blurred the normalisation conventions the agent had been following, and extraction output has started to drift. What is the durable fix?",
       "options": [
-        "Compaction discards tool results before user messages, so the agent loses the files that demonstrated the conventions and reverts to generic defaults",
-        "Compaction keeps the first and last messages but drops the middle, so conventions stated early survive only if restated in the most recent turn",
-        "Compaction rebuilds the system prompt from the session's tool definitions, so conventions must be encoded as tool descriptions to survive it",
-        "Compaction summarises older messages and can blur instruction detail; the SDK re-reads CLAUDE.md after compacting, so durable conventions belong there"
+        "Keep the conventions in a compact structured state object that is re-injected on every turn, outside whatever gets summarised",
+        "Have the agent restate the conventions in each of its own replies, so the most recent turns always carry them forward intact",
+        "Raise the threshold at which the session summarises, so older turns survive considerably longer before they are condensed away",
+        "Split the run into shorter sessions and let each one rediscover the conventions from the documents that it happens to process"
       ],
-      "correct": 3,
-      "explain": "Compaction summarises older turns and can wash out instruction detail, and because CLAUDE.md is re-read after compaction, durable conventions persist when they live there. The first-and-last-preserved answer is tempting, but restating conventions per turn is not what saves them; the CLAUDE.md re-read is, and hard rules belong in a hook anyway."
+      "correct": 0,
+      "explain": "Critical instructions should be held in a small structured state block that is selectively retained and re-injected, so summarisation of the conversation cannot erode them. The near-miss has the agent restate conventions each turn: it survives a sliding window, but the restatement is itself model output that drifts and is eventually summarised too."
     },
     {
       "domain": "Context Mgmt",
@@ -805,11 +779,11 @@
       "q": "A coordinator must decide what a research subagent returns. The subagent produced 25,000 tokens of exploration to reach four conclusions. What should cross the boundary?",
       "options": [
         "A model-written prose summary of the reasoning path alongside the four conclusions, so the coordinator can see how each one was reached",
-        "Only a distilled structured result: the four conclusions in a defined schema with source attribution, since the raw transcript persists separately for audit",
         "The four conclusions plus the tool results that produced them, so the coordinator can re-verify each claim without resuming the subagent",
+        "Only a distilled structured result: the four conclusions in a defined schema with source attribution, since the raw transcript persists separately for audit",
         "The first several thousand tokens of exploration followed by the conclusions, keeping the early framing that shaped the later analysis"
       ],
-      "correct": 1,
+      "correct": 2,
       "explain": "Handoffs should carry distilled, schema-shaped results with attribution so the coordinator's context stays lean; the audit trail survives because subagent transcripts persist and can be resumed via agentId. Attaching the supporting tool results is the tempting near-miss, but that re-imports the bulk the boundary exists to keep out, and the 25,000 tokens remain retrievable anyway."
     },
     {
@@ -830,12 +804,12 @@
       "d": 2,
       "q": "Your loop executes tool calls one at a time even when Claude returns several tool_use blocks in a single response. What's the consequence and the fix?",
       "options": [
-        "Nothing is lost architecturally: the Messages API requires tool_result blocks to be returned one per message, so serial execution is mandatory",
         "You discard parallelism Claude already offered — run that turn's tool_use blocks concurrently and return all tool_result blocks together",
+        "Nothing is lost architecturally: the Messages API requires tool_result blocks to be returned one per message, so serial execution is mandatory",
         "Return only the first tool_result and let Claude re-request the rest, so each call is confirmed before the next one is dispatched",
         "Set tool_choice to 'any' so each turn yields exactly one tool_use block and your serial executor matches the model's output shape"
       ],
-      "correct": 1,
+      "correct": 0,
       "explain": "Multiple tool_use blocks in one turn mean Claude has already judged those calls independent; executing them concurrently and returning all tool_result blocks in one follow-up message recovers the latency win. The tool_choice='any' option is the near-miss — it does force tool use but does not cap a response at one tool call, and it fixes the symptom by removing the parallelism instead of using it."
     },
     {
@@ -858,10 +832,10 @@
       "options": [
         "The subagent's context window fills with search results before it reaches the summarisation step, so its final report is truncated",
         "The coordinator passes no conversation history, so the subagent lacks the background needed to judge which search results are relevant",
-        "Web search should be dropped from the subagent's toolset in favour of a curated document store that the coordinator assembles and supplies",
-        "The delegation is procedural — it prescribes a fixed sequence, so the subagent follows the script even when interim results show it is failing"
+        "The delegation is procedural — it prescribes a fixed sequence, so the subagent follows the script even when interim results show it is failing",
+        "Web search should be dropped from the subagent's toolset in favour of a curated document store that the coordinator assembles and supplies"
       ],
-      "correct": 3,
+      "correct": 2,
       "explain": "A fixed procedural sequence executes regardless of intermediate findings, so a subagent told to read the top three results reads them even when they are irrelevant; a goal-oriented brief with reformulation criteria lets it adapt. The missing-history option is the near-miss — background can help relevance judgements, but the scenario shows the subagent completing all three prescribed steps, which is scripted compliance rather than a knowledge gap."
     },
     {
@@ -870,11 +844,11 @@
       "q": "You define a subagent in the Agent SDK, but the coordinator never spawns it — it attempts the work itself instead. Nothing errors. What's the most likely misconfiguration?",
       "options": [
         "The subagent's system prompt is too terse for the coordinator's matcher to score it as relevant to the incoming request",
-        "The Task/Agent tool is absent from the coordinator's allowedTools, so it has no mechanism to delegate and silently does the work inline",
+        "Subagent definitions must also be declared in CLAUDE.md before the coordinator will treat them as spawnable at runtime",
         "The subagent's description does not match the task wording, so the coordinator scores it as a poor fit and handles the request itself",
-        "Subagent definitions must also be declared in CLAUDE.md before the coordinator will treat them as spawnable at runtime"
+        "The Task/Agent tool is absent from the coordinator's allowedTools, so it has no mechanism to delegate and silently does the work inline"
       ],
-      "correct": 1,
+      "correct": 3,
       "explain": "Delegation is explicit wiring: with no Task (Agent) tool in the coordinator's allowed tool list there is no mechanism to spawn anything, so it completes the work inline without erroring. The vague-description option is the strong near-miss — a poor description really can suppress selection, but that usually shows up as inconsistent delegation, whereas here the subagent is never spawned at all."
     },
     {
@@ -895,12 +869,12 @@
       "d": 2,
       "q": "A Claude research pipeline is built as a fixed 5-step sequence. When early findings reveal an unexpected subtopic, the pipeline ignores it and produces incomplete coverage. What design change addresses this?",
       "options": [
-        "Decompose into dynamically generated subtasks that adapt as new information surfaces, rather than a predetermined sequence run regardless of findings",
-        "Extend the fixed sequence with extra steps that anticipate the subtopics human reviewers have most often flagged as missing in past runs",
         "Run the same five-step sequence once per candidate subtopic and merge all the outputs, letting sheer breadth substitute for adaptivity",
+        "Extend the fixed sequence with extra steps that anticipate the subtopics human reviewers have most often flagged as missing in past runs",
+        "Decompose into dynamically generated subtasks that adapt as new information surfaces, rather than a predetermined sequence run regardless of findings",
         "Insert a coverage-check step at the end that flags gaps, then rerun the whole five-step sequence with those gaps appended to the brief"
       ],
-      "correct": 0,
+      "correct": 2,
       "explain": "A predetermined sequence cannot respond to what it learns; dynamic decomposition lets the coordinator generate new subtasks from intermediate findings, which is what produces full coverage when the topic's shape is unknown. The end-of-run coverage check is the tempting near-miss — it eventually catches gaps, but only after a full wasted pass, and the scenario's problem is that findings surfacing mid-run are ignored."
     },
     {
@@ -921,12 +895,12 @@
       "d": 1,
       "q": "Three independent documents each need the same analysis, and results are combined at the end. Which orchestration pattern fits, and which would be wrong?",
       "options": [
-        "Parallel execution under a coordinator, since the three analyses are independent; a sequential pipeline serialises work that has no dependencies",
+        "Nested subagents, each one spawning the next and passing its findings down, so the innermost agent produces the combined result",
         "A sequential pipeline, so that each document's analysis can inform how the next document is approached, weighted, and interpreted",
         "One agent processing all three documents in a single shared context, so cross-document continuity is preserved for the final merge",
-        "Nested subagents, each one spawning the next and passing its findings down, so the innermost agent produces the combined result"
+        "Parallel execution under a coordinator, since the three analyses are independent; a sequential pipeline serialises work that has no dependencies"
       ],
-      "correct": 0,
+      "correct": 3,
       "explain": "Pattern choice follows the dependency graph: independent tasks with a final merge map to coordinator-managed parallel execution. Single-context processing is the tempting near-miss — continuity sounds useful for the merge step, but the scenario states the documents are independent, so one shared context just serialises the work and burns context window."
     },
     {
@@ -934,12 +908,12 @@
       "d": 2,
       "q": "A workflow must extract data, then validate it against the extracted values, then generate a report from the validated data. Which pattern, and why not parallel?",
       "options": [
-        "Parallel execution across the three stages, with each stage retrying on failure until the inputs it depends on eventually become available",
-        "Coordinator-worker with three independent workers, one per stage, coordinated through a shared results store that they each poll",
         "A sequential pipeline, since each stage consumes the prior stage's output; parallelising would run validation before the data it validates exists",
+        "Coordinator-worker with three independent workers, one per stage, coordinated through a shared results store that they each poll",
+        "Parallel execution across the three stages, with each stage retrying on failure until the inputs it depends on eventually become available",
         "A single tool call performing extraction, validation, and reporting internally, so no orchestration layer is needed around it at all"
       ],
-      "correct": 2,
+      "correct": 0,
       "explain": "Each stage strictly consumes the previous stage's output, so the stages must run sequentially; parallelism only helps where tasks are genuinely independent. The one-big-tool option is the near-miss — it does preserve the ordering internally, but the question asks which orchestration pattern fits, and hiding all three stages in one call gives up the per-stage validation and visibility the workflow needs."
     },
     {
@@ -973,12 +947,12 @@
       "d": 2,
       "q": "A single Claude review prompt asks for security issues, business-logic bugs, and API design feedback at once. Recall on each concern is mediocre. What's the fix?",
       "options": [
-        "Merge the three concerns into one longer, more emphatic prompt that enumerates each category and demands equal attention to all three",
         "Run specialised review passes separating the concerns, each with its own focused prompt and dedicated few-shot examples, avoiding recall trade-offs",
+        "Merge the three concerns into one longer, more emphatic prompt that enumerates each category and demands equal attention to all three",
         "Keep the single prompt but require findings to be emitted grouped by concern, so each category is addressed explicitly before the next",
         "Keep the single pass and raise temperature so the model explores more angles and surfaces findings it would otherwise rank as marginal"
       ],
-      "correct": 1,
+      "correct": 0,
       "explain": "Competing concerns in one prompt force recall trade-offs; separate passes with concern-specific examples let each dimension get full attention, at the cost of extra calls. Grouping the output by concern is the tempting near-miss — it improves report structure, but the model is still reasoning about all three concerns in one pass, so recall on each stays mediocre."
     },
     {
@@ -987,11 +961,11 @@
       "q": "You've split your Claude Code CI reviews into security, business-logic, and API-design passes. Each pass now needs to reach production quality. What most improves each pass individually?",
       "options": [
         "Reuse the same generic few-shot examples across all three passes so that findings stay consistently formatted and comparable",
-        "Run each pass twice with different phrasings and take the union of findings, so anything either run surfaced reaches the report",
+        "Give each pass dedicated few-shot examples drawn from its own concern, plus explicit inclusion and exclusion boundaries for that category",
         "Raise max_tokens on all three passes so no pass has to truncate its reasoning before reporting every finding it identified",
-        "Give each pass dedicated few-shot examples drawn from its own concern, plus explicit inclusion and exclusion boundaries for that category"
+        "Run each pass twice with different phrasings and take the union of findings, so anything either run surfaced reaches the report"
       ],
-      "correct": 3,
+      "correct": 1,
       "explain": "Splitting passes pays off only when each gets concern-specific examples and explicit inclusion/exclusion boundaries, which is what defines the category for that pass. Running each pass twice and unioning is the near-miss — it can add recall, but it doubles cost and amplifies false positives without ever telling a pass what belongs in its category."
     },
     {
@@ -999,12 +973,12 @@
       "d": 2,
       "q": "In a Claude extraction pipeline, dates arrive in mixed forms — '3/4/26', 'March 4 2026', '2026-03-04' — breaking downstream parsing. Schema validation passes each time. Best fix?",
       "options": [
-        "Put format normalisation in the extraction prompt — always ISO 8601 YYYY-MM-DD — alongside the schema, so output is consistent at source",
         "Add a downstream normaliser that regex-matches every date format you have observed so far and rewrites each one to a canonical form",
+        "Put format normalisation in the extraction prompt — always ISO 8601 YYYY-MM-DD — alongside the schema, so output is consistent at source",
         "Set the field's JSON Schema type to string with format 'date', relying on the validator to reject any value that is not ISO 8601",
         "Retype the field as a plain string and defer all interpretation to the consumer, which already knows which locale each source uses"
       ],
-      "correct": 0,
+      "correct": 1,
       "explain": "The schema types the field loosely enough that every observed form validates, so the canonical representation has to be specified in the extraction instructions — state ISO 8601 and consistency is produced at source. The format:'date' option is the strong near-miss: it names a real JSON Schema annotation, but format is advisory and commonly unenforced, and the scenario already reports validation passing on every variant."
     },
     {
@@ -1012,12 +986,12 @@
       "d": 2,
       "q": "A status field should only ever be one of pending, shipped, delivered, cancelled, but Claude sometimes returns 'in transit' or 'on the way'. Which schema change fixes this?",
       "options": [
-        "Spell out the four allowed values in the field's description text, so the model is told plainly which statuses are acceptable here",
+        "Define the field as an enum over the four permitted values, so anything outside that set is structurally invalid rather than merely discouraged",
         "Make the field nullable so that unrecognised statuses can be emitted as null and then filtered out before the value reaches consumers",
         "Add a few-shot example showing each of the four statuses in use, so the model generalises from the demonstrated status vocabulary",
-        "Define the field as an enum over the four permitted values, so anything outside that set is structurally invalid rather than merely discouraged"
+        "Spell out the four allowed values in the field's description text, so the model is told plainly which statuses are acceptable here"
       ],
-      "correct": 3,
+      "correct": 0,
       "explain": "An enum constrains the field to a fixed value set at the schema level, making out-of-set values invalid rather than just disfavoured. The few-shot option is the tempting near-miss — examples do steer vocabulary and would reduce 'in transit', but they remain guidance, so an unlisted value still validates; only the enum enforces the closed set."
     },
     {
@@ -1039,12 +1013,246 @@
       "q": "Why is a structured state object preferable to a prose running summary for tracking a Claude agent's accumulated facts across compaction cycles?",
       "options": [
         "It occupies far more tokens than equivalent prose, which devotes a much larger share of the window to the agent's accumulated facts",
-        "Structured state can be validated against a schema, letting the runtime reject any compaction whose output has dropped a required field",
+        "It keeps values addressable and unambiguous: fields are read, updated, and validated individually, while prose blurs specifics on re-summarisation",
         "Prose summaries must be re-summarised on every compaction cycle, whereas structured state is carried forward untouched and never needs updating",
-        "It keeps values addressable and unambiguous: fields are read, updated, and validated individually, while prose blurs specifics on re-summarisation"
+        "Structured state can be validated against a schema, letting the runtime reject any compaction whose output has dropped a required field"
+      ],
+      "correct": 1,
+      "explain": "Structured fields stay individually readable, updatable, and verifiable, so specific values survive repeated compaction, whereas each re-summarisation of prose loses precision. Schema validation of the state is the near-miss — it is a genuine side benefit, but the core reason is addressability of the values themselves, and validation alone would not stop prose from blurring."
+    },
+    {
+      "domain": "CI/CD",
+      "d": 1,
+      "q": "Your GitHub Actions workflow needs Claude Code to review each pull request on a runner with no TTY, and a later step must parse the result. Which invocation shape is correct?",
+      "options": [
+        "Run `claude -p` with the review prompt plus `--verbose`, then scrape the streamed thinking blocks for the reviewer's final conclusions.",
+        "Run `claude` with the review prompt as a positional argument, then pipe the interactive transcript to a parsing step later in the job.",
+        "Run `claude -p` with the review prompt plus `--output-format json`, so the run is non-interactive and the result is machine-parseable.",
+        "Run `claude --continue` with the review prompt so the job reuses the previous run's session and prints its final result to standard out."
+      ],
+      "correct": 2,
+      "explain": "Print mode (`-p`/`--print`) is the non-interactive entry point, and `--output-format json` gives the later step a stable structure to parse. The near-miss is invoking `claude` with a positional prompt: without print mode Claude Code starts an interactive session, which a TTY-less runner cannot drive."
+    },
+    {
+      "domain": "CI/CD",
+      "d": 2,
+      "q": "A nightly Claude Code CI job occasionally loops on a flaky test, burning hours of runtime and API spend before the job timeout kills it. Which configuration most directly bounds both the work and the spend of the run?",
+      "options": [
+        "Set `--max-turns` and `--max-budget-usd` on the print-mode invocation, so the run stops once either the turn cap or the dollar cap is hit.",
+        "Set `--max-turns` and lower the job's runner timeout, relying on the CI platform to stop the run before meaningful API spend accrues.",
+        "Set `--permission-mode plan` and `--verbose` so the run only proposes work, which keeps its cost inherently bounded on every invocation.",
+        "Set `--fallback-model` to a cheaper model and lower the reasoning effort, so each turn costs less even when the agent loops on a bad test."
+      ],
+      "correct": 0,
+      "explain": "`--max-turns` and `--max-budget-usd` are print-mode caps that stop the run on turns and on dollars respectively, and subagent spend counts toward the budget cap. The near-miss pairs the right turn cap with a runner timeout: wall-clock termination bounds job duration but not the spend already incurred, and it gives no graceful exit."
+    },
+    {
+      "domain": "CI/CD",
+      "d": 2,
+      "q": "Your CI job posts Claude's review findings as individual line comments. A shell script currently regex-scrapes the markdown Claude prints, and it breaks whenever the prose wording shifts. What is the most reliable fix?",
+      "options": [
+        "Run print mode with `--json-schema` describing the finding objects, so the run emits validated JSON that the posting step consumes directly.",
+        "Have the job run the review twice and post only findings whose scraped text matches across both runs, discarding any that differ at all.",
+        "Add a strict system prompt fixing the markdown headings and bullet wording, then keep the existing regex scraper pointed at that format.",
+        "Pipe the printed markdown into a second print-mode Claude Code call that reformats it as JSON before the posting step reads the findings."
+      ],
+      "correct": 0,
+      "explain": "`--json-schema` in print mode makes the run emit output validated against the schema you supply, so the posting step parses fields instead of prose. The near-miss is pinning the markdown format via the system prompt: formatting instructions are best-effort, so the scraper stays one wording drift away from breaking again."
+    },
+    {
+      "domain": "CI/CD",
+      "d": 2,
+      "q": "Your review bot runs on every push to a pull request. On the third push it re-posts the same three comments about a deliberate custom error wrapper that the author already replied to and dismissed. What is the best fix?",
+      "options": [
+        "Have the posting step compare new comment bodies against the pull request's existing comments and drop exact text matches before posting.",
+        "Narrow the review to only the files touched by the most recent push, so previously reviewed code cannot produce the same findings again.",
+        "Pass the prior run's findings and the project's accepted patterns in as review context, so the agent skips issues already raised or excluded.",
+        "Instruct the reviewer to be conservative and report only issues it is highly confident about, which will suppress the repeated comments."
+      ],
+      "correct": 2,
+      "explain": "Feeding prior findings and the codebase's accepted patterns into each run stops the agent re-deriving the same issue, and persistent convention context is what keeps a deliberate pattern from being flagged at all. The near-miss is text-matching comments before posting: it hides exact repeats but not reworded ones, and the agent still spends the run rediscovering them."
+    },
+    {
+      "domain": "CI/CD",
+      "d": 3,
+      "q": "A CI pipeline has Claude Code generate a feature implementation and then, in the same session, asks it to review its own diff. The review almost never finds problems. Which change best addresses this?",
+      "options": [
+        "Extend the same session with a review turn instructing the agent to adopt a skeptical persona and re-read every file it has just written.",
+        "Run the review as a separate Claude Code instance that sees only the diff and the project standards, not the authoring session's reasoning.",
+        "Keep the single session but raise the turn limit, giving the agent room to iterate over its own output before it reports any findings.",
+        "Keep the single session but require a confidence score per file, and escalate only the files scoring below a fixed review threshold."
+      ],
+      "correct": 1,
+      "explain": "An independent instance reviews the diff without the authoring session's rationale in context, so it does not inherit the assumptions that produced the defect. The near-miss is a skeptical-persona turn in the same session: the flawed reasoning is still in context, so the model tends to re-justify its own work rather than challenge it."
+    },
+    {
+      "domain": "CI/CD",
+      "d": 2,
+      "q": "Claude Code generates unit tests in CI, but the output uses a mocking library the repo does not use, ignores the shared fixture factory, and mostly asserts that constructors return non-null values. How do you most improve this?",
+      "options": [
+        "Raise the turn limit and request more tests per module, so broader coverage compensates for weak assertions in any individual test case.",
+        "Add a lint step that rejects any test importing an unapproved library, and re-run generation until the produced suite passes that check.",
+        "Supply representative existing test files and the fixture conventions as context, plus criteria separating behavioral tests from trivial ones.",
+        "Switch generation to plan mode so the agent proposes a test plan for approval before writing any assertions against the new modules."
+      ],
+      "correct": 2,
+      "explain": "Existing tests show the mocking library and fixture factory by example, and explicit criteria for a behavioral assertion stop the model settling for non-null checks. The near-miss is the lint gate: it can reject the wrong import but cannot teach fixture conventions or turn a trivial assertion into a meaningful one."
+    },
+    {
+      "domain": "Tool Design",
+      "d": 1,
+      "q": "Your team wants an internal analytics MCP server available to everyone who clones the repository, with the same command and arguments, and reviewed like any other change. Which configuration approach fits?",
+      "options": [
+        "Add it at user scope in each developer's own configuration, and document the exact add command in the repository's contributor guide.",
+        "Add it at local scope in the repository checkout so it applies to that project directory only and travels with the cloned working tree.",
+        "Ship a setup task that runs the add command at session start, so the server is registered freshly for each developer on every machine.",
+        "Add it at project scope so the definition lands in the repository's checked-in `.mcp.json` and is reviewed and shared like any other change."
       ],
       "correct": 3,
-      "explain": "Structured fields stay individually readable, updatable, and verifiable, so specific values survive repeated compaction, whereas each re-summarisation of prose loses precision. Schema validation of the state is the near-miss — it is a genuine side benefit, but the core reason is addressability of the values themselves, and validation alone would not stop prose from blurring."
+      "explain": "Project scope writes the server into `.mcp.json` at the repo root, which is committed, so every clone gets the same definition and changes go through code review. The near-miss is user scope plus documentation: it works per machine but drifts silently, since nothing keeps each developer's private configuration in step with the repo."
+    },
+    {
+      "domain": "Tool Design",
+      "d": 2,
+      "q": "The checked-in `.mcp.json` for that analytics server needs an API key. Keys differ per developer and must never be committed to the repository. What is the right configuration?",
+      "options": [
+        "Store the key in the CI secret store and have a setup script rewrite `.mcp.json` with the literal value before each interactive session.",
+        "Commit a placeholder key value in `.mcp.json` and have each developer edit it locally, keeping that edited file out of every future commit.",
+        "Move the whole server definition to user scope for everyone, because a project-scoped configuration cannot carry any credential material.",
+        "Reference the key as `${ANALYTICS_API_KEY}` in the server's env block, so each developer supplies the value from their own environment."
+      ],
+      "correct": 3,
+      "explain": "Claude Code expands `${VAR}` references in `.mcp.json`, so the shared file stays secret-free while each developer's environment supplies the value. The near-miss is a committed placeholder edited locally: it puts real credentials in a tracked file, where a routine commit leaks them."
+    },
+    {
+      "domain": "Tool Design",
+      "d": 1,
+      "q": "After adding an MCP server, a developer reports that Claude 'does not know about' its tools. You need to establish whether Claude Code actually connected to the server. What do you check first?",
+      "options": [
+        "Ask Claude inside the session to list the tools it can call, and treat the absence of that server's tools as proof the config is invalid.",
+        "Re-add the server at a broader scope, since tool discovery only happens for servers configured at user scope rather than project scope.",
+        "Inspect the server process logs for inbound traffic, since a connected client always writes a discovery request the server records in a log.",
+        "Check the server's connection status in the MCP server listing, since a server that fails to connect or awaits approval exposes no tools."
+      ],
+      "correct": 3,
+      "explain": "Listing the MCP servers shows a per-server status such as connected, needs authentication, or failed to connect, which separates a config problem from a connection or approval problem. The near-miss is asking Claude what tools it has: the symptom is confirmed but the cause is not, and a model's self-report of its tool list is not a diagnostic."
+    },
+    {
+      "domain": "Tool Design",
+      "d": 3,
+      "q": "A support MCP server exposes a `search_docs` tool. Agents spend many turns calling it repeatedly to page through a small, stable refund policy handbook before they can answer. What is the better design?",
+      "options": [
+        "Keep the tool but widen its result limit so one call returns the whole handbook, and instruct agents to call it exactly once per case.",
+        "Keep the tool and add a `get_policy_section` tool, so agents can jump straight to a named section instead of paging through search hits.",
+        "Expose the handbook documents as MCP resources the client can attach directly, so agents read them without exploratory search tool calls.",
+        "Drop the tool and inline the handbook text into the agent's system prompt at the start of every support case the agent picks up."
+      ],
+      "correct": 2,
+      "explain": "Resources are addressable content the client can fetch and attach, which is the right fit for a small stable corpus and removes the exploratory search loop entirely. The near-miss is adding `get_policy_section`: it shortens the loop but still spends a model turn and a tool call to retrieve content that could simply be attached."
+    },
+    {
+      "domain": "Tool Design",
+      "d": 3,
+      "q": "An extraction service must always return a record through your `record_invoice` tool, but the model sometimes answers in prose, and sometimes calls `record_invoice` before calling `fetch_vendor` for the vendor ID it needs. How do you fix both?",
+      "options": [
+        "Force `record_invoice` with `tool_choice`, and mark the vendor ID required so the model must fetch it before it can populate the record.",
+        "Set `tool_choice` to `any` for the exchange, so the model must call some tool each turn and will therefore order the two calls correctly.",
+        "Leave `tool_choice` on auto, add a prompt line requiring the lookup first, and retry the request whenever the reply comes back as prose.",
+        "Force `record_invoice` with `tool_choice`, and sequence the work so the vendor lookup happens in an earlier call whose result is passed in."
+      ],
+      "correct": 3,
+      "explain": "Forcing the specific tool guarantees the structured call instead of prose, and because the forced turn cannot also call `fetch_vendor`, the prerequisite lookup has to be its own earlier step whose result is fed forward. The near-miss relies on a required schema field to force the lookup: a required field only makes the model fill the slot, which it can do by guessing rather than by calling `fetch_vendor`."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 2,
+      "q": "A long Claude Code session has mapped a 2,000-file service. Overnight another team merged changes to eight of those files. You resume the session the next morning. How do you most efficiently restore correctness?",
+      "options": [
+        "Ask the agent to redo its original exploration from scratch, since any cached understanding of the service may now be silently outdated.",
+        "Resume the session and name the eight changed files, so the agent re-reads only those and updates the understanding it already holds.",
+        "Resume the session and ask the agent to diff its own notes against the repository, letting it decide for itself which files to re-read.",
+        "Start a new session with the merge diff attached, discarding the earlier mapping because a resumed session's context cannot be corrected."
+      ],
+      "correct": 1,
+      "explain": "Resumption preserves the expensive mapping, and injecting the list of changed files scopes re-analysis to exactly the stale portion. The near-miss is having the agent diff its own notes against the repo: it is targeted in spirit but spends many turns rediscovering what the merge already told you precisely."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 3,
+      "q": "A three-hour debugging session is near its context limit, and most of the history is verbose tool output describing a database schema that has since been redesigned. You must continue the work tomorrow. Which approach is best?",
+      "options": [
+        "Start a fresh session and inject a written summary of the conclusions and the new schema, leaving the obsolete tool output behind entirely.",
+        "Resume the session with forking so the original transcript is preserved, then carry on from the same accumulated tool results as before.",
+        "Resume the session and prepend a note that the schema changed, relying on the agent to prefer that note over the stale output it holds.",
+        "Resume the session and compact the history, trusting compaction to drop the obsolete schema output while retaining the useful conclusions."
+      ],
+      "correct": 0,
+      "explain": "When most of the accumulated context is actively wrong, a fresh session seeded with a curated summary is both cheaper and safer than carrying contradictory material forward. The near-miss is resuming and compacting: compaction shrinks the transcript but you do not control what it keeps, so the outdated schema can survive into the summary and keep misleading the agent."
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 2,
+      "q": "A nightly pipeline runs a coordinator over 400 repositories with analysis subagents. When the runner is preempted at repository 300, the entire run restarts from zero the next night. Which design change fixes this?",
+      "options": [
+        "Raise each subagent's turn limit and run repositories in larger parallel batches, so the pipeline finishes before preemption can occur.",
+        "Persist per-repository status and results to durable external state as each finishes, so a restart resumes at the first unprocessed repo.",
+        "Have each subagent retry its own repository on failure, so an interrupted worker recovers locally and the coordinator never has to restart.",
+        "Have the coordinator hold every per-repository result in its own context and emit them at the end, so a restart can reuse that state."
+      ],
+      "correct": 1,
+      "explain": "Externalising per-unit progress as work completes makes the pipeline resumable: a restart reads the manifest and skips everything already done. The near-miss keeps results in the coordinator's context, which dies with the process and also grows the context window until quality degrades."
+    },
+    {
+      "domain": "Context Mgmt",
+      "d": 2,
+      "q": "An invoice extraction pipeline sends 10% of documents to human reviewers, chosen at random. Reviewers mostly confirm easy documents while real errors keep reaching downstream systems. How should routing be redesigned?",
+      "options": [
+        "Route on the overall document confidence score alone, sending every document scoring below one tuned global threshold to a human reviewer.",
+        "Route on field-level confidence and document characteristics, so ambiguous fields and unusual document types reach a reviewer every time.",
+        "Raise the random sample to 30% of documents, since a larger uniform sample will catch proportionally more of the errors going downstream.",
+        "Route the documents that needed the most extraction retries, since retry count is the clearest signal available that a document was hard."
+      ],
+      "correct": 1,
+      "explain": "Targeting review at low-confidence fields and at document characteristics known to be difficult puts human attention where the errors actually are, instead of spending it on easy documents. The near-miss is a single document-level confidence threshold: it is confidence-driven but a document with one badly ambiguous field can still score high overall and bypass review."
+    },
+    {
+      "domain": "Context Mgmt",
+      "d": 3,
+      "q": "Your extraction pipeline reports 96% field accuracy overall and the team proposes cutting human review. One vendor's handwritten remittance advices make up 4% of volume. What is the key risk in that number?",
+      "options": [
+        "Accuracy is measured against reviewer-corrected data, so the figure is circular and cannot support any decision about review volume at all.",
+        "Accuracy without a confidence interval is unusable, so the number must be recomputed with error bars before any decision is defensible.",
+        "An aggregate can hide a document type that performs far worse; a rare handwritten class could fail badly and barely move the overall figure.",
+        "Field accuracy weights every field equally, so the number says nothing about whether throughput can absorb a reduction in human review."
+      ],
+      "correct": 2,
+      "explain": "A volume-weighted aggregate is dominated by the easy majority, so a 4% class could be near-random and still leave the headline near 96%. The near-miss is the circularity objection: reviewer-corrected ground truth is a real methodological caveat, but it does not explain why a small hard class is invisible in the aggregate."
+    },
+    {
+      "domain": "Context Mgmt",
+      "d": 2,
+      "q": "Before reducing human review on your extraction pipeline, the team wants evidence that doing so is safe. Which validation gives the strongest basis for deciding where review can be cut?",
+      "options": [
+        "One held-out sample drawn uniformly from recent volume and scored overall, with review reduced once the total error rate looks acceptable.",
+        "A production test that halves review for one traffic group and compares downstream correction tickets between groups over a full quarter.",
+        "A calibration check that reported confidence scores match observed accuracy, with review reduced wherever reported confidence is high.",
+        "Accuracy measured per document type and per field against ground truth, with review retained for the type-and-field pairs that fall short."
+      ],
+      "correct": 3,
+      "explain": "Segmenting accuracy by document type and field shows exactly which slices are safe to automate and which must stay under review, rather than trading a blanket decision on one number. The near-miss is the calibration check: well-calibrated confidence is necessary but not sufficient, because a type can be confidently and consistently wrong."
+    },
+    {
+      "domain": "Structured Output",
+      "d": 3,
+      "q": "A review call asks Claude to return a JSON array of findings for a 4,000-line diff. The response is consistently cut off mid-object and fails schema validation, even though the schema itself is correct. What is the right fix?",
+      "options": [
+        "Split the diff into smaller scoped review calls that each return a valid findings array, and merge the results once all the calls finish.",
+        "Raise the output token limit to the model's ceiling so the whole findings array fits, and validate that single response against the schema.",
+        "Relax the schema so partial objects still validate, then repair the truncated final entry in post-processing before the findings are merged.",
+        "Retry the same call with the validation error fed back, so the model emits a shorter array that fits within the available response budget."
+      ],
+      "correct": 0,
+      "explain": "Truncation is an output-length problem, and scoping each call to a slice of the diff keeps every response comfortably inside the limit while the merge reconstructs the full finding set. The near-miss is raising the token ceiling: it may buy headroom for this diff but the failure returns on the next larger one, and it does nothing about quality loss over a very long single response."
     }
   ]
 }

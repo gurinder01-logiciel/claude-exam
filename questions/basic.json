@@ -28,11 +28,11 @@
       "q": "Your app needs to process 10,000 support tickets overnight for classification. Live responses aren't needed and cost efficiency matters most. What should you use?",
       "options": [
         "Streaming Messages API fanned out across many concurrent worker connections",
-        "Message Batches API, which processes large request sets asynchronously at reduced cost",
         "Extended thinking with a high budget_tokens value on each classification request",
+        "Message Batches API, which processes large request sets asynchronously at reduced cost",
         "One synchronous request that packs all tickets into a single prompt-cached context"
       ],
-      "correct": 1,
+      "correct": 2,
       "explain": "The Message Batches API is purpose-built for large asynchronous workloads and costs less per token than live calls. High-concurrency streaming is the tempting near-miss: it does raise throughput but bills at standard rates and adds rate-limit pressure, so it misses the cost-efficiency requirement."
     },
     {
@@ -41,25 +41,25 @@
       "q": "You need Claude to always return valid JSON matching a specific schema. Which combination is most reliable?",
       "options": [
         "A stop_sequences list of closing braces so output is truncated to valid JSON only",
-        "A schema in the system prompt with temperature raised so Claude explores valid variants",
+        "A schema in the system prompt plus assistant prefill, with a validate-and-retry loop",
         "Extended thinking enabled so Claude self-checks the JSON shape before emitting it",
-        "A schema in the system prompt plus assistant prefill, with a validate-and-retry loop"
+        "A schema in the system prompt with temperature raised so Claude explores valid variants"
       ],
-      "correct": 3,
+      "correct": 1,
       "explain": "Reliability comes from combining a clear schema, prefilling the assistant turn to anchor the format, and programmatically retrying on validation failure. The extended-thinking option is the strong near-miss: internal reasoning can improve quality but provides no guarantee of schema conformance, so you still need external validation."
     },
     {
       "domain": "Claude API",
       "d": 1,
-      "q": "Why is the Messages API described as 'stateless'?",
+      "q": "SCENARIO - Customer Support Resolution Agent. Your Messages API loop receives stop_reason 'tool_use', runs lookup_order locally, and must let Claude continue the same turn. What must the next request contain?",
       "options": [
-        "Conversation state is retained only for the lifetime of a single streaming connection",
-        "Every request must carry the full conversation history; no turns are stored server-side",
-        "State is kept server-side but expires once the prompt cache TTL elapses for that prefix",
-        "Only the system prompt persists between calls; user and assistant turns must be resent"
+        "The full prior message list plus an assistant message restating the tool output as plain prose for the model to read",
+        "Only the tool_result block for that call, because the service retains the earlier turns of this conversation for you",
+        "The full prior message list plus a new user message carrying the tool_result block that matches that tool_use id",
+        "Only the original user question and the tool output, letting the model reconstruct the intervening reasoning itself"
       ],
-      "correct": 1,
-      "explain": "Stateless means the API stores nothing between calls, so the client resends the entire message list each time. 'Retained for the lifetime of a streaming connection' is the tempting near-miss: streaming only affects how one response is delivered, and no turn history survives even within that connection."
+      "correct": 2,
+      "explain": "The loop continues by appending the assistant's tool_use turn and then a user turn whose tool_result block carries the matching id, with the whole history resent each time. The near-miss is sending only the tool_result: it uses the right block but assumes the prior turns are held for you, so the model loses the request it was answering."
     },
     {
       "domain": "Claude API",
@@ -92,12 +92,12 @@
       "d": 1,
       "q": "A project-level CLAUDE.md and a user-level CLAUDE.md give conflicting instructions. Which takes precedence?",
       "options": [
-        "The more specific, local configuration wins, so project-level overrides user-level",
         "User-level wins, since personal preferences are loaded last and override project files",
+        "The more specific, local configuration wins, so project-level overrides user-level",
         "The files are concatenated and Claude asks you which conflicting instruction to follow",
         "Whichever file is larger is treated as authoritative for the overlapping instructions"
       ],
-      "correct": 0,
+      "correct": 1,
       "explain": "Memory files cascade from broad to specific, and the closest scope to the work (project, then directory) takes precedence on conflicts. 'User-level loaded last' is the near-miss: load order is real, but it runs the other way, with narrower project context taking priority."
     },
     {
@@ -107,10 +107,10 @@
       "options": [
         "Claude should make the edits and rely on a stop hook to revert anything that breaks",
         "Claude should read the whole repo into context first, then edit as understanding forms",
-        "Claude should use plan mode to propose an approach for review before editing any file",
-        "Claude should split the refactor across separate subagents that each pick a strategy"
+        "Claude should split the refactor across separate subagents that each pick a strategy",
+        "Claude should use plan mode to propose an approach for review before editing any file"
       ],
-      "correct": 2,
+      "correct": 3,
       "explain": "For large, ambiguous, cross-file work, plan mode surfaces the intended approach so you can correct it before any write happens. Reading the repo first is the tempting near-miss: context gathering is useful but it is not a review gate, and edits can still begin from a wrong plan."
     },
     {
@@ -118,12 +118,12 @@
       "d": 1,
       "q": "What's the primary use of hooks in Claude Code?",
       "options": [
-        "Running validation, logging, or blocking of risky actions before or after a step",
+        "Routing certain prompts to a cheaper model to reduce token spend on simple requests",
         "Injecting extra reference files into context at the moment a tool result is returned",
         "Retrying a failed tool call automatically with adjusted parameters until it succeeds",
-        "Routing certain prompts to a cheaper model to reduce token spend on simple requests"
+        "Running validation, logging, or blocking of risky actions before or after a step"
       ],
-      "correct": 0,
+      "correct": 3,
       "explain": "Hooks are shell commands wired to lifecycle events, letting you validate, log, or block an action deterministically. 'Injecting extra reference files' is the near-miss: some hooks can add context, but that is a side effect, not the primary purpose of enforcement and observability."
     },
     {
@@ -131,38 +131,25 @@
       "d": 1,
       "q": "An MCP server exposes 40 near-identical tools, and Claude keeps picking the wrong one. What's the real problem and fix?",
       "options": [
-        "Reasoning overload from many near-identical tools; consolidate and scope them tightly",
         "Ambiguous parameter schemas; add enum constraints to every argument on all 40 tools",
+        "Reasoning overload from many near-identical tools; consolidate and scope them tightly",
         "Tool descriptions truncated by the client; shorten each name so all 40 fit in context",
         "Missing tool_choice configuration; force a specific tool on every turn to remove doubt"
       ],
-      "correct": 0,
+      "correct": 1,
       "explain": "Large sets of overlapping tools make selection ambiguous, so the fix is consolidating and narrowing tool surface area. Tightening parameter schemas is the tempting near-miss: better schemas help argument accuracy but do nothing to disambiguate which of 40 similar tools to call."
-    },
-    {
-      "domain": "MCP",
-      "d": 1,
-      "q": "When should you choose SSE/HTTP transport over stdio for an MCP server?",
-      "options": [
-        "When the server is written in a language that cannot read and write standard streams",
-        "When the server is local but needs to stream partial tool results back incrementally",
-        "When the server must handle several concurrent requests from one local desktop client",
-        "When the server must be reachable remotely and serve multiple users with authentication"
-      ],
-      "correct": 3,
-      "explain": "stdio fits local single-user processes; HTTP/SSE exists for remote servers that need network reachability, multi-user access, and auth. Streaming partial results is the near-miss: it sounds transport-specific, but stdio already carries incremental messages, so streaming is not the deciding factor."
     },
     {
       "domain": "MCP",
       "d": 3,
       "q": "You're designing an MCP tool that can permanently delete production records. What must the design include?",
       "options": [
-        "An explicit confirmation step that must be satisfied before the irreversible call runs",
         "A dry_run parameter defaulting to true, with the description warning about data loss",
+        "An explicit confirmation step that must be satisfied before the irreversible call runs",
         "Rate limiting on the endpoint so no more than a few records can be removed per minute",
         "A read-only companion tool listing affected records that Claude is instructed to call first"
       ],
-      "correct": 0,
+      "correct": 1,
       "explain": "Destructive, irreversible operations need a real confirmation gate enforced at the tool boundary, not left to model judgment. The dry_run default is the strongest near-miss: it reduces accidents but the model can still set dry_run to false in the same turn, so nothing actually blocks the deletion."
     },
     {
@@ -177,19 +164,6 @@
       ],
       "correct": 3,
       "explain": "MCP servers publish capabilities (tools, resources, prompts) and MCP clients like Claude connect, discover, and invoke them. The symmetric-capabilities option is the near-miss: clients do expose some features such as sampling, but tools and resources flow from server to client, not both ways."
-    },
-    {
-      "domain": "Claude Code",
-      "d": 2,
-      "q": "You can describe exactly what 'done' looks like (all tests pass, zero type errors) better than the steps to get there. Which approach fits best?",
-      "options": [
-        "Use /compact between attempts so the running summary preserves only the failing test names",
-        "Use plan mode so the proposed steps are reviewed before any of the refactoring begins",
-        "Re-run the same prompt on a fixed interval until the test suite eventually comes back green",
-        "Use /goal to set a completion condition so Claude iterates until an evaluator confirms it"
-      ],
-      "correct": 3,
-      "explain": "When the finish line is easier to specify than the path, a goal with a completion condition lets Claude keep working until a fast evaluator verifies it. Plan mode is the tempting near-miss: it structures the approach up front but has no mechanism for checking whether 'done' was ever reached."
     },
     {
       "domain": "Claude Code",
@@ -210,51 +184,38 @@
       "q": "You've typed the same multi-step procedure more than once, and it includes long reference material and a helper script. How should you package it?",
       "options": [
         "Register it as an organization-level managed policy so the procedure is applied automatically",
-        "Package it as a skill with every step and the full reference material written inline in skill.md",
+        "Package it as a skill with a lean skill.md, pushing depth into reference.md and helper scripts",
         "Paste the whole procedure plus reference material into project CLAUDE.md for the team to share",
-        "Package it as a skill with a lean skill.md, pushing depth into reference.md and helper scripts"
+        "Package it as a skill with every step and the full reference material written inline in skill.md"
       ],
-      "correct": 3,
+      "correct": 1,
       "explain": "Skills use progressive disclosure: a short skill.md that Claude always sees, with bulky reference files and scripts loaded only when needed. Writing everything inline in skill.md is the near-miss: it is still a skill, but it defeats progressive disclosure and consumes context on every invocation."
     },
     {
       "domain": "Claude Code",
       "d": 2,
-      "q": "You ask Claude in auto mode to refactor authentication and it writes broken authentication. What happens, and what should you add?",
+      "q": "SCENARIO - Code Generation with Claude Code. A refactor of authentication touches a dozen files and the team lead must sign off on the approach before any edit lands. How should the work be run?",
       "options": [
-        "The safety classifier allows it since broken code is not dangerous; add a stop hook running tests",
-        "The safety classifier flags the edit because authentication code is treated as security sensitive",
-        "Plan mode would have prevented it by validating the refactor's correctness before any writes",
-        "Bypass permissions would have surfaced it by prompting on each individual file modification"
+        "Use plan mode so an approach is produced and approved before any edit begins, then execute the agreed plan on the files",
+        "Use direct execution but ask Claude to summarise its intended approach in its first reply before it changes anything",
+        "Use direct execution and have a second Claude instance review the resulting diff once the refactor has been written",
+        "Use one prompt asking for both the refactor and a written rationale, and have the lead read that rationale afterwards"
       ],
       "correct": 0,
-      "explain": "Auto mode's classifier screens actions for danger, not for correctness, so safe-but-broken code passes through; a stop hook that runs your tests catches it. The plan-mode option is the tempting near-miss: review of the approach is valuable but it cannot verify the code that gets written."
+      "explain": "Plan mode fits work that is broad, high risk, and gated on human approval, because the plan is reviewed while the session is still read-only. The near-miss asks for an approach summary under direct execution: the summary arrives, but nothing stops the edits from proceeding before the lead has agreed to it."
     },
     {
       "domain": "Claude Code",
       "d": 2,
-      "q": "You want a dependency audit to run every morning at 9am with no machine of yours staying on and no workflow file to maintain. Which fits?",
+      "q": "SCENARIO - Claude Code for Continuous Integration. A CI job must run Claude on every pull request without a terminal, emit findings a script can parse, and never let one run stall the pipeline. Which invocation fits?",
       "options": [
-        "A routine running on Anthropic-hosted infrastructure, started by a cron-style schedule trigger",
-        "A headless claude -p invocation wired to a cron entry on one of your own always-on machines",
-        "The Agent SDK embedded in a small service you deploy so the audit runs on your own schedule",
-        "A GitHub Actions workflow on a schedule trigger, calling Claude Code from the action runner"
+        "Run Claude interactively in the runner and pipe the transcript to a parser, with the turn limit configured in settings",
+        "Run Claude in print mode and parse the plain-text findings, relying on the CI job's own wall-clock timeout to stop runs",
+        "Run Claude in print mode, request the JSON output format, and cap the turns so a looping run terminates rather than hangs",
+        "Run Claude in print mode with no limits, then add a follow-up job that inspects the transcript the run leaves behind"
       ],
-      "correct": 0,
-      "explain": "A hosted routine with a cron trigger satisfies all three constraints: nothing of yours stays powered on and there is no workflow file to maintain. The GitHub Actions option is the strongest near-miss: the runner is not your machine, but you still author and maintain a workflow file."
-    },
-    {
-      "domain": "Claude Code",
-      "d": 2,
-      "q": "Your team wants Claude to review every PR with inline comments, nothing to build or host, and no approve/block needed. Which fits?",
-      "options": [
-        "Managed code review via the Claude GitHub app, which posts inline comments once installed",
-        "The Claude Code GitHub action with a workflow file that comments on each pull request event",
-        "A headless claude -p run behind a webhook receiver your team deploys and keeps available",
-        "The /code-review command run locally by each reviewer before they approve the pull request"
-      ],
-      "correct": 0,
-      "explain": "The managed GitHub app is installed rather than built, and it posts inline review comments automatically without gating merges. The GitHub action is the tempting near-miss: it produces the same comments but requires you to author and maintain a workflow file."
+      "correct": 2,
+      "explain": "Non-interactive print mode plus a structured JSON output format plus an explicit turn or cost limit is the CI shape: parseable results and a bounded run. The near-miss keeps print mode but parses prose and outsources the bound to the job timeout, which yields brittle parsing and kills the run instead of ending it cleanly."
     },
     {
       "domain": "Claude Code",
@@ -262,25 +223,12 @@
       "q": "A job ran unattended in CI and reports success. What's the most reliable first move before shipping?",
       "options": [
         "Read Claude's end-of-run summary and confirm it lists the same files the ticket mentioned",
-        "Start from the diff itself and confirm from test output that the suite genuinely passed",
+        "Check that the run exited with status zero and that no tool calls were denied by permissions",
         "Re-run the identical prompt in a fresh session and compare the two summaries for agreement",
-        "Check that the run exited with status zero and that no tool calls were denied by permissions"
+        "Start from the diff itself and confirm from test output that the suite genuinely passed"
       ],
-      "correct": 1,
+      "correct": 3,
       "explain": "A self-reported success is a claim, so verification means inspecting the actual diff and the real test output. Checking the exit status is the tempting near-miss: it is objective evidence, but a run can exit cleanly while tests were skipped, filtered, or never invoked."
-    },
-    {
-      "domain": "Claude Code",
-      "d": 1,
-      "q": "A community plugin gives you a skill you want. What should you do before enabling it?",
-      "options": [
-        "Confirm it comes from a marketplace that runs automated review before publishing submissions",
-        "Inspect every hook, agent, and MCP server it adds, since plugin code runs with your privileges",
-        "Rely on plugin namespacing to keep its commands and agents from colliding with your own",
-        "Enable it in a throwaway project first and rely on permission prompts to catch anything risky"
-      ],
-      "correct": 1,
-      "explain": "A plugin can contribute hooks, agents, and MCP servers that execute with your own privileges and fire automatically, so you review its contents before enabling. The sandboxed-trial option is the tempting near-miss: isolation helps, but hooks run as shell commands outside the permission prompts you would be watching for."
     },
     {
       "domain": "Claude Code",
@@ -289,24 +237,24 @@
       "options": [
         "Package it as a plugin and publish it to an internal marketplace teammates must add first",
         "Distribute it through enterprise managed settings so IT pushes it to every developer machine",
-        "Commit it under .claude/skills in the repo so everyone who clones the project gets it",
-        "Place it in each teammate's ~/.claude/skills directory as part of onboarding setup"
+        "Place it in each teammate's ~/.claude/skills directory as part of onboarding setup",
+        "Commit it under .claude/skills in the repo so everyone who clones the project gets it"
       ],
-      "correct": 2,
+      "correct": 3,
       "explain": "Skills committed to .claude/skills in the repo travel with the clone, so no installation step is needed. The plugin-marketplace option is tempting because marketplaces do distribute skills, but each teammate still has to add the marketplace and install the plugin."
     },
     {
       "domain": "Claude Code",
       "d": 1,
-      "q": "Two skills share a name: one at enterprise (managed settings) level, one at project level. Which wins?",
+      "q": "SCENARIO - Developer Productivity with Claude. Your team has a rule that every SQL migration must be reversible. It matters only when a file under db/migrations is edited, and should not occupy context otherwise. Where does it belong?",
       "options": [
-        "Project-level wins, since the more specific scope always overrides broader configuration",
-        "Both load side by side and Claude picks whichever description matches the request better",
-        "Enterprise managed settings win, taking highest priority so admins can enforce standards",
-        "The user-level ~/.claude copy is promoted to break the tie between the two conflicting scopes"
+        "In each engineer's user-level memory file, so the rule travels with them across every repository they happen to open",
+        "In the project CLAUDE.md under a migrations heading, so every session carries the rule and applies it when it is relevant",
+        "In a Skill described for migration work, so the model pulls the guidance in whenever it judges the task to be a migration",
+        "In a .claude/rules/ file with a frontmatter paths glob for the migrations directory, so it loads only on matching edits"
       ],
-      "correct": 2,
-      "explain": "Managed (enterprise) settings sit at the top of the precedence chain precisely so administrators can enforce mandatory standards. 'Project-level wins because it is more specific' is the tempting near-miss: specificity governs many config systems, but Claude Code deliberately puts managed settings above project scope."
+      "correct": 3,
+      "explain": "Path-scoped guidance belongs in .claude/rules/ with a paths glob, which is exactly the mechanism for rules that should load only when matching files are touched. The near-miss is project CLAUDE.md: it does reach everyone, but it loads in every session regardless of what is being edited, spending context on guidance that usually does not apply."
     },
     {
       "domain": "Claude Code",
@@ -324,79 +272,14 @@
     {
       "domain": "MCP",
       "d": 1,
-      "q": "What does it mean that MCP is 'transport agnostic'?",
-      "options": [
-        "Servers advertise a transport during initialize, and clients must implement all of them to connect",
-        "The protocol negotiates a transport at runtime, upgrading a stdio session to HTTP when remote",
-        "Message payloads are transport-neutral binary frames rather than the JSON-RPC used elsewhere",
-        "Client and server may talk over different transports: stdio locally, or HTTP for remote servers"
-      ],
-      "correct": 3,
-      "explain": "Transport agnostic means the JSON-RPC message layer is independent of the channel carrying it: stdio for local processes, HTTP-based transports for remote ones. The runtime-upgrade option sounds plausible but no transport negotiation or stdio-to-HTTP upgrade exists; the transport is chosen when the connection is configured."
-    },
-    {
-      "domain": "MCP",
-      "d": 1,
-      "q": "In the MCP tool-calling flow, what are the two core message-type pairs exchanged?",
-      "options": [
-        "InitializeRequest/Result to handshake, and CallToolRequest/Result to execute a chosen tool",
-        "ListToolsRequest/Result to discover tools, and CallToolRequest/Result to execute one",
-        "ListToolsRequest/Result to discover tools, and ToolResultNotification to stream back output",
-        "ListPromptsRequest/Result to enumerate capabilities, and GetPromptRequest/Result to run them"
-      ],
-      "correct": 1,
-      "explain": "Tool use runs on two request/result pairs: ListTools to discover what exists, then CallTool to invoke one. The initialize pairing is the near-miss: initialize really is exchanged, but it is the connection handshake, not part of the tool-calling flow itself."
-    },
-    {
-      "domain": "MCP",
-      "d": 1,
-      "q": "Using the Python MCP SDK's decorator approach, how does the SDK know a tool's arguments and descriptions?",
-      "options": [
-        "Type hints on the parameters plus field descriptions, from which the SDK generates the schema",
-        "A JSON schema you supply in the decorator's schema argument, which the SDK forwards unchanged",
-        "Runtime introspection of the first few calls, from which the SDK infers argument types over time",
-        "The function's docstring only, which the SDK parses into both parameter names and their types"
-      ],
-      "correct": 0,
-      "explain": "The decorator reads Python type annotations and field descriptions and generates the JSON schema for you. The docstring-only answer is the tempting near-miss: the docstring does supply the tool description, but parameter types come from the annotations, not from parsing prose."
-    },
-    {
-      "domain": "MCP",
-      "d": 1,
-      "q": "What is the MCP Inspector primarily used for?",
-      "options": [
-        "A local browser-based tool for connecting to a server and testing its tools, resources, prompts",
-        "A CLI validator that checks a server's schemas against the MCP spec and reports violations",
-        "A proxy that records production client-server traffic so failed tool calls can be replayed later",
-        "A scaffolding utility that reads your server code and generates a matching test client harness"
-      ],
-      "correct": 0,
-      "explain": "The Inspector is a development-time UI you point at a local server to exercise its tools, resources, and prompts interactively. The schema-validator option is plausible because the Inspector does surface schema problems, but it is an interactive testing client, not a spec-conformance linter."
-    },
-    {
-      "domain": "MCP",
-      "d": 1,
-      "q": "On the client side, what two core functions does your MCP client class typically implement for tools?",
-      "options": [
-        "get_capabilities() to enumerate server features, and send_request() to dispatch any raw message",
-        "connect() to open the session, and call_tool() to invoke a tool once the session is ready",
-        "list_tools() to discover tools, and read_resource() to fetch each tool's output payload",
-        "list_tools() to discover available tools, and call_tool() to invoke one with arguments"
-      ],
-      "correct": 3,
-      "explain": "A client wrapper normally exposes list_tools() for discovery and call_tool() for execution. The connect()/call_tool() pairing tempts because a session must indeed be established first, but connection setup is lifecycle plumbing rather than one of the two tool operations."
-    },
-    {
-      "domain": "MCP",
-      "d": 1,
       "q": "What's the key difference between a 'direct' and a 'templated' resource in MCP?",
       "options": [
         "Direct resources are read once and cached, while templated resources are re-fetched on every read",
         "Direct resources are listed by resources/list, while templated ones are only returned by tools/call",
-        "Direct resources expose a static URI; templated resources embed parameters parsed into your function",
-        "Direct resources return a single content block; templated resources always return a list of blocks"
+        "Direct resources return a single content block; templated resources always return a list of blocks",
+        "Direct resources expose a static URI; templated resources embed parameters parsed into your function"
       ],
-      "correct": 2,
+      "correct": 3,
       "explain": "A direct resource has a fixed, parameter-free URI; a templated resource carries URI parameters that are parsed and handed to your handler. The listing-based option is the near-miss: templates really do appear separately from concrete resources in listing, but via resources/templates/list, and they are still read through resources/read."
     },
     {
@@ -415,67 +298,41 @@
     {
       "domain": "MCP",
       "d": 1,
-      "q": "Your MCP client reads a resource with MIME type 'application/json'. What should it do with the text?",
+      "q": "SCENARIO - Developer Productivity with Claude. Your MCP server fronts an internal wiki, and agents spend many turns listing and fetching pages just to discover what exists before real work starts. What is the fix?",
       "options": [
-        "Re-request the resource with a blob content type so the JSON arrives already decoded by the SDK",
-        "Store the text verbatim and let the model parse the JSON when it reasons over the content",
-        "Validate the text against the resource's declared schema and reject the read if it does not match",
-        "Parse the returned text as JSON into a structured object instead of handling it as a raw string"
+        "Expose the wiki pages as MCP resources so the host can surface the catalogue as context instead of discovery calls",
+        "Expose one search_wiki tool with a rich description so the model can locate the right page in a single call each time",
+        "Expose one tool per wiki section so tool selection itself narrows the search space before any page content is fetched",
+        "Expose the pages as resources but require a confirming tool call before the host may read any of them into context"
       ],
-      "correct": 3,
-      "explain": "The MIME type tells the client how to interpret the payload, so application/json text should be parsed into a structured object. Leaving it verbatim for the model is the plausible near-miss: it may still work, but it discards the very hint the MIME type exists to provide."
+      "correct": 0,
+      "explain": "Resources are the primitive for server content the host can attach directly, which removes the exploratory round trips that tool-based discovery costs. The near-miss is one well-described search tool: better than many tools, but the model still has to spend a call, and often several, to learn what the wiki contains."
     },
     {
       "domain": "MCP",
       "d": 1,
-      "q": "Why define a custom prompt (like a /format command) instead of letting users type free-form instructions?",
+      "q": "SCENARIO - Multi-Agent Research System. Everyone on the team needs the same research MCP server available in this repository, but each developer holds a personal API key that must never be committed. How do you configure it?",
       "options": [
-        "A named prompt is cached by the server, so repeated invocations skip re-processing the instructions",
-        "Server-defined prompts are validated against the tool schemas, so malformed instructions are caught",
-        "A pre-built, tested template encodes expertise and handles edge cases consistently for every user",
-        "Prompt templates run with elevated permissions, letting them call tools a user request cannot reach"
+        "Commit the project .mcp.json and reference the credential through environment variable expansion so each dev supplies it",
+        "Commit the project .mcp.json with the credential written inline, and ask each developer to replace it locally after cloning",
+        "Have each developer add the server to their own user-level config with the credential inline, leaving the repo untouched",
+        "Commit the server definition inside CLAUDE.md so it loads for everyone, with the credential read from the shell at startup"
+      ],
+      "correct": 0,
+      "explain": "Project-scoped .mcp.json shares the server definition through the repository, and ${ENV_VAR} expansion keeps the secret in each developer's environment rather than in version control. The near-miss is per-developer user-level config: it does protect the secret, but the server definition is no longer shared, so onboarding and drift become manual problems."
+    },
+    {
+      "domain": "MCP",
+      "d": 1,
+      "q": "SCENARIO - Customer Support Resolution Agent. The agent keeps calling lookup_order when it should call get_customer. Both descriptions open with the phrase 'retrieve account information'. What is the right correction?",
+      "options": [
+        "Merge the two into one account_info tool that branches internally on whichever identifier the caller happens to pass in",
+        "Rewrite the system prompt with an ordered rule telling the agent to try get_customer first before it ever calls lookup_order",
+        "Rewrite both descriptions to state distinct purposes, accepted inputs, and when the other tool should be preferred instead",
+        "Restrict this agent to lookup_order and move get_customer onto a subagent so the two can never be confused at call time"
       ],
       "correct": 2,
-      "explain": "A prompt authored and tested once bakes in expertise and edge-case handling that ad-hoc user phrasing will not reproduce reliably. The caching option is the tempting distractor: prompt caching is a real API feature, but MCP prompts are not automatically cached by the server on invocation."
-    },
-    {
-      "domain": "MCP",
-      "d": 1,
-      "q": "Your MCP client calls get_prompt on your server with arguments like {\"doc_id\": \"plan.md\"} — what happens to that value?",
-      "options": [
-        "The value is resolved as a resource URI first, and the fetched content replaces the placeholder",
-        "The value is validated against the prompt's argument list and then attached as message metadata",
-        "The value is interpolated into the template, filling the placeholder the prompt declares",
-        "The value is forwarded to the matching tool, whose result becomes the returned prompt message"
-      ],
-      "correct": 2,
-      "explain": "Arguments reach the server handler as parameters and are substituted into the message template it returns. The resource-resolution option is the near-miss: a document id looks like something to fetch, but the server only substitutes the string unless its own code chooses to read a resource."
-    },
-    {
-      "domain": "MCP",
-      "d": 1,
-      "q": "MCP has three primitives: tools, resources, prompts. Which part of the stack controls each?",
-      "options": [
-        "All three are server-controlled, with the client only rendering whatever the server advertises",
-        "Tools are model-controlled, prompts are application-controlled, resources are user-controlled",
-        "Tools and prompts are both model-controlled, while resources remain under application control",
-        "Tools are model-controlled, resources are application-controlled, prompts are user-controlled"
-      ],
-      "correct": 3,
-      "explain": "The standard mental model: Claude decides on tools, the host application decides on resources, and the user explicitly triggers prompts. Swapping prompts and resources is the tempting near-miss, but prompts are the user-facing primitive surfaced as slash commands or buttons."
-    },
-    {
-      "domain": "MCP",
-      "d": 1,
-      "q": "You're deciding how to implement a feature: users click a button to trigger a 'summarize document' workflow. Which MCP primitive?",
-      "options": [
-        "Resources, because the workflow's document data must be read into context before summarizing",
-        "Tools, because summarization is a new capability the model needs exposed to it explicitly",
-        "Prompts, because the user explicitly triggers when the summarize workflow should start",
-        "Sampling, because the server needs the host to run a completion on the user's behalf"
-      ],
-      "correct": 2,
-      "explain": "A button the user clicks to launch a workflow is user-initiated, which is exactly what prompts model. Tools is the strongest distractor since summarization sounds like a capability, but tools are invoked by the model's own choice rather than by a direct user action."
+      "explain": "Descriptions are the selection mechanism, so overlapping wording is fixed at the source by stating each tool's purpose, inputs, and boundary against its neighbour. The near-miss is an ordering rule in the system prompt: it patches one observed misroute with prompt guidance while the ambiguous descriptions keep misleading selection everywhere else."
     },
     {
       "domain": "Claude Code",
@@ -495,12 +352,12 @@
       "d": 3,
       "q": "SCENARIO — Customer Support Resolution Agent (Claude + MCP tools). Production data shows that in 12% of cases, your Claude agent skips get_customer entirely and calls lookup_order using only the customer's stated name, occasionally leading to misidentified accounts and incorrect refunds. What change would most effectively address this reliability issue?",
       "options": [
-        "Block lookup_order and process_refund programmatically until get_customer returns a verified ID",
-        "State in the system prompt that get_customer verification is mandatory before any order operation",
         "Add few-shot examples where the agent calls get_customer first even when an order number is given",
+        "State in the system prompt that get_customer verification is mandatory before any order operation",
+        "Block lookup_order and process_refund programmatically until get_customer returns a verified ID",
         "Route each request through a classifier that enables only the tools that request type should use"
       ],
-      "correct": 0,
+      "correct": 2,
       "explain": "Critical business ordering needs deterministic enforcement in code, not probabilistic model compliance. The few-shot option is the tempting near-miss: examples do measurably improve sequencing, but they cannot guarantee it in the 12% tail where money is at stake."
     },
     {
@@ -509,11 +366,11 @@
       "q": "SCENARIO — Customer Support Resolution Agent. Production logs show Claude frequently calls get_customer when users ask about orders (e.g., 'check my order #12345'), instead of calling lookup_order. Both tools have minimal descriptions ('Retrieves customer information' / 'Retrieves order details') and accept similar identifier formats. What's the most effective first step to improve tool selection reliability?",
       "options": [
         "Parse each user message for order-number patterns and pre-select the tool before the turn runs",
-        "Add five to eight few-shot exchanges to the system prompt showing correct selection between them",
+        "Expand each description with input formats, sample queries, edge cases, and when-not-to-use bounds",
         "Merge both into one lookup_entity tool that inspects the identifier and picks the backend itself",
-        "Expand each description with input formats, sample queries, edge cases, and when-not-to-use bounds"
+        "Add five to eight few-shot exchanges to the system prompt showing correct selection between them"
       ],
-      "correct": 3,
+      "correct": 1,
       "explain": "Descriptions are the model's primary signal for choosing between tools, so enriching the two thin descriptions attacks the root cause cheaply. Few-shot examples are the strong near-miss: they help, but they patch symptoms with extra tokens while the ambiguous descriptions remain."
     },
     {
@@ -534,12 +391,12 @@
       "d": 2,
       "q": "You want to create a custom /review slash command that runs your team's standard code review checklist, available to every developer when they clone or pull the repository. Where should you create this command file?",
       "options": [
-        "Define the checklist as a section inside the CLAUDE.md file at the root of the project repo",
-        "Create it in each developer's ~/.claude/commands/ directory so the command is always available",
         "Create it in the project repository's .claude/commands/ directory so it ships with every clone",
+        "Create it in each developer's ~/.claude/commands/ directory so the command is always available",
+        "Define the checklist as a section inside the CLAUDE.md file at the root of the project repo",
         "Register it in .claude/settings.json under a commands array pointing at the checklist file"
       ],
-      "correct": 2,
+      "correct": 0,
       "explain": "Project-scoped slash commands live in .claude/commands/ in the repo, so they are version-controlled and appear for everyone who clones or pulls. The ~/.claude/commands/ option is the near-miss: that path does define working commands, but only for that one developer's machine."
     },
     {
@@ -547,12 +404,12 @@
       "d": 2,
       "q": "You've been assigned to restructure the team's monolithic application into microservices, involving changes across dozens of files and decisions about service boundaries and module dependencies. Which approach should you take?",
       "options": [
-        "Enter plan mode first to map dependencies and design the service boundaries before editing any files",
-        "Execute directly in small increments and let the emerging import graph reveal the service boundaries for you",
         "Execute directly, but front-load one very detailed prompt that fixes each service's structure in advance",
+        "Execute directly in small increments and let the emerging import graph reveal the service boundaries for you",
+        "Enter plan mode first to map dependencies and design the service boundaries before editing any files",
         "Execute directly and escalate into plan mode only once cross-module coupling starts causing broken builds"
       ],
-      "correct": 0,
+      "correct": 2,
       "explain": "Plan mode exists for exactly this shape of work: many files, several viable designs, and architectural decisions worth exploring before committing. The tempting near-miss is letting the import graph reveal boundaries incrementally — it reads like discovery-driven design but it commits you to edits before the dependency picture exists, guaranteeing rework."
     },
     {
@@ -561,11 +418,11 @@
       "q": "Your codebase has distinct areas with different conventions (React hooks, async/await API handlers, repository-pattern DB models). Test files are spread throughout alongside the code they test (e.g., Button.test.tsx next to Button.tsx), and you want all tests to follow the same conventions regardless of location. Most maintainable way to ensure Claude auto-applies correct conventions?",
       "options": [
         "Drop a scoped CLAUDE.md into each area's subdirectory so its conventions load whenever files there are touched",
-        "Add rule files under .claude/rules/ whose frontmatter globs apply each convention by file path automatically",
+        "Keep every convention in the root CLAUDE.md under per-area headings and let Claude match code to heading",
         "Define one skill per code type under .claude/skills/, keeping each area's conventions inside its SKILL.md",
-        "Keep every convention in the root CLAUDE.md under per-area headings and let Claude match code to heading"
+        "Add rule files under .claude/rules/ whose frontmatter globs apply each convention by file path automatically"
       ],
-      "correct": 1,
+      "correct": 3,
       "explain": "Rule files with glob frontmatter (e.g. **/*.test.tsx) attach conventions to path patterns, so they fire wherever a matching file lives. The strong near-miss is per-directory CLAUDE.md files: that is a real mechanism, but it is directory-bound, so tests scattered next to their sources would each need their own copy."
     },
     {
@@ -574,11 +431,11 @@
       "q": "Running the system on 'impact of AI on creative industries,' each subagent completes successfully, but final reports cover only visual arts, missing music, writing, and film. The coordinator's logs show it decomposed the topic into 'AI in digital art creation,' 'AI in graphic design,' and 'AI in photography.' Most likely root cause?",
       "options": [
         "The synthesis agent has no instruction to audit incoming findings for topic-coverage gaps before writing",
-        "The coordinator decomposed the topic too narrowly, so the subagent assignments never spanned all creative domains",
+        "The document analysis agent's relevance threshold is discarding music, writing, and film sources as off-topic",
         "The search agent's query templates are too literal, so they retrieve only the visual-arts phrasing of the topic",
-        "The document analysis agent's relevance threshold is discarding music, writing, and film sources as off-topic"
+        "The coordinator decomposed the topic too narrowly, so the subagent assignments never spanned all creative domains"
       ],
-      "correct": 1,
+      "correct": 3,
       "explain": "The coordinator's own logs show all three subtasks were visual-arts framings, so the omission was baked into decomposition and the subagents completed exactly what they were given. The tempting near-miss blames the synthesis agent for not auditing coverage — a gap check might surface the symptom, but the missing domains were never researched, so synthesis has nothing to recover."
     },
     {
@@ -587,11 +444,11 @@
       "q": "The web search subagent times out while researching a complex topic. You need to design how this failure flows back to the coordinator. Which error propagation approach best enables intelligent recovery?",
       "options": [
         "Absorb the timeout in the subagent and hand back an empty result set flagged as a successful completion",
-        "Retry inside the subagent with exponential backoff, returning a generic 'search unavailable' once retries end",
         "Return structured error context: failure type, the attempted query, any partial results, and alternatives",
+        "Retry inside the subagent with exponential backoff, returning a generic 'search unavailable' once retries end",
         "Let the timeout bubble to a top-level handler that halts the research workflow and reports the stage reached"
       ],
-      "correct": 2,
+      "correct": 1,
       "explain": "Structured context is what lets the coordinator choose intelligently between narrowing the query, substituting a source, or proceeding on partial results. The tempting near-miss is in-subagent retry with backoff: retrying is reasonable, but collapsing the outcome to a generic status destroys the query and partial results the coordinator needs to recover."
     },
     {
@@ -601,10 +458,10 @@
       "options": [
         "Have the search agent cache extra surrounding context per source, anticipating what synthesis will later ask",
         "Grant the synthesis agent the full web search toolset so it can resolve any verification without a round trip",
-        "Have synthesis collect every verification need and hand them back to the coordinator as one batch at the end",
-        "Give synthesis a scoped verify_fact tool for simple lookups and keep deep checks routed via the coordinator"
+        "Give synthesis a scoped verify_fact tool for simple lookups and keep deep checks routed via the coordinator",
+        "Have synthesis collect every verification need and hand them back to the coordinator as one batch at the end"
       ],
-      "correct": 3,
+      "correct": 2,
       "explain": "A scoped verify_fact tool removes the round trips for the 85% simple case while leaving genuine investigation with the specialist agent — least privilege plus latency win. The tempting near-miss is handing synthesis the whole search toolset: it does kill the round trips, but it over-provisions and dissolves the separation of concerns that keeps the 15% deep cases reliable."
     },
     {
@@ -613,11 +470,11 @@
       "q": "Your pipeline script runs claude \"Analyze this pull request for security issues\" but the job hangs indefinitely; logs indicate Claude Code is waiting for interactive input. Correct approach to run Claude Code in an automated pipeline?",
       "options": [
         "Export CLAUDE_CODE_NONINTERACTIVE=1 in the job environment so the CLI skips its interactive startup path",
-        "Redirect stdin from /dev/null so the session sees EOF immediately and falls through to prompt processing",
         "Pass the -p/--print flag so the prompt is processed non-interactively and output goes to stdout",
+        "Redirect stdin from /dev/null so the session sees EOF immediately and falls through to prompt processing",
         "Pass --output-format json, which implies non-interactive execution because streamed UI output is disabled"
       ],
-      "correct": 2,
+      "correct": 1,
       "explain": "-p (--print) is the documented non-interactive mode: it runs the prompt, prints the result, and exits, which is what CI needs. The tempting near-miss is redirecting stdin from /dev/null — a real Unix trick that may stop the hang, but it does not select print mode, so you are relying on side effects rather than the supported flag; the env var shown is not a real setting and --output-format alone does not imply -p."
     },
     {
@@ -625,12 +482,12 @@
       "d": 3,
       "q": "Your team wants to reduce API costs. Real-time Claude calls power two workflows: (1) a blocking pre-merge check developers wait on before merging, and (2) an overnight technical-debt report for next-morning review. Your manager proposes switching both to the Message Batches API for 50% savings. How should you evaluate this?",
       "options": [
-        "Move both to the Batches API and poll batch status, since most batches complete well inside a few minutes",
         "Move only the overnight technical-debt report to the Batches API and keep the pre-merge check on real time",
+        "Move both to the Batches API and poll batch status, since most batches complete well inside a few minutes",
         "Move both to the Batches API but fall back to real-time calls whenever a batch exceeds a latency threshold",
         "Keep both on real-time calls, because batch responses return unordered and cannot be matched to requests"
       ],
-      "correct": 1,
+      "correct": 0,
       "explain": "The Batches API trades roughly 50% cost for asynchronous processing with up to a 24-hour window, which fits an overnight report and not a check developers block on. The tempting near-miss is batching both and polling because batches 'usually' finish fast: typical speed is not a guarantee, so a blocking pre-merge gate would intermittently stall; the ordering claim is also wrong since custom_id matches results back to requests."
     },
     {
@@ -640,62 +497,62 @@
       "options": [
         "Run the full pull request through three independent passes and report only findings that recur in two",
         "Gate the pipeline so developers must break large pull requests into 3-4 file chunks before review runs",
-        "Move to a larger-context model so all 14 files fit comfortably and each receives equal analytical depth",
-        "Split it up: review each file individually, then run one integration pass over cross-file data flow"
+        "Split it up: review each file individually, then run one integration pass over cross-file data flow",
+        "Move to a larger-context model so all 14 files fit comfortably and each receives equal analytical depth"
       ],
-      "correct": 3,
+      "correct": 2,
       "explain": "Per-file passes give each file consistent depth and a dedicated integration pass recovers the cross-file reasoning, addressing attention dilution directly. The tempting near-miss is a bigger context window: the 14 files likely already fit, and capacity does not fix how attention is distributed across them."
     },
     {
       "domain": "Claude Code",
       "d": 2,
-      "q": "Your user settings allow Bash(curl *), the project settings.json denies it, and IT has deployed a managed policy that also denies it. You add an allow rule in .claude/settings.local.json. What is the effective result?",
+      "q": "SCENARIO - Claude Code for Continuous Integration. Your automated review job must never make outbound network calls. A line in CLAUDE.md asking Claude not to use curl has already been ignored twice. What should you do?",
       "options": [
-        "curl is allowed — an explicit allow rule always takes priority over a deny rule at any settings scope",
-        "curl is allowed — local settings sit above project settings, so the local allow rule resolves the conflict",
-        "curl stays denied — managed policy sits above every other scope and cannot be loosened from below",
-        "Claude Code refuses to start the session and reports a permission conflict across the settings scopes"
+        "Move the instruction into a .claude/rules/ file with a paths glob, so it loads whenever the review touches those files",
+        "Repeat the same instruction in the job's prompt as well as CLAUDE.md, so the constraint sits in context at decision time",
+        "Add a deny rule for the curl Bash pattern in settings permissions, so the call is refused outright rather than discouraged",
+        "Have the review report any network access it made, so the pipeline can fail the job afterwards when such a call appears"
       ],
       "correct": 2,
-      "explain": "Precedence runs managed above CLI flags, local, project, then user, so an enterprise managed deny is final regardless of what lower scopes allow. The tempting near-miss is 'local beats project' — true on its own, but irrelevant here because the managed deny still sits above the local allow."
+      "explain": "A hard prohibition belongs in settings permissions as a deny rule, which the tool layer enforces regardless of what the model decides. The near-miss is restating the instruction closer to the model: it raises compliance odds but is still guidance, and guidance has already failed twice here."
     },
     {
       "domain": "Claude Code",
       "d": 2,
       "q": "In Claude Code settings.json, how do permission rules behave differently from ordinary settings keys when multiple scopes define them?",
       "options": [
-        "Permission rules resolve like every other key: the highest-precedence scope's arrays replace the lower ones",
         "The allow, ask, and deny arrays from all scopes merge into one effective policy instead of being replaced",
+        "Permission rules resolve like every other key: the highest-precedence scope's arrays replace the lower ones",
         "Only the managed and project scopes contribute rules; local and user permission arrays are read but ignored",
         "Arrays merge, but a later scope's allow entry removes any matching deny entry contributed by an earlier scope"
       ],
-      "correct": 1,
+      "correct": 0,
       "explain": "Ordinary settings keys take the winning scope's value, whereas permission arrays are unioned across scopes into a single policy evaluated before each tool call — which is why a deny anywhere in the chain still bites. The tempting near-miss says arrays merge but allows cancel denies; merging is right, cancellation is not, since deny takes priority within the merged policy."
     },
     {
       "domain": "Claude Code",
       "d": 3,
-      "q": "A teammate writes a PreToolUse hook to block edits to production config. It detects the violation and exits with code 1, printing the reason to stderr. The edit still goes through. Why?",
+      "q": "SCENARIO - Code Generation with Claude Code. An /audit-config slash command reads dozens of production configuration files. Afterwards the main session is crowded with that raw output and later work degrades. What is the right fix?",
       "options": [
-        "The matcher must name the tool explicitly, as a wildcard PreToolUse matcher runs in advisory mode only",
-        "Blocking requires the JSON decision object on stdout; a bare non-zero exit code is only logged as a warning",
-        "The reason must go to stdout, since Claude Code discards a PreToolUse hook's stderr stream entirely",
-        "Exit 1 is treated as a non-blocking error — only exit 2 blocks and returns stderr to Claude as the reason"
+        "Set an allowed-tools list on the command limiting it to Read and Grep, so it draws in less file content on every run",
+        "Set context: fork on the command so it runs in an isolated subagent context and returns only its findings to the session",
+        "Have the command write its findings to a scratchpad file and tell the session to read that file whenever it needs them",
+        "Split the command into several smaller commands so each invocation only ever loads one slice of the configuration tree"
       ],
-      "correct": 3,
-      "explain": "For PreToolUse, exit 0 allows, exit 2 blocks and feeds stderr back to Claude as the reason, and any other non-zero code is a non-blocking error — so the conventional exit 1 blocks nothing. The tempting near-miss is 'you must emit JSON on stdout': structured JSON output is a real alternative way to decide, but it is not required, and exit 2 alone would have worked."
+      "correct": 1,
+      "explain": "context: fork runs the command in a separate subagent context, so the bulky intermediate reads never enter the main transcript and only the result comes back. The near-miss is the scratchpad file: a real context strategy, but the files are still read into the main session first, so the crowding it is meant to prevent has already happened."
     },
     {
       "domain": "Claude Code",
       "d": 2,
       "q": "A session is running with bypassPermissions. A PreToolUse hook returns permissionDecision 'deny' for a dangerous command. What happens, and what's the inverse case?",
       "options": [
-        "It is blocked, and the inverse holds too — a hook returning allow overrides a settings deny symmetrically",
         "It is blocked: PreToolUse hooks evaluate ahead of the permission mode, and a hook allow cannot undo a deny rule",
+        "It is blocked, and the inverse holds too — a hook returning allow overrides a settings deny symmetrically",
         "It runs, because bypassPermissions short-circuits the permission pipeline before any PreToolUse hook fires",
         "It runs, because hook decisions are advisory once the session starts in bypassPermissions or skip mode"
       ],
-      "correct": 1,
+      "correct": 0,
       "explain": "PreToolUse hooks run before permission-mode evaluation, so a hook deny stops the command even under bypassPermissions, yet hooks can only tighten policy — an allow will not override a settings-level deny. The tempting near-miss agrees on the block but claims symmetry; that inverse does not hold."
     },
     {
@@ -703,12 +560,12 @@
       "d": 2,
       "q": "You want to guarantee a formatter runs after every file edit, and separately to guarantee a dangerous command never executes. Which hook events, and what's the key limitation to understand?",
       "options": [
-        "PreToolUse blocks the dangerous command before it runs; PostToolUse formats after an edit but cannot undo it",
+        "UserPromptSubmit handles both by rewriting the request before any tool call is planned or executed",
         "PostToolUse handles both, since it inspects each completed call and can revert one that violated a policy",
         "PreToolUse handles both: it fires before the tool and again after it returns, so it can format the written file",
-        "UserPromptSubmit handles both by rewriting the request before any tool call is planned or executed"
+        "PreToolUse blocks the dangerous command before it runs; PostToolUse formats after an edit but cannot undo it"
       ],
-      "correct": 0,
+      "correct": 3,
       "explain": "PreToolUse is the checkpoint that can stop a call before execution, while PostToolUse fires after success and is the right place to format, lint, or test — but it cannot roll the call back, so anything that must never happen belongs in PreToolUse. The tempting near-miss has PostToolUse reverting violations; it can report and even feed back to Claude, but the tool call has already taken effect."
     },
     {
@@ -716,12 +573,12 @@
       "d": 1,
       "q": "The same MCP server name is defined at local, project, and user scope with different configs. Which one loads?",
       "options": [
-        "Project scope wins — the committed .mcp.json entry is authoritative so every teammate resolves it identically",
         "Local scope wins — precedence runs local, then project, then user, and it shadows the others silently",
+        "Project scope wins — the committed .mcp.json entry is authoritative so every teammate resolves it identically",
         "User scope wins — it is the global definition and therefore sits at the top of the MCP resolution chain",
         "The configs are merged field by field, with narrower scopes overriding only the keys they actually define"
       ],
-      "correct": 1,
+      "correct": 0,
       "explain": "MCP scope precedence is local over project over user, and a local definition shadows a same-named server at a wider scope without any warning; claude mcp get <name> shows which one resolved. The tempting near-miss is field-by-field merging — plausible given how other settings behave, but same-named servers are shadowed wholesale, not blended."
     },
     {
@@ -730,11 +587,11 @@
       "q": "You run `claude mcp add sentry --transport http https://mcp.sentry.dev/mcp` and expect teammates to get it on their next pull, but nothing appears in the repo. What went wrong?",
       "options": [
         "HTTP transport entries are stored in the user config only; a committable .mcp.json accepts stdio servers",
-        "Without --scope the server lands at user scope in ~/.claude.json, which is shared but still not committable",
         "Without --scope the server lands at local scope in ~/.claude.json; use --scope project to write .mcp.json",
+        "Without --scope the server lands at user scope in ~/.claude.json, which is shared but still not committable",
         "The command has to be run from the repository root, otherwise the generated .mcp.json goes to your home"
       ],
-      "correct": 2,
+      "correct": 1,
       "explain": "claude mcp add defaults to local scope, stored in ~/.claude.json keyed by project path and private to you, so -s project is what writes a shareable .mcp.json at the repo root. The tempting near-miss names user scope instead: same file, wrong default, and it would misleadingly suggest the entry applies across all your projects."
     },
     {
@@ -743,11 +600,11 @@
       "q": "A developer clones a repo containing .mcp.json, runs claude, and reports the project's MCP servers show as unavailable. Nothing is misconfigured. What's happening?",
       "options": [
         "Cloned .mcp.json entries load read-only until each server is re-registered locally with claude mcp add",
-        "Project servers from a cloned .mcp.json start unapproved by design — approve them from /mcp in a session",
         "The file only takes effect once renamed .mcp.local.json, which is the form Claude Code actually reads",
+        "Project servers from a cloned .mcp.json start unapproved by design — approve them from /mcp in a session",
         "Project scope entries require a matching enabledMcpjsonServers entry in the user settings before loading"
       ],
-      "correct": 1,
+      "correct": 2,
       "explain": "Servers arriving in a repo's .mcp.json sit in a pending-approval state deliberately, since code from a clone should not auto-connect; /mcp approves them and claude mcp reset-project-choices reopens the prompt. The tempting near-miss says you must re-register each server locally — that would work by accident but misses that approval, not registration, is the missing step."
     },
     {
@@ -768,12 +625,12 @@
       "d": 1,
       "q": "In the Agent SDK, what is the practical difference between the 'default' and 'dontAsk' permission modes?",
       "options": [
-        "dontAsk pre-approves every tool for speed, while default denies anything absent from the allow rules",
-        "In default, unmatched tools go to canUseTool; in dontAsk the callback still runs but its reply is auto-approved",
         "In default, unmatched tools go to your canUseTool callback; in dontAsk anything not pre-approved is denied",
+        "In default, unmatched tools go to canUseTool; in dontAsk the callback still runs but its reply is auto-approved",
+        "dontAsk pre-approves every tool for speed, while default denies anything absent from the allow rules",
         "default only applies to interactive sessions, while dontAsk is the mode headless SDK runs select by default"
       ],
-      "correct": 2,
+      "correct": 0,
       "explain": "default sends tools not covered by allow rules to canUseTool for a runtime decision, while dontAsk turns every would-be prompt into a denial, so pre-approved tools run and nothing else does. The tempting near-miss keeps canUseTool firing under dontAsk with replies auto-approved; in reality the callback is bypassed entirely and the call is refused."
     },
     {
@@ -781,12 +638,12 @@
       "d": 2,
       "q": "An Agent SDK deployment sets allowed_tools to a short read-only list but also enables bypassPermissions for speed. A code review flags this as unsafe. Why?",
       "options": [
-        "bypassPermissions narrows to allowed_tools but skips the prompt, so any listed write tool now runs unattended",
         "allowed_tools is not a hard boundary under bypassPermissions — unlisted tools fall through and simply run",
+        "bypassPermissions narrows to allowed_tools but skips the prompt, so any listed write tool now runs unattended",
         "The two options conflict, so the SDK raises a configuration error as soon as the session is initialised",
         "bypassPermissions only covers file edits, so the read-only surface holds for every other tool category"
       ],
-      "correct": 1,
+      "correct": 0,
       "explain": "bypassPermissions approves everything, so an allow list stops functioning as a boundary and unlisted tools run rather than being denied; a genuinely restricted surface needs dontAsk, deny rules, or a PreToolUse hook. The tempting near-miss claims bypass still narrows to allowed_tools and merely skips the prompt — that would make the config safe, but the list does not constrain it."
     },
     {
