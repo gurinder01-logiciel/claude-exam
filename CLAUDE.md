@@ -27,8 +27,9 @@ not work**; it renders an explicit error screen in that case.
 
 The leaderboard needs `KV_REST_API_URL` and `KV_REST_API_TOKEN` (Upstash Redis
 REST). Vercel's Upstash integration injects them; locally put them in
-`.env.local`. Note: `README.md`/`DOCS.md` tell you to `cp .env.example .env.local`
-but `.env.example` is not in the repo — create the file by hand.
+`.env.local` — `cp .env.example .env.local` and fill in the two values.
+(`.gitignore` ignores `.env*` but negates `!.env.example`, so keep that
+exception if you touch it.)
 
 ## Architecture
 
