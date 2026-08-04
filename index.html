@@ -64,13 +64,35 @@
   .lb-meta { display: block; font-size: 0.68rem; color: var(--text-dim); font-weight: 400; line-height: 1.35; }
   .lb-score { font-family: var(--font-mono); font-weight: 700; font-size: 0.85rem; flex-shrink: 0; width: 62px; text-align: right; }
   .lb-empty { font-size: 0.82rem; color: var(--text-dim); text-align: center; padding: 20px 0; line-height: 1.5; }
-  .lb-profile {
-    display: block; width: 100%; margin-top: 14px; padding: 9px 0;
-    background: none; border: none; border-top: 1px solid var(--border);
-    font-family: inherit; font-size: 0.78rem; font-weight: 600; color: var(--text-dim);
+  /* Account menu — fixed to the top-right corner, above the sidebar drawer */
+  .user-menu { position: fixed; top: 16px; right: 20px; z-index: 100; }
+  .avatar {
+    width: 42px; height: 42px; border-radius: 50%; cursor: pointer;
+    background: var(--surface); border: 1px solid var(--border);
+    font-family: var(--font-display); font-size: 0.85rem; font-weight: 700; color: var(--text);
+    box-shadow: 0 2px 10px rgba(46,46,46,0.08); transition: border-color .15s, box-shadow .15s;
+  }
+  .avatar:hover, .user-menu.open .avatar { border-color: var(--lime); box-shadow: 0 2px 14px rgba(38,208,124,0.28); }
+  .user-pop {
+    position: absolute; top: 52px; right: 0; width: 210px; overflow: hidden;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    box-shadow: 0 10px 34px rgba(46,46,46,0.16);
+  }
+  .user-pop-head { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  .user-pop-label { display: block; font-size: 0.66rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; }
+  .user-pop-name { display: block; font-weight: 700; font-size: 0.9rem; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .user-pop-item {
+    display: block; width: 100%; padding: 11px 14px; background: none; border: none;
+    font-family: inherit; font-size: 0.85rem; font-weight: 600; color: var(--text);
     text-align: left; cursor: pointer;
   }
-  .lb-profile:hover { color: var(--text); }
+  .user-pop-item:hover { background: var(--lime-dim); }
+  .user-pop-item.danger { color: var(--bad); border-top: 1px solid var(--border); }
+  .user-pop-item.danger:hover { background: rgba(224,82,77,0.08); }
+  @media (max-width: 1080px) {
+    /* Clear of the 🏆 drawer button, which sits bottom-left */
+    .user-menu { top: 12px; right: 12px; }
+  }
 
   /* My profile screen */
   .profile-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 4px; }
@@ -342,6 +364,17 @@
   .review-opt.struck-review { opacity: 0.5; text-decoration: line-through; text-decoration-color: var(--bad); }
   .review-explain { margin-top: 10px; padding: 12px 14px; background: var(--surface-2); border-radius: 8px; font-size: 0.86rem; color: var(--text-dim); line-height: 1.55; }
   .tag-mini { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 12px; }
+  /* Prep resources */
+  .res-plan { margin: 0 0 20px 0; padding-left: 20px; color: var(--text-dim); font-size: 0.86rem; line-height: 1.65; }
+  .res-plan li { margin-bottom: 5px; }
+  .res-wrap { display: grid; gap: 14px; }
+  .res-group { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; box-shadow: 0 2px 12px rgba(46,46,46,0.05); }
+  .res-title { font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; margin-bottom: 10px; }
+  .res-item { display: block; text-decoration: none; color: var(--text); padding: 9px 0; border-top: 1px solid var(--border); }
+  .res-item:first-of-type { border-top: none; }
+  .res-item:hover .res-name { color: var(--lime); }
+  .res-name { display: block; font-weight: 600; font-size: 0.88rem; }
+  .res-note { display: block; font-size: 0.76rem; color: var(--text-dim); margin-top: 2px; line-height: 1.45; }
   .hidden { display: none !important; }
   .filter-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
   .filter-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); border-radius: 20px; padding: 6px 14px; font-size: 0.82rem; cursor: pointer; font-family: inherit; font-weight: 600; }
@@ -354,6 +387,17 @@
   <aside class="sidebar" id="board"></aside>
 </div>
 <button class="board-toggle" id="boardToggle" aria-label="Toggle leaderboard">🏆</button>
+<div class="user-menu" id="userMenu" hidden>
+  <button class="avatar" id="avatarBtn" aria-haspopup="menu" aria-expanded="false" aria-label="Account menu"></button>
+  <div class="user-pop" id="userPop" role="menu" hidden>
+    <div class="user-pop-head">
+      <span class="user-pop-label">Signed in as</span>
+      <span class="user-pop-name" id="userPopName"></span>
+    </div>
+    <button class="user-pop-item" id="menuHistory" role="menuitem">📊 My history</button>
+    <button class="user-pop-item danger" id="menuSignOut" role="menuitem">↩ Sign out</button>
+  </div>
+</div>
 
 <script>
 // ========================= QUESTION BANK =========================
@@ -364,6 +408,16 @@
 // Note: this fetches, so the app must be served over HTTP — opening index.html
 // directly from disk (file://) will not work. See README for local dev.
 let LEVELS = {};
+let RESOURCES = null;
+
+// Prep links live in resources.json so they can be edited without touching code.
+// Failure is non-fatal: the section is simply hidden.
+async function loadResources() {
+  try {
+    const r = await fetch('./resources.json', { cache: 'no-store' });
+    if (r.ok) RESOURCES = await r.json();
+  } catch {}
+}
 
 async function loadLevels() {
   const manifest = await fetch('./questions/index.json', { cache: 'no-store' }).then(r => {
@@ -595,28 +649,130 @@ const boardEl = document.getElementById('board');
 let user = { name: null };
 const NAME_KEY = 'ccaf_name';
 
+// The last name used on this browser outlives sign-out. Names must be unique on
+// the leaderboard, so without this a Sign out would be a one-way door: your own
+// name is on the board, the gate would reject it, and you could never sign back
+// in. Remembering it here exempts *this browser* from that check while still
+// stopping a different person from claiming the name.
+const LAST_NAME_KEY = 'ccaf_last_name';
+
+// Canonical form of a name — used both for the uniqueness check and for the
+// per-name progress key, so "Jagtar Singh" and "jagtar  singh" are one person.
+function normName(s) {
+  return String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
 function loadName() {
   try { return localStorage.getItem(NAME_KEY); } catch { return null; }
 }
 function saveName(n) {
-  try { localStorage.setItem(NAME_KEY, n); } catch {}
+  try {
+    localStorage.setItem(NAME_KEY, n);
+    localStorage.setItem(LAST_NAME_KEY, n);
+  } catch {}
 }
+function loadLastName() {
+  try { return localStorage.getItem(LAST_NAME_KEY); } catch { return null; }
+}
+
+// Sign out drops the active name but keeps completed levels — unlocks have
+// always been per-browser rather than per-person, and clearing them would
+// silently relock everyone who shares a machine.
+function signOut() {
+  try { localStorage.removeItem(NAME_KEY); } catch {}
+  user.name = null;
+  closeUserMenu();
+  boardEl.innerHTML = '';
+  renderNameGate(loadLastName());
+  syncUserMenu();
+}
+
+// ---- Account menu (top-right) ------------------------------------------
+// Hidden during exam/pause: swapping #app from here would tear down the question
+// screen while the timer kept running.
+const MENU_SCREENS = ['start', 'results', 'profile'];
+
+function initials(name) {
+  const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '?';
+  return (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
+}
+
+function closeUserMenu() {
+  document.getElementById('userMenu')?.classList.remove('open');
+  document.getElementById('userPop')?.setAttribute('hidden', '');
+  document.getElementById('avatarBtn')?.setAttribute('aria-expanded', 'false');
+}
+
+function syncUserMenu() {
+  const menu = document.getElementById('userMenu');
+  if (!menu) return;
+  const show = Boolean(user.name) && MENU_SCREENS.includes(state.screen);
+  menu.toggleAttribute('hidden', !show);
+  if (!show) { closeUserMenu(); return; }
+  document.getElementById('avatarBtn').textContent = initials(user.name);
+  document.getElementById('userPopName').textContent = user.name;
+  // "My history" is a no-op when it's already on screen.
+  document.getElementById('menuHistory').disabled = state.screen === 'profile';
+}
+
+document.getElementById('avatarBtn')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const menu = document.getElementById('userMenu');
+  const open = menu.classList.toggle('open');
+  document.getElementById('userPop').toggleAttribute('hidden', !open);
+  document.getElementById('avatarBtn').setAttribute('aria-expanded', String(open));
+});
+document.getElementById('menuHistory')?.addEventListener('click', () => {
+  closeUserMenu();
+  renderProfile();
+});
+document.getElementById('menuSignOut')?.addEventListener('click', signOut);
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#userMenu')) closeUserMenu();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeUserMenu();
+});
 
 // ---- Level progression -------------------------------------------------
 // Levels can declare `requires: "<levelKey>"` in their JSON. That level stays
 // locked until the required one has been completed, so people work through the
 // foundations instead of jumping straight to the full mock.
+// Progress is stored per name (`ccaf_completed:<name>`), not per browser. A
+// shared key would hand the previous person's unlocks to whoever signs in next
+// on the same machine, so signing out and in as someone else would skip levels.
 const PROGRESS_KEY = 'ccaf_completed';
 
+function progressKey(name = user.name) {
+  return `${PROGRESS_KEY}:${normName(name)}`;
+}
+
+// One-time move of the pre-per-name key onto whoever is signed in when the app
+// first loads after this change. It can only be attributed to one person, and
+// the active name is the best available guess; afterwards the legacy key is gone
+// so nobody else inherits it.
+function adoptLegacyProgress() {
+  if (!user.name) return;
+  try {
+    const legacy = localStorage.getItem(PROGRESS_KEY);
+    if (!legacy) return;
+    if (!localStorage.getItem(progressKey())) localStorage.setItem(progressKey(), legacy);
+    localStorage.removeItem(PROGRESS_KEY);
+  } catch {}
+}
+
 function loadProgress() {
-  try { return new Set(JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]')); }
+  if (!user.name) return new Set();
+  try { return new Set(JSON.parse(localStorage.getItem(progressKey()) || '[]')); }
   catch { return new Set(); }
 }
 function markCompleted(levelKey) {
+  if (!user.name) return;
   try {
     const done = loadProgress();
     done.add(levelKey);
-    localStorage.setItem(PROGRESS_KEY, JSON.stringify([...done]));
+    localStorage.setItem(progressKey(), JSON.stringify([...done]));
   } catch {}
 }
 function isUnlocked(lv) {
@@ -664,20 +820,17 @@ function renderBoard(scores, live) {
   // Latest attempt per person, ranked by that score. `at` is stamped server-side
   // on POST; entries without it (older local-fallback ones) sort as oldest.
   const latest = {};
-  const attempts = {};
   scores.forEach(s => {
     if (!s || !s.name) return;
-    attempts[s.name] = (attempts[s.name] || 0) + 1;
     if (!latest[s.name] || (s.at || 0) > (latest[s.name].at || 0)) latest[s.name] = s;
   });
   const ranked = Object.values(latest).sort((a, b) => b.score - a.score);
 
   const rows = ranked.length ? ranked.map((s, i) => {
-    const n = attempts[s.name];
+    // Attempt counts live on the profile screen, not here.
     const meta = [
       s.level && escapeHtml(s.level),
-      s.total ? Math.round(s.score * s.total / 1000) + '/' + s.total + ' right' : '',
-      n > 1 ? n + ' attempts' : ''
+      s.total ? Math.round(s.score * s.total / 1000) + '/' + s.total + ' right' : ''
     ].filter(Boolean).join(' · ');
     return `
     <div class="lb-row ${s.name === user.name ? 'me' : ''}">
@@ -690,20 +843,11 @@ function renderBoard(scores, live) {
   }).join('')
     : `<div class="lb-empty">No scores yet.<br>Finish an exam to appear here.</div>`;
 
-  // Only offered from the start screen — swapping #app mid-exam would tear down
-  // the question screen while the timer kept running.
-  const profileLink = state.screen === 'start' && user.name
-    ? `<button class="lb-profile" id="profileLink">My profile · attempt history →</button>`
-    : '';
-
   boardEl.innerHTML = `
     <h3>🏆 Team leaderboard</h3>
     <div class="lb-sub">Score out of 1000 · latest per person · pass ${PASS_SCORE}${live ? '' : ' · offline (this browser only)'}</div>
     ${rows}
-    ${profileLink}
   `;
-
-  document.getElementById('profileLink')?.addEventListener('click', renderProfile);
 }
 
 function escapeHtml(s) {
@@ -723,10 +867,9 @@ document.getElementById('boardToggle')?.addEventListener('click', () => {
 // Compared case- and whitespace-insensitively so "Jagtar Singh" can't shadow
 // "jagtar  singh". `except` lets the change-name flow keep your own name.
 function nameIsTaken(name, except = null) {
-  const norm = s => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
-  const target = norm(name);
-  if (except && norm(except) === target) return false;
-  return boardCache.some(s => s && norm(s.name) === target);
+  const target = normName(name);
+  if (except && normName(except) === target) return false;
+  return boardCache.some(s => s && normName(s.name) === target);
 }
 
 // `keepName` is the caller's current name (change-name flow) — it stays valid so
@@ -742,6 +885,7 @@ function renderNameGate(keepName = null) {
       <button class="btn" id="nameGo" style="width:100%">Continue</button>
     </div>
   `;
+  syncUserMenu();
   const input = document.getElementById('nameInput');
   const err = document.getElementById('nameErr');
   const go = async () => {
@@ -760,6 +904,7 @@ function renderNameGate(keepName = null) {
     err.textContent = '';
     user.name = v;
     saveName(v);
+    adoptLegacyProgress();
     renderStart();
     refreshBoard();
   };
@@ -943,14 +1088,30 @@ function renderProfile() {
   document.getElementById('profileBack').addEventListener('click', () => {
     state.screen = 'start';
     renderStart();
-    // Synchronous re-render brings the profile link straight back; the fetch
-    // then refreshes the numbers without a flash of a link-less board.
-    renderBoard(boardCache, boardLive);
     refreshBoard();
   });
 
-  // Re-render the board so the profile link hides while we're on this screen.
-  renderBoard(boardCache, boardLive);
+  syncUserMenu();
+}
+
+function renderResources() {
+  const chr39 = String.fromCharCode(39);
+  if (!RESOURCES || !Array.isArray(RESOURCES.groups)) return '';
+  const groups = RESOURCES.groups.map(g => {
+    const items = (g.items || []).map(it =>
+      '<a class=' + chr39 + 'res-item' + chr39 + ' href=' + chr39 + escapeHtml(it.url || '') + chr39 +
+      ' target=' + chr39 + '_blank' + chr39 + ' rel=' + chr39 + 'noopener' + chr39 + '>' +
+      '<span class=' + chr39 + 'res-name' + chr39 + '>' + escapeHtml(it.name || '') + '</span>' +
+      '<span class=' + chr39 + 'res-note' + chr39 + '>' + escapeHtml(it.note || '') + '</span></a>'
+    ).join('');
+    return '<div class=' + chr39 + 'res-group' + chr39 + '><div class=' + chr39 + 'res-title' + chr39 + '>' +
+      escapeHtml(g.title || '') + '</div>' + items + '</div>';
+  }).join('');
+  const plan = Array.isArray(RESOURCES.plan) && RESOURCES.plan.length
+    ? '<ol class=' + chr39 + 'res-plan' + chr39 + '>' + RESOURCES.plan.map(x => '<li>' + escapeHtml(x) + '</li>').join('') + '</ol>'
+    : '';
+  return '<div class=' + chr39 + 'section-label' + chr39 + ' style=' + chr39 + 'margin-top:34px' + chr39 + '>How to prepare</div>' +
+    plan + '<div class=' + chr39 + 'res-wrap' + chr39 + '>' + groups + '</div>';
 }
 
 function renderStart() {
@@ -1024,6 +1185,7 @@ function renderStart() {
       Every level runs at the real exam's pace — 2 minutes per question. The timer supports <b style="color:var(--text)">pause / resume</b>, so the clock stops while you're away.
       <br><br>Taking this as <b style="color:var(--text)">${escapeHtml(user.name || '—')}</b> · <a href="#" id="changeName" style="color:var(--lime);text-decoration:none;font-weight:600">change name</a>
     </p>
+    ${renderResources()}
   `;
 
   app.querySelectorAll('.level-card:not(:disabled)').forEach(btn => {
@@ -1037,6 +1199,7 @@ function renderStart() {
     e.preventDefault();
     renderNameGate(user.name);
   });
+  syncUserMenu();
 }
 
 function beginExam(levelKey) {
@@ -1052,6 +1215,7 @@ function beginExam(levelKey) {
   state.timeLeft = state.totalTime;
   state.submitted = false;
   state.screen = 'exam';
+  syncUserMenu();
   renderExam();
   startTimer();
 }
@@ -1168,6 +1332,7 @@ function renderExam() {
 function pauseExam() {
   stopTimer();
   state.screen = 'paused';
+  syncUserMenu();
   const unanswered = state.answers.filter(a => a === null).length;
   const overlay = document.createElement('div');
   overlay.className = 'overlay';
@@ -1183,6 +1348,7 @@ function pauseExam() {
   document.getElementById('resumeBtn').addEventListener('click', () => {
     document.getElementById('pauseOverlay').remove();
     state.screen = 'exam';
+    syncUserMenu();
     startTimer();
   });
 }
@@ -1202,6 +1368,7 @@ function confirmSubmit() {
 function finishExam() {
   stopTimer();
   state.screen = 'results';
+  syncUserMenu();
   renderResults();
 }
 
@@ -1347,6 +1514,7 @@ async function boot() {
   app.innerHTML = `<div class="gate"><p style="margin-top:6vh">Loading question banks…</p></div>`;
   try {
     await loadLevels();
+    await loadResources();
   } catch (err) {
     app.innerHTML = `
       <div class="gate">
@@ -1364,6 +1532,7 @@ async function boot() {
   const storedName = loadName();
   if (storedName) {
     user.name = storedName;
+    adoptLegacyProgress();
     renderStart();
     refreshBoard();
   } else {

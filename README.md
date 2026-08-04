@@ -100,9 +100,11 @@ Send the deployment URL. Each person types their name once (remembered in their
 browser), picks a level, and their latest score appears on the leaderboard.
 
 Names must be unique: the name gate rejects a name already on the leaderboard
-(compared ignoring case and extra spaces). A consequence worth knowing — if
-someone clears their browser storage or moves to another laptop, they cannot
-re-enter their own name and will need a new one.
+(compared ignoring case and extra spaces). The account menu at the top-right
+holds **My history** and **Sign out**; signing out and back in with the same name
+works on the same browser, because the last name used is remembered and exempted
+from the check. Clearing browser storage or moving to another laptop does lose
+that exemption — there, the name is taken and a new one is needed.
 
 **Note:** the leaderboard has no authentication — anyone can submit any name and
 score, and the uniqueness check is client-side only, so `POST /api/scores` will

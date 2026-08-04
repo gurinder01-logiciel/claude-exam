@@ -87,8 +87,13 @@ low score.
 Locked levels stay **visible but greyed out**, with a note saying what unlocks
 them. Hiding them entirely would mean nobody knows the app has more to offer.
 
-Progress is stored per browser in `localStorage` under `ccaf_completed`. Clearing
-site data resets it. This is a study aid, not a security boundary.
+Progress is stored per person in `localStorage` under `ccaf_completed:<name>`
+(name lowercased and whitespace-collapsed by `normName()`), so signing out and in
+as someone else does not hand over their unlocks. `adoptLegacyProgress()` moves
+the old shared `ccaf_completed` key onto whoever is signed in the first time the
+app loads after this change, then deletes it. Progress is still per browser as
+well — the same person on a different machine starts locked — and clearing site
+data resets it. This is a study aid, not a security boundary.
 
 It's configured in the level JSON, not in code:
 
@@ -183,10 +188,18 @@ to `/api/scores`, and the sidebar shows the **latest score per person**, ranked
 by that score, with the level they took and an attempt count once they have more
 than one. Your own row is highlighted.
 
-Every attempt is retained in Redis, so the **My profile** link under the board
-(shown only on the start screen) opens a read-only history for the signed-in
-name: attempts, best score, latest score, passes, and one row per sitting
-newest-first. It reuses the board payload — no extra endpoint.
+Every attempt is retained in Redis, so **My history** — in the account menu at
+the top-right — opens a read-only view for the signed-in name: attempts, best
+score, latest score, passes, and one row per sitting newest-first. It reuses the
+board payload, so there's no extra endpoint.
+
+The account menu is an initials avatar fixed to the top-right corner. It holds
+**My history** and **Sign out**, and `syncUserMenu()` shows it only on the
+`start`, `results`, and `profile` screens — never during `exam` or `paused`,
+where swapping `#app` would tear down the question screen while the timer kept
+running. Sign out drops `ccaf_name` but leaves each person's
+`ccaf_completed:<name>` intact, so your own unlocks survive signing back in
+without leaking to the next person who uses the browser.
 
 Because the name is the only identity the app has, the name gate enforces
 uniqueness: `nameIsTaken()` normalises case and collapsed whitespace, then

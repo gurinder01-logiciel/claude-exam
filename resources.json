@@ -1,0 +1,76 @@
+{
+  "plan": [
+    "Read the official exam guide first - domains, weightings and the 12 sample questions tell you what is actually tested.",
+    "Sit Foundations here and look at the domain breakdown on your results, not just the score.",
+    "Study only your weakest two domains using the resources below. Skip what you already score well on.",
+    "Sit Scenario Practice - these are the trap questions where most candidates lose marks.",
+    "Sit the Full Mock Exam twice. Once you clear 720 consistently, book the real exam."
+  ],
+  "groups": [
+    {
+      "title": "Official - start here",
+      "items": [
+        {
+          "name": "CCAR-F Exam Guide (PDF)",
+          "url": "https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F6nizmqk8tpzpfjvt6qmmav7rh%2Fpublic%2F1783542750%2FClaude+Certified+Architect+%E2%80%93+Foundations+Exam+Guide.pdf",
+          "note": "Domain weightings, test objectives, 12 sample questions. If this link expires, get it from the cert page."
+        },
+        {
+          "name": "Partner Academy - CCAF prep courses",
+          "url": "https://anthropic-partners.skilljar.com/page/claude-certified-architect-foundations-prep-courses",
+          "note": "Prioritise Building with the Claude API, Claude Code in Action, Introduction to MCP."
+        },
+        {
+          "name": "Partner certifications hub",
+          "url": "https://anthropic-partners.skilljar.com/page/partner-certifications",
+          "note": "Exam details and the Pearson VUE booking link (USD 125)."
+        }
+      ]
+    },
+    {
+      "title": "Courses",
+      "items": [
+        {
+          "name": "Introduction to Model Context Protocol",
+          "url": "https://anthropic.skilljar.com/introduction-to-model-context-protocol",
+          "note": "14 lessons: tools vs resources vs prompts, transports, the Inspector, building a client."
+        },
+        {
+          "name": "Claude Code Power User",
+          "url": "https://www.developersdigest.tech/courses/claude-code-power-user",
+          "note": "Settings precedence, hooks, skills, subagents, CI usage."
+        },
+        {
+          "name": "Agents 101",
+          "url": "https://www.developersdigest.tech/courses/agents-101",
+          "note": "Agent SDK, agentic loops, orchestration patterns."
+        }
+      ]
+    },
+    {
+      "title": "Community",
+      "items": [
+        {
+          "name": "Claude Certification Guide",
+          "url": "https://claudecertificationguide.com/learn",
+          "note": "A lesson per official task statement, each with exam traps and a practice scenario."
+        },
+        {
+          "name": "Claude Certified Architect - full course (YouTube)",
+          "url": "https://www.youtube.com/playlist?list=PLviC8AFqAj5A9MHkRIn2fU5Ac2lEdJxNf",
+          "note": "22 videos covering every domain, including an exam-traps episode."
+        }
+      ]
+    },
+    {
+      "title": "Reference",
+      "items": [
+        {
+          "name": "Claude documentation",
+          "url": "https://docs.claude.com",
+          "note": "Authoritative for settings precedence, hook exit codes, MCP scopes and Agent SDK permission modes."
+        }
+      ]
+    }
+  ]
+}

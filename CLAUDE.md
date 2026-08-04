@@ -79,9 +79,13 @@ Timing is always 2 min/question (`SECONDS_PER_QUESTION`), derived per level from
 `round(correct / total * 1000)`; the same pass also builds the domain breakdown,
 marks the level complete, and posts the attempt.
 
-`localStorage` holds only the name (`ccaf_name`) and completed levels — so level
-unlocks are per-browser and clearing storage relocks them. Leaderboard failures
-degrade to a local-only board rather than surfacing an error.
+`localStorage` holds the active name (`ccaf_name`), the last name used on this
+browser (`ccaf_last_name`, which survives sign-out so the uniqueness check can
+exempt it), and completed levels per person under `ccaf_completed:<name>` — so
+level unlocks are per person *and* per browser: signing in as someone else starts
+locked, the same person on another machine also starts locked, and clearing
+storage relocks everyone. Leaderboard failures degrade to a local-only board
+rather than surfacing an error.
 
 The endpoint is unauthenticated by design (team practice tool); it validates name
 length and a 0–1000 score range, nothing more.
