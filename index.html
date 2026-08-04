@@ -36,9 +36,9 @@
   }
   .wrap { max-width: 780px; margin: 0 auto; }
 
-  /* Shell: main column + leaderboard sidebar */
-  .shell { display: flex; gap: 24px; max-width: 1180px; margin: 0 auto; align-items: flex-start; }
-  .shell .wrap { flex: 1; min-width: 0; margin: 0; }
+  /* Shell: leaderboard sidebar (left, via order:-1) + main column + prep panel (right) */
+  .shell { display: flex; gap: 24px; max-width: 1500px; margin: 0 auto; align-items: flex-start; }
+  .shell .wrap { flex: 1; min-width: 0; margin: 0; max-width: 880px; }
   .sidebar {
     width: 290px; flex-shrink: 0; position: sticky; top: 20px; order: -1;
     background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
@@ -120,6 +120,13 @@
   .attempt-badge.pass { background: var(--lime-dim); color: var(--good); }
   .attempt-badge.fail { background: rgba(46,46,46,0.06); color: var(--text-dim); }
   .board-toggle { display: none; }
+
+  /* Too narrow for three columns: the prep panel wraps to its own full-width row.
+     The .prep overrides live with the .prep rule further down — this file's later
+     rules would otherwise win, since a media query adds no specificity. */
+  @media (max-width: 1340px) {
+    .shell { flex-wrap: wrap; }
+  }
 
   @media (max-width: 1080px) {
     .shell { display: block; }
@@ -364,7 +371,19 @@
   .review-opt.struck-review { opacity: 0.5; text-decoration: line-through; text-decoration-color: var(--bad); }
   .review-explain { margin-top: 10px; padding: 12px 14px; background: var(--surface-2); border-radius: 8px; font-size: 0.86rem; color: var(--text-dim); line-height: 1.55; }
   .tag-mini { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 12px; }
-  /* Prep resources */
+  /* Prep resources — right-hand panel on the start screen, stacked below on narrow screens */
+  .prep {
+    width: 320px; flex-shrink: 0; position: sticky; top: 20px;
+    max-height: calc(100vh - 40px); overflow-y: auto;
+    padding-top: 38px; /* clears the fixed account avatar in the top-right corner */
+  }
+  .prep .section-label { margin-top: 0; }
+  @media (max-width: 1340px) {
+    .prep {
+      position: static; width: 100%; max-height: none; overflow: visible;
+      order: 3; margin-top: 34px; padding-top: 0;
+    }
+  }
   .res-plan { margin: 0 0 20px 0; padding-left: 20px; color: var(--text-dim); font-size: 0.86rem; line-height: 1.65; }
   .res-plan li { margin-bottom: 5px; }
   .res-wrap { display: grid; gap: 14px; }
@@ -384,6 +403,7 @@
 <body>
 <div class="shell">
   <div class="wrap" id="app"></div>
+  <aside class="prep" id="prep" hidden></aside>
   <aside class="sidebar" id="board"></aside>
 </div>
 <button class="board-toggle" id="boardToggle" aria-label="Toggle leaderboard">🏆</button>
@@ -704,7 +724,10 @@ function closeUserMenu() {
   document.getElementById('avatarBtn')?.setAttribute('aria-expanded', 'false');
 }
 
+// Called after every screen transition, so the side/fixed chrome that lives
+// outside #app stays in step with state.screen.
 function syncUserMenu() {
+  syncPrep();
   const menu = document.getElementById('userMenu');
   if (!menu) return;
   const show = Boolean(user.name) && MENU_SCREENS.includes(state.screen);
@@ -1110,8 +1133,19 @@ function renderResources() {
   const plan = Array.isArray(RESOURCES.plan) && RESOURCES.plan.length
     ? '<ol class=' + chr39 + 'res-plan' + chr39 + '>' + RESOURCES.plan.map(x => '<li>' + escapeHtml(x) + '</li>').join('') + '</ol>'
     : '';
-  return '<div class=' + chr39 + 'section-label' + chr39 + ' style=' + chr39 + 'margin-top:34px' + chr39 + '>How to prepare</div>' +
+  return '<div class=' + chr39 + 'section-label' + chr39 + '>How to prepare</div>' +
     plan + '<div class=' + chr39 + 'res-wrap' + chr39 + '>' + groups + '</div>';
+}
+
+// The prep panel is the right-hand column of the shell, so it lives outside #app
+// and is synced on every screen transition rather than rendered into the page.
+// Start screen only — during an exam it would compete with the question.
+function syncPrep() {
+  const panel = document.getElementById('prep');
+  if (!panel) return;
+  const html = state.screen === 'start' ? renderResources() : '';
+  panel.innerHTML = html;
+  panel.toggleAttribute('hidden', !html);
 }
 
 function renderStart() {
@@ -1185,7 +1219,6 @@ function renderStart() {
       Every level runs at the real exam's pace — 2 minutes per question. The timer supports <b style="color:var(--text)">pause / resume</b>, so the clock stops while you're away.
       <br><br>Taking this as <b style="color:var(--text)">${escapeHtml(user.name || '—')}</b> · <a href="#" id="changeName" style="color:var(--lime);text-decoration:none;font-weight:600">change name</a>
     </p>
-    ${renderResources()}
   `;
 
   app.querySelectorAll('.level-card:not(:disabled)').forEach(btn => {

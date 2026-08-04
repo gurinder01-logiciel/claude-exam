@@ -75,6 +75,12 @@ One mutable `state` object (`screen`, `questions`, `answers`, `struck`, `flagged
 rewrites `#app` wholesale and re-attaches listeners. There is no diffing — after
 mutating `state`, call the matching render.
 
+The leaderboard (`#board`, left) and the How-to-prepare panel (`#prep`, right)
+are siblings of `#app`, so `render*()` never touches them. They're kept in step
+by `syncUserMenu()` — which also calls `syncPrep()` — invoked at the end of every
+render. Adding chrome outside `#app` means wiring it in there too. See DOCS.md
+§ Page layout.
+
 Timing is always 2 min/question (`SECONDS_PER_QUESTION`), derived per level from
 `count`, so it holds on shorter levels too. Scoring in `renderResults()` is
 `round(correct / total * 1000)`; the same pass also builds the domain breakdown,

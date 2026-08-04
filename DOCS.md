@@ -213,6 +213,21 @@ localStorage or switching browsers locks a person out of re-using their name.
 The sidebar sits on the **left** on desktop; below 1080px it becomes a drawer
 opened by the 🏆 button.
 
+### Page layout
+
+On wide screens the shell is three columns: leaderboard on the left (`.sidebar`,
+placed there by `order: -1`), the main column in the middle, and the **How to
+prepare** panel on the right (`.prep`, sticky). Both side columns live outside
+`#app`, so they are not rewritten by the `render*()` functions — `syncPrep()`
+fills the prep panel and is called from `syncUserMenu()`, which already runs on
+every screen transition. The panel shows on the start screen only; during an
+exam it would compete with the question.
+
+Below 1340px there is no room for three columns, so `.prep` wraps to its own
+full-width row beneath the main column. Those overrides are declared *after* the
+base `.prep` rule rather than up with the other media queries — a media query
+adds no specificity, so an earlier one would lose to the later base rule.
+
 ### Storage
 
 `api/scores.js` is a Vercel serverless function backed by Redis over Upstash's
