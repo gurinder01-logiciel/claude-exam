@@ -60,10 +60,43 @@
     min-width: 22px; font-size: 0.8rem;
   }
   .lb-rank.top { color: var(--lime); }
-  .lb-name { flex: 1; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .lb-meta { font-size: 0.68rem; color: var(--text-dim); font-weight: 400; }
-  .lb-score { font-family: var(--font-mono); font-weight: 700; font-size: 0.85rem; }
+  .lb-name { flex: 1; min-width: 0; font-weight: 600; }
+  .lb-meta { display: block; font-size: 0.68rem; color: var(--text-dim); font-weight: 400; line-height: 1.35; }
+  .lb-score { font-family: var(--font-mono); font-weight: 700; font-size: 0.85rem; flex-shrink: 0; width: 62px; text-align: right; }
   .lb-empty { font-size: 0.82rem; color: var(--text-dim); text-align: center; padding: 20px 0; line-height: 1.5; }
+  .lb-profile {
+    display: block; width: 100%; margin-top: 14px; padding: 9px 0;
+    background: none; border: none; border-top: 1px solid var(--border);
+    font-family: inherit; font-size: 0.78rem; font-weight: 600; color: var(--text-dim);
+    text-align: left; cursor: pointer;
+  }
+  .lb-profile:hover { color: var(--text); }
+
+  /* My profile screen */
+  .profile-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 4px; }
+  .profile-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px;
+    margin: 22px 0 28px;
+  }
+  .profile-stat {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px;
+  }
+  .profile-stat .num { font-family: var(--font-mono); font-size: 1.35rem; font-weight: 700; }
+  .profile-stat .lbl { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+  .attempt {
+    display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px;
+  }
+  .attempt-main { flex: 1; min-width: 0; }
+  .attempt-level { font-weight: 600; font-size: 0.92rem; }
+  .attempt-meta { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
+  .attempt-score { font-family: var(--font-mono); font-weight: 700; font-size: 1.05rem; flex-shrink: 0; }
+  .attempt-badge {
+    flex-shrink: 0; font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; padding: 4px 9px; border-radius: 20px;
+  }
+  .attempt-badge.pass { background: var(--lime-dim); color: var(--good); }
+  .attempt-badge.fail { background: rgba(46,46,46,0.06); color: var(--text-dim); }
   .board-toggle { display: none; }
 
   @media (max-width: 1080px) {
@@ -595,6 +628,9 @@ function isUnlocked(lv) {
 // bare file rather than deployed), so the app never breaks.
 let memoryBoard = [];
 let boardCache = [];
+// Whether boardCache came from the API — kept so anything that re-renders the
+// board from cache (the profile screen) doesn't wrongly drop the offline notice.
+let boardLive = false;
 
 async function fetchBoard() {
   try {
@@ -602,9 +638,11 @@ async function fetchBoard() {
     if (!r.ok) throw new Error('bad status');
     const data = await r.json();
     boardCache = Array.isArray(data.scores) ? data.scores : [];
+    boardLive = true;
     return { scores: boardCache, live: true };
   } catch {
     boardCache = memoryBoard;
+    boardLive = false;
     return { scores: boardCache, live: false };
   }
 }
@@ -623,29 +661,49 @@ async function submitScore(entry) {
 }
 
 function renderBoard(scores, live) {
-  // Best score per person, ranked
-  const best = {};
+  // Latest attempt per person, ranked by that score. `at` is stamped server-side
+  // on POST; entries without it (older local-fallback ones) sort as oldest.
+  const latest = {};
+  const attempts = {};
   scores.forEach(s => {
     if (!s || !s.name) return;
-    if (!best[s.name] || s.score > best[s.name].score) best[s.name] = s;
+    attempts[s.name] = (attempts[s.name] || 0) + 1;
+    if (!latest[s.name] || (s.at || 0) > (latest[s.name].at || 0)) latest[s.name] = s;
   });
-  const ranked = Object.values(best).sort((a, b) => b.score - a.score);
+  const ranked = Object.values(latest).sort((a, b) => b.score - a.score);
 
-  const rows = ranked.length ? ranked.map((s, i) => `
+  const rows = ranked.length ? ranked.map((s, i) => {
+    const n = attempts[s.name];
+    const meta = [
+      s.level && escapeHtml(s.level),
+      s.total ? Math.round(s.score * s.total / 1000) + '/' + s.total + ' right' : '',
+      n > 1 ? n + ' attempts' : ''
+    ].filter(Boolean).join(' · ');
+    return `
     <div class="lb-row ${s.name === user.name ? 'me' : ''}">
       <span class="lb-rank ${i < 3 ? 'top' : ''}">${i + 1}</span>
       <span class="lb-name">${escapeHtml(s.name)}
-        <span class="lb-meta">${escapeHtml(s.level || '')}${s.total ? ' · ' + Math.round(s.score * s.total / 1000) + '/' + s.total + ' right' : ''}${s.passed ? ' · passed' : ''}</span>
+        <span class="lb-meta">${meta}</span>
       </span>
       <span class="lb-score" style="color:${s.passed ? 'var(--good)' : 'var(--text-dim)'}">${s.score}<span style='font-size:0.66rem;color:var(--text-dim);font-weight:400'>/1000</span></span>
-    </div>`).join('')
+    </div>`;
+  }).join('')
     : `<div class="lb-empty">No scores yet.<br>Finish an exam to appear here.</div>`;
+
+  // Only offered from the start screen — swapping #app mid-exam would tear down
+  // the question screen while the timer kept running.
+  const profileLink = state.screen === 'start' && user.name
+    ? `<button class="lb-profile" id="profileLink">My profile · attempt history →</button>`
+    : '';
 
   boardEl.innerHTML = `
     <h3>🏆 Team leaderboard</h3>
-    <div class="lb-sub">Score out of 1000 · best per person · pass ${PASS_SCORE}${live ? '' : ' · offline (this browser only)'}</div>
+    <div class="lb-sub">Score out of 1000 · latest per person · pass ${PASS_SCORE}${live ? '' : ' · offline (this browser only)'}</div>
     ${rows}
+    ${profileLink}
   `;
+
+  document.getElementById('profileLink')?.addEventListener('click', renderProfile);
 }
 
 function escapeHtml(s) {
@@ -661,22 +719,45 @@ document.getElementById('boardToggle')?.addEventListener('click', () => {
   boardEl.classList.toggle('open');
 });
 
-function renderNameGate() {
+// Names are the only identity this app has, so they must be unique on the board.
+// Compared case- and whitespace-insensitively so "Jagtar Singh" can't shadow
+// "jagtar  singh". `except` lets the change-name flow keep your own name.
+function nameIsTaken(name, except = null) {
+  const norm = s => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  const target = norm(name);
+  if (except && norm(except) === target) return false;
+  return boardCache.some(s => s && norm(s.name) === target);
+}
+
+// `keepName` is the caller's current name (change-name flow) — it stays valid so
+// re-entering your own name isn't rejected as a duplicate of yourself.
+function renderNameGate(keepName = null) {
   boardEl.innerHTML = '';
   app.innerHTML = `
     <div class="gate">
       <h1>CCAR-F <span>Exam Simulator</span></h1>
-      <p>Enter your name to start. Your best score appears on the team leaderboard.</p>
-      <input id="nameInput" type="text" placeholder="Your name" maxlength="40" autocomplete="name">
+      <p>Enter your name to start. Your latest score appears on the team leaderboard, and your full attempt history stays on your profile.</p>
+      <input id="nameInput" type="text" placeholder="Your name" maxlength="40" autocomplete="name" value="${escapeHtml(keepName || '')}">
       <div class="err" id="nameErr"></div>
       <button class="btn" id="nameGo" style="width:100%">Continue</button>
     </div>
   `;
   const input = document.getElementById('nameInput');
   const err = document.getElementById('nameErr');
-  const go = () => {
+  const go = async () => {
     const v = input.value.trim();
     if (v.length < 2) { err.textContent = 'Please enter at least 2 characters.'; return; }
+    // The board may not have loaded yet on a cold start — fetch before deciding,
+    // otherwise an empty cache would wave every duplicate through.
+    err.textContent = 'Checking name…';
+    await fetchBoard();
+    if (nameIsTaken(v, keepName)) {
+      err.textContent = `“${v}” is already taken on the leaderboard. Please pick a different name.`;
+      input.focus();
+      input.select();
+      return;
+    }
+    err.textContent = '';
     user.name = v;
     saveName(v);
     renderStart();
@@ -799,6 +880,79 @@ function resetToMenu() {
   renderStart();
 }
 
+// "3 days ago" from an epoch ms stamp. Entries predating the `at` field show nothing.
+function relativeTime(at) {
+  if (!at) return '';
+  const secs = Math.max(0, Math.round((Date.now() - at) / 1000));
+  const units = [[60, 'second'], [60, 'minute'], [24, 'hour'], [7, 'day'], [4.35, 'week'], [12, 'month']];
+  let n = secs, label = 'second';
+  for (const [step, next] of units) {
+    if (n < step) break;
+    n = n / step; label = next;
+  }
+  n = Math.floor(n);
+  if (label === 'second' && n < 5) return 'just now';
+  return `${n} ${label}${n === 1 ? '' : 's'} ago`;
+}
+
+// Read-only history for the signed-in name, drawn from the board payload we
+// already fetched. Offline, this shows only the attempts made in this browser.
+function renderProfile() {
+  state.screen = 'profile';
+  const mine = boardCache
+    .filter(s => s && s.name === user.name)
+    .sort((a, b) => (b.at || 0) - (a.at || 0));
+
+  const scores = mine.map(s => s.score);
+  const best = scores.length ? Math.max(...scores) : 0;
+  const passes = mine.filter(s => s.passed).length;
+
+  const attempts = mine.length ? mine.map(s => {
+    const right = s.total ? Math.round(s.score * s.total / 1000) + '/' + s.total + ' right' : '';
+    const when = relativeTime(s.at);
+    return `
+    <div class="attempt">
+      <div class="attempt-main">
+        <div class="attempt-level">${escapeHtml(s.level || 'Unknown level')}</div>
+        <div class="attempt-meta">${[right, when].filter(Boolean).join(' · ')}</div>
+      </div>
+      <div class="attempt-badge ${s.passed ? 'pass' : 'fail'}">${s.passed ? 'Passed' : 'Failed'}</div>
+      <div class="attempt-score" style="color:${s.passed ? 'var(--good)' : 'var(--text-dim)'}">${s.score}</div>
+    </div>`;
+  }).join('')
+    : `<div class="lb-empty">No attempts recorded yet.<br>Finish a level and it will show up here.</div>`;
+
+  app.innerHTML = `
+    <div class="profile-head">
+      <div>
+        <div class="section-label" style="margin:0">My profile</div>
+        <h2 style="font-family:var(--font-display);font-size:1.5rem;margin-top:4px">${escapeHtml(user.name || '—')}</h2>
+      </div>
+      <button class="btn ghost" id="profileBack">← Back to levels</button>
+    </div>
+    <div class="profile-stats">
+      <div class="profile-stat"><div class="num">${mine.length}</div><div class="lbl">Attempts</div></div>
+      <div class="profile-stat"><div class="num">${best}</div><div class="lbl">Best score</div></div>
+      <div class="profile-stat"><div class="num">${mine.length ? mine[0].score : 0}</div><div class="lbl">Latest score</div></div>
+      <div class="profile-stat"><div class="num">${passes}</div><div class="lbl">Passed</div></div>
+    </div>
+    <div class="section-label">Attempt history · newest first</div>
+    ${attempts}
+  `;
+
+  document.getElementById('profileBack').addEventListener('click', () => {
+    state.screen = 'start';
+    renderStart();
+    // Synchronous re-render brings the profile link straight back; the fetch
+    // then refreshes the numbers without a flash of a link-less board.
+    renderBoard(boardCache, boardLive);
+    refreshBoard();
+  });
+
+  // Re-render the board so the profile link hides while we're on this screen.
+  renderBoard(boardCache, boardLive);
+}
+
 function renderStart() {
   stopTimer();
   const scenarioColors = ['#26d07c','#3b9ae1','#f0a828','#a678e2','#e0524d','#20c4b8'];
@@ -881,7 +1035,7 @@ function renderStart() {
   });
   document.getElementById('changeName')?.addEventListener('click', (e) => {
     e.preventDefault();
-    renderNameGate();
+    renderNameGate(user.name);
   });
 }
 
@@ -1064,7 +1218,8 @@ function renderResults() {
   const passed = scaled >= PASS_SCORE;
   // Completing a level unlocks anything that requires it.
   if (state.level) markCompleted(state.level);
-  // Publish this attempt to the team leaderboard (best score per person wins).
+  // Publish this attempt to the team leaderboard (the board ranks each
+  // person's most recent attempt; every attempt is kept for the profile view).
   if (user.name && !state.submitted) {
     state.submitted = true;
     submitScore({

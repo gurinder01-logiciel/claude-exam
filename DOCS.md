@@ -179,8 +179,23 @@ exam frames them.
 ## 5. Leaderboard
 
 Each person enters a name once (remembered in their browser). Finished exams post
-to `/api/scores`, and the sidebar shows the **best score per person**, ranked,
-with the level they took. Your own row is highlighted.
+to `/api/scores`, and the sidebar shows the **latest score per person**, ranked
+by that score, with the level they took and an attempt count once they have more
+than one. Your own row is highlighted.
+
+Every attempt is retained in Redis, so the **My profile** link under the board
+(shown only on the start screen) opens a read-only history for the signed-in
+name: attempts, best score, latest score, passes, and one row per sitting
+newest-first. It reuses the board payload — no extra endpoint.
+
+Because the name is the only identity the app has, the name gate enforces
+uniqueness: `nameIsTaken()` normalises case and collapsed whitespace, then
+rejects any name already present in the board payload. It fetches the board
+before deciding, so a cold start can't wave a duplicate through; offline (board
+unreachable) it has nothing to compare against and lets the name pass. The
+change-name flow exempts your own current name. This is a client-side guard
+only — `POST /api/scores` still accepts duplicates. Trade-off: clearing
+localStorage or switching browsers locks a person out of re-using their name.
 
 The sidebar sits on the **left** on desktop; below 1080px it becomes a drawer
 opened by the 🏆 button.

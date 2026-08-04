@@ -13,7 +13,8 @@ exam: 60 scenario questions in 120 minutes, with a shared team leaderboard.
 - **Instant feedback** (optional): marks each pick right or wrong *without*
   revealing the correct answer
 - **Score out of 1000** with a domain breakdown and per-question explanations
-- **Team leaderboard** showing each person's best score
+- **Team leaderboard** ranking each person's latest score, plus a **My profile**
+  view with their full attempt history
 - **Scenario blocks like the real exam** — the Full Mock draws 4 of the 6
   official scenarios, each framing a run of consecutive questions under a shared
   context banner
@@ -96,11 +97,17 @@ it should return `{"scores":[]}` rather than an error.
 ### 5. Share with the team
 
 Send the deployment URL. Each person types their name once (remembered in their
-browser), picks a level, and their best score appears on the leaderboard.
+browser), picks a level, and their latest score appears on the leaderboard.
+
+Names must be unique: the name gate rejects a name already on the leaderboard
+(compared ignoring case and extra spaces). A consequence worth knowing — if
+someone clears their browser storage or moves to another laptop, they cannot
+re-enter their own name and will need a new one.
 
 **Note:** the leaderboard has no authentication — anyone can submit any name and
-score. That's fine for team practice, but don't treat it as a source of truth for
-reporting.
+score, and the uniqueness check is client-side only, so `POST /api/scores` will
+still accept a duplicate name. That's fine for team practice, but don't treat it
+as a source of truth for reporting.
 
 ---
 
