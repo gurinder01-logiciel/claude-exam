@@ -635,15 +635,15 @@ function renderBoard(scores, live) {
     <div class="lb-row ${s.name === user.name ? 'me' : ''}">
       <span class="lb-rank ${i < 3 ? 'top' : ''}">${i + 1}</span>
       <span class="lb-name">${escapeHtml(s.name)}
-        <span class="lb-meta">${escapeHtml(s.level || '')}${s.passed ? ' · passed' : ''}</span>
+        <span class="lb-meta">${escapeHtml(s.level || '')}${s.total ? ' · ' + Math.round(s.score * s.total / 1000) + '/' + s.total + ' right' : ''}${s.passed ? ' · passed' : ''}</span>
       </span>
-      <span class="lb-score" style="color:${s.passed ? 'var(--good)' : 'var(--text-dim)'}">${s.score}</span>
+      <span class="lb-score" style="color:${s.passed ? 'var(--good)' : 'var(--text-dim)'}">${s.score}<span style='font-size:0.66rem;color:var(--text-dim);font-weight:400'>/1000</span></span>
     </div>`).join('')
     : `<div class="lb-empty">No scores yet.<br>Finish an exam to appear here.</div>`;
 
   boardEl.innerHTML = `
     <h3>🏆 Team leaderboard</h3>
-    <div class="lb-sub">Best score per person · pass mark ${PASS_SCORE}${live ? '' : ' · offline (this browser only)'}</div>
+    <div class="lb-sub">Score out of 1000 · best per person · pass ${PASS_SCORE}${live ? '' : ' · offline (this browser only)'}</div>
     ${rows}
   `;
 }
