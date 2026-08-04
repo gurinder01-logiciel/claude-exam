@@ -1,7 +1,7 @@
 {
   "key": "scenario",
   "name": "Scenario Practice",
-  "desc": "Production scenarios and exam-trap drills across all five domains — the 'best decision' items that decide pass or fail",
+  "desc": "Scenario-grouped practice across the official exam scenarios, weighted toward Claude Code in CI/CD — the cluster candidates report seeing most.",
   "ready": true,
   "requires": "basic",
   "count": 60,
@@ -43,7 +43,8 @@
         "Scan-style prompts need an explicit --output-format json, and without it the CLI buffers the whole transcript and never flushes it"
       ],
       "correct": 2,
-      "explain": "Without -p (--print), Claude Code opens an interactive session and waits for input on a terminal that a CI runner never attaches, so it hangs to the workflow timeout. The tempting near-miss is the lazy interactive credential prompt: missing or unexposed credentials produce a fast authentication error and a non-zero exit, not a silent hang for the full timeout window."
+      "explain": "Without -p (--print), Claude Code opens an interactive session and waits for input on a terminal that a CI runner never attaches, so it hangs to the workflow timeout. The tempting near-miss is the lazy interactive credential prompt: missing or unexposed credentials produce a fast authentication error and a non-zero exit, not a silent hang for the full timeout window.",
+      "scenario": 5
     },
     {
       "domain": "CI/CD",
@@ -56,7 +57,8 @@
         "The review request follows the generation output, so the earlier reasoning is served from cache and replayed instead of being re-derived"
       ],
       "correct": 1,
-      "explain": "An agent reviewing its own output in the same session treats that output as established context and confirms it; isolating the reviewer as an independent session makes it evaluate the code fresh. The 'lost in the middle' answer is tempting because context length does degrade recall, but the failure here is consistent across every run and every PR size, which points at bias, not position."
+      "explain": "An agent reviewing its own output in the same session treats that output as established context and confirms it; isolating the reviewer as an independent session makes it evaluate the code fresh. The 'lost in the middle' answer is tempting because context length does degrade recall, but the failure here is consistent across every run and every PR size, which points at bias, not position.",
+      "scenario": 5
     },
     {
       "domain": "CI/CD",
@@ -69,7 +71,8 @@
         "Use the Message Batches API for the overnight debt report to get the cost discount, and real-time Messages calls for the pre-merge check"
       ],
       "correct": 3,
-      "explain": "Batch processing is the right fit for high-volume work that is not latency-sensitive, so the overnight report belongs there, while a blocking pre-merge gate needs an immediate response and must use real-time requests. Polling a batch for the pre-merge check is the tempting near-miss: the cost math is real, but batch results are not guaranteed to return quickly enough to gate a merge."
+      "explain": "Batch processing is the right fit for high-volume work that is not latency-sensitive, so the overnight report belongs there, while a blocking pre-merge gate needs an immediate response and must use real-time requests. Polling a batch for the pre-merge check is the tempting near-miss: the cost math is real, but batch results are not guaranteed to return quickly enough to gate a merge.",
+      "scenario": 5
     },
     {
       "domain": "CI/CD",
@@ -82,7 +85,8 @@
         "Cap the reviewer at the five largest changed files in each PR so it has room to reason carefully and thoroughly about each one"
       ],
       "correct": 1,
-      "explain": "False positives drop when 'issue' is defined categorically with severities the reviewer must map to, and when previous findings are supplied so it stops re-reporting them. Temperature 0 is the tempting near-miss, and it fails twice over: the API docs state that even at temperature 0 results are not fully deterministic, and even if they were, a confidently wrong criterion would just be applied consistently."
+      "explain": "False positives drop when 'issue' is defined categorically with severities the reviewer must map to, and when previous findings are supplied so it stops re-reporting them. Temperature 0 is the tempting near-miss, and it fails twice over: the API docs state that even at temperature 0 results are not fully deterministic, and even if they were, a confidently wrong criterion would just be applied consistently.",
+      "scenario": 5
     },
     {
       "domain": "Multi-Agent",
@@ -95,7 +99,8 @@
         "Cache the synthesis subagent's responses so repeat follow-ups on the same findings are served without another spawn"
       ],
       "correct": 0,
-      "explain": "The coordinator already holds the findings, so the summarization needs no delegation at all; doing it inline removes both the spawn overhead and the redundant token transfer. Compressing before the handoff is the tempting near-miss because it shrinks the payload, but it still pays for a spawn and still re-sends data that never had to leave the coordinator."
+      "explain": "The coordinator already holds the findings, so the summarization needs no delegation at all; doing it inline removes both the spawn overhead and the redundant token transfer. Compressing before the handoff is the tempting near-miss because it shrinks the payload, but it still pays for a spawn and still re-sends data that never had to leave the coordinator.",
+      "scenario": 3
     },
     {
       "domain": "Multi-Agent",
@@ -108,7 +113,8 @@
         "Collapse all eighteen documents into one long-running agent so there is no cross-agent coordination left to fail"
       ],
       "correct": 2,
-      "explain": "Durable per-document checkpointing is what makes the crash cheap: completed work is preserved and the run resumes only the six unfinished documents. Longer timeouts with backoff retries is the tempting near-miss, but it only addresses transient slowness and still discards the twelve finished documents when the process dies mid-run."
+      "explain": "Durable per-document checkpointing is what makes the crash cheap: completed work is preserved and the run resumes only the six unfinished documents. Longer timeouts with backoff retries is the tempting near-miss, but it only addresses transient slowness and still discards the twelve finished documents when the process dies mid-run.",
+      "scenario": 3
     },
     {
       "domain": "Multi-Agent",
@@ -121,7 +127,8 @@
         "Return a best-effort partial answer with a low confidence score, so downstream synthesis can weight it instead of branching"
       ],
       "correct": 2,
-      "explain": "The coordinator can only route around a failure if it knows what was tried and whether the source was unreachable or simply held no data, which is exactly what a structured error carries. The best-effort partial with a confidence score is the tempting near-miss: it keeps the pipeline flowing but launders a failure into a claim, so the coordinator cannot tell a lookup error from a real absence."
+      "explain": "The coordinator can only route around a failure if it knows what was tried and whether the source was unreachable or simply held no data, which is exactly what a structured error carries. The best-effort partial with a confidence score is the tempting near-miss: it keeps the pipeline flowing but launders a failure into a claim, so the coordinator cannot tell a lookup error from a real absence.",
+      "scenario": 3
     },
     {
       "domain": "Multi-Agent",
@@ -134,7 +141,8 @@
         "Pass the full accumulated context to every subagent so each one can reason about how its piece fits the overall task"
       ],
       "correct": 0,
-      "explain": "Each subagent should receive only the narrowly scoped context its task requires, which keeps focus high and token cost low. Passing only the bare instruction and letting subagents rediscover background is the tempting near-miss: it is admirably lean, but it forces redundant tool calls and re-derivation of context the coordinator could simply have handed over."
+      "explain": "Each subagent should receive only the narrowly scoped context its task requires, which keeps focus high and token cost low. Passing only the bare instruction and letting subagents rediscover background is the tempting near-miss: it is admirably lean, but it forces redundant tool calls and re-derivation of context the coordinator could simply have handed over.",
+      "scenario": 3
     },
     {
       "domain": "Structured Output",
@@ -147,7 +155,8 @@
         "Mark all three fields required in the schema and drop records where the cancellation date fails downstream date parsing"
       ],
       "correct": 1,
-      "explain": "A schema-backed tool call enforces the shape, and typing the cancellation date as nullable lets the model represent a genuinely absent date instead of inventing one. Marking all three required and discarding unparseable records is the tempting near-miss: it does yield valid JSON, but it pressures the model to fabricate dates and silently throws away otherwise good extractions."
+      "explain": "A schema-backed tool call enforces the shape, and typing the cancellation date as nullable lets the model represent a genuinely absent date instead of inventing one. Marking all three required and discarding unparseable records is the tempting near-miss: it does yield valid JSON, but it pressures the model to fabricate dates and silently throws away otherwise good extractions.",
+      "scenario": 6
     },
     {
       "domain": "Structured Output",
@@ -160,7 +169,8 @@
         "No, and a schema adds nothing useful either, since the model may still return keys and types that fall outside the declared shape"
       ],
       "correct": 1,
-      "explain": "A schema can confirm that attendee_count is an integer; it cannot confirm the source document ever stated a number, so semantic checks like cross-field totals belong in your own validation layer. The decode-time constraint answer is the tempting near-miss: constrained generation really does lock the shape, but shape conformance says nothing about whether the value is supported by the source."
+      "explain": "A schema can confirm that attendee_count is an integer; it cannot confirm the source document ever stated a number, so semantic checks like cross-field totals belong in your own validation layer. The decode-time constraint answer is the tempting near-miss: constrained generation really does lock the shape, but shape conformance says nothing about whether the value is supported by the source.",
+      "scenario": 6
     },
     {
       "domain": "Structured Output",
@@ -173,7 +183,8 @@
         "Increase max_tokens so long invoices are never truncated mid-table and every line item reaches the extraction output"
       ],
       "correct": 0,
-      "explain": "Extracting the stated total and an independently computed total lets code assert they agree, which turns an invisible semantic error into a caught, reviewable exception. Raising max_tokens is the tempting near-miss: truncation would indeed break sums, but it would also visibly cut the item array short, whereas here the schema is satisfied and only the arithmetic disagrees."
+      "explain": "Extracting the stated total and an independently computed total lets code assert they agree, which turns an invisible semantic error into a caught, reviewable exception. Raising max_tokens is the tempting near-miss: truncation would indeed break sums, but it would also visibly cut the item array short, whereas here the schema is satisfied and only the arithmetic disagrees.",
+      "scenario": 6
     },
     {
       "domain": "Structured Output",
@@ -186,7 +197,8 @@
         "Send the document plus a stricter restatement of the schema, with the previously failing fields marked required a second time"
       ],
       "correct": 2,
-      "explain": "A useful retry is targeted feedback: the source document, the output that failed, and the precise validator message the model must fix. Sending only the error and schema is the tempting near-miss, since it does name the defect, but without the document the model has to re-guess the underlying values rather than repair the one broken field."
+      "explain": "A useful retry is targeted feedback: the source document, the output that failed, and the precise validator message the model must fix. Sending only the error and schema is the tempting near-miss, since it does name the defect, but without the document the model has to re-guess the underlying values rather than repair the one broken field.",
+      "scenario": 6
     },
     {
       "domain": "Tool Design",
@@ -199,7 +211,8 @@
         "Enforce it as a programmatic hook or gate in the refund tool's execution path that blocks or escalates any amount above the limit"
       ],
       "correct": 3,
-      "explain": "A code-level gate on the refund tool's execution path enforces the threshold regardless of what the model decides, which is what a hard financial limit requires. The tool-description answer is the tempting near-miss: descriptions do strongly steer tool use and sit closer to the call site than a system prompt, but they remain model-read guidance, not enforcement."
+      "explain": "A code-level gate on the refund tool's execution path enforces the threshold regardless of what the model decides, which is what a hard financial limit requires. The tool-description answer is the tempting near-miss: descriptions do strongly steer tool use and sit closer to the call site than a system prompt, but they remain model-read guidance, not enforcement.",
+      "scenario": 1
     },
     {
       "domain": "Tool Design",
@@ -212,7 +225,8 @@
         "Leave tool_choice unset and validate afterward that a tool_use block is present, retrying the request when one is absent"
       ],
       "correct": 1,
-      "explain": "tool_choice set to 'any' forces exactly one tool call while leaving the schema selection to Claude, which is the requirement here. Naming a single tool with tool_choice 'tool' is the tempting near-miss: it also guarantees a call, but it makes you pre-choose the document type, which is precisely what you wanted to avoid."
+      "explain": "tool_choice set to 'any' forces exactly one tool call while leaving the schema selection to Claude, which is the requirement here. Naming a single tool with tool_choice 'tool' is the tempting near-miss: it also guarantees a call, but it makes you pre-choose the document type, which is precisely what you wanted to avoid.",
+      "scenario": 6
     },
     {
       "domain": "Dev Productivity",
@@ -225,7 +239,8 @@
         "Use Read, Grep, and Glob to locate and inspect files by pattern and content without modifying anything in the repository"
       ],
       "correct": 3,
-      "explain": "Exploration is a read and search task, and Read, Grep, and Glob cover locating files by name pattern, searching contents, and inspecting them without any write risk. Bash-only is the tempting near-miss because those shell utilities genuinely can search a repo, but it trades the safe read-only surface for arbitrary command execution and loses the structured file-oriented tools."
+      "explain": "Exploration is a read and search task, and Read, Grep, and Glob cover locating files by name pattern, searching contents, and inspecting them without any write risk. Bash-only is the tempting near-miss because those shell utilities genuinely can search a repo, but it trades the safe read-only surface for arbitrary command execution and loses the structured file-oriented tools.",
+      "scenario": 4
     },
     {
       "domain": "Context Mgmt",
@@ -238,7 +253,8 @@
         "Move the transcript into an external store and retrieve only the passages that match each incoming question by keyword"
       ],
       "correct": 2,
-      "explain": "Attention is least reliable over the middle of a very long context, so the fix is to compress, prune, and reposition the important material where it is attended to. External retrieval is the tempting near-miss and is a sound pattern generally, but keyword retrieval can miss the buried facts entirely and does not address a context that is simply too bloated to attend to."
+      "explain": "Attention is least reliable over the middle of a very long context, so the fix is to compress, prune, and reposition the important material where it is attended to. External retrieval is the tempting near-miss and is a sound pattern generally, but keyword retrieval can miss the buried facts entirely and does not address a context that is simply too bloated to attend to.",
+      "scenario": 3
     },
     {
       "domain": "Multi-Agent",
@@ -251,7 +267,8 @@
         "Accept whichever figure the more recent subagent returned, on the assumption its sources were fetched later and are fresher"
       ],
       "correct": 0,
-      "explain": "Keeping each claim tied to its source is what makes the conflict resolvable, since one figure may be an audited filing and the other a press estimate. Re-running with a narrower prompt is the tempting near-miss: it might produce agreement, but agreement without provenance is not verification, and the disagreement itself is the signal worth keeping."
+      "explain": "Keeping each claim tied to its source is what makes the conflict resolvable, since one figure may be an audited filing and the other a press estimate. Re-running with a narrower prompt is the tempting near-miss: it might produce agreement, but agreement without provenance is not verification, and the disagreement itself is the signal worth keeping.",
+      "scenario": 3
     },
     {
       "domain": "Structured Output",
@@ -264,7 +281,8 @@
         "Set temperature to 0 so the model stops sampling speculative dates and returns the same value on every extraction attempt"
       ],
       "correct": 1,
-      "explain": "When the information is genuinely absent, a required field leaves the model no valid way to answer, so it fabricates; making the field nullable gives absence a legitimate representation. Temperature 0 is the tempting near-miss: it does suppress sampling variance, but it makes the invented date consistent rather than making it go away."
+      "explain": "When the information is genuinely absent, a required field leaves the model no valid way to answer, so it fabricates; making the field nullable gives absence a legitimate representation. Temperature 0 is the tempting near-miss: it does suppress sampling variance, but it makes the invented date consistent rather than making it go away.",
+      "scenario": 6
     },
     {
       "domain": "CI/CD",
@@ -277,7 +295,8 @@
         "Treat headless review as a first automated check, not final approval: gate auth and payment changes on human review and assert output is on-topic"
       ],
       "correct": 3,
-      "explain": "A zero exit only means the process ran, so the pipeline must assert the output is substantive and relevant, and sensitive modules like authentication still need human approval. Retrying until output appears is the tempting near-miss: it patches the empty-output symptom, but it neither confirms the content is on-topic nor supplies the human sign-off an auth change warrants."
+      "explain": "A zero exit only means the process ran, so the pipeline must assert the output is substantive and relevant, and sensitive modules like authentication still need human approval. Retrying until output appears is the tempting near-miss: it patches the empty-output symptom, but it neither confirms the content is on-topic nor supplies the human sign-off an auth change warrants.",
+      "scenario": 5
     },
     {
       "domain": "Claude Code",
@@ -290,7 +309,8 @@
         "Use a hook, because it enforces the rule as deterministic code; CLAUDE.md is guidance the model can probabilistically fail to follow"
       ],
       "correct": 3,
-      "explain": "A hook runs as code on a defined lifecycle event, so a no-exception compliance rule is enforced regardless of what the model chooses to do. The CLAUDE.md plus pre-commit lint option is the tempting near-miss: it does add a deterministic check, but the lint only verifies the instruction text exists, not that any session actually complied with it."
+      "explain": "A hook runs as code on a defined lifecycle event, so a no-exception compliance rule is enforced regardless of what the model chooses to do. The CLAUDE.md plus pre-commit lint option is the tempting near-miss: it does add a deterministic check, but the lint only verifies the instruction text exists, not that any session actually complied with it.",
+      "scenario": 2
     },
     {
       "domain": "Agentic Arch",
@@ -303,7 +323,8 @@
         "Pick multi-agent whenever the task needs more than one tool, since one agent cannot reliably sequence heterogeneous tools."
       ],
       "correct": 1,
-      "explain": "Simplicity is the default: orchestration is justified only by real parallelism or context-isolation needs, otherwise it adds cost, latency and new failure modes. The tempting near-miss is the claim that workers keep contexts small and so always improve quality — context isolation only pays off when subtasks are genuinely independent, and this task is merely moderately complex, so coordination overhead dominates."
+      "explain": "Simplicity is the default: orchestration is justified only by real parallelism or context-isolation needs, otherwise it adds cost, latency and new failure modes. The tempting near-miss is the claim that workers keep contexts small and so always improve quality — context isolation only pays off when subtasks are genuinely independent, and this task is merely moderately complex, so coordination overhead dominates.",
+      "scenario": 1
     },
     {
       "domain": "Structured Output",
@@ -316,7 +337,8 @@
         "Prompt-only JSON is fine for prototypes, but pipelines feeding a database need schema-backed structured output or strict tool use."
       ],
       "correct": 3,
-      "explain": "Prompt-only JSON can drift in shape, so pipelines feeding downstream systems need schema-backed output for reliability and auditability. The tempting near-miss is retrying on parse errors: that catches malformed JSON but not syntactically valid JSON with renamed, missing or extra fields, which is exactly what silently corrupts a database load."
+      "explain": "Prompt-only JSON can drift in shape, so pipelines feeding downstream systems need schema-backed output for reliability and auditability. The tempting near-miss is retrying on parse errors: that catches malformed JSON but not syntactically valid JSON with renamed, missing or extra fields, which is exactly what silently corrupts a database load.",
+      "scenario": 6
     },
     {
       "domain": "Claude Code",
@@ -329,7 +351,8 @@
         "Run one review pass per file but reuse the generator session, clearing history between files to keep each pass focused."
       ],
       "correct": 2,
-      "explain": "Per-file passes plus an integration pass, in a session isolated from the generator, avoids both attention loss over a large diff and self-review bias. The tempting near-miss is the single all-14-files pass in the generating session for 'full context' — it is exactly the setup that buries mid-diff issues and lets the author's own rationalisations stand unchallenged."
+      "explain": "Per-file passes plus an integration pass, in a session isolated from the generator, avoids both attention loss over a large diff and self-review bias. The tempting near-miss is the single all-14-files pass in the generating session for 'full context' — it is exactly the setup that buries mid-diff issues and lets the author's own rationalisations stand unchallenged.",
+      "scenario": 5
     },
     {
       "domain": "Tool Design",
@@ -342,7 +365,8 @@
         "Rewrite the two descriptions so each states distinctly when it applies, or consolidate them, so routing follows from the schemas."
       ],
       "correct": 3,
-      "explain": "Misrouting is a tool-definition problem: distinct, precise descriptions (or one consolidated tool) let the model route from the schema itself. The tempting near-miss is the system-prompt decision table — it can help short-term but leaves the ambiguity in the definitions, drifts out of sync with the tools, and breaks for query shapes the table never enumerated."
+      "explain": "Misrouting is a tool-definition problem: distinct, precise descriptions (or one consolidated tool) let the model route from the schema itself. The tempting near-miss is the system-prompt decision table — it can help short-term but leaves the ambiguity in the definitions, drifts out of sync with the tools, and breaks for query shapes the table never enumerated.",
+      "scenario": 1
     },
     {
       "domain": "Context Mgmt",
@@ -355,7 +379,8 @@
         "Have the coordinator summarise the subagent output with a second call, then drop the first half of the original reasoning dump."
       ],
       "correct": 2,
-      "explain": "Handoffs should carry distilled, schema-shaped results so the coordinator's context stays lean and focused on the three facts it needs. The tempting near-miss is keeping everything and leaning on prompt caching: caching lowers cost but the tokens still occupy the window and dilute attention, which is the actual problem here."
+      "explain": "Handoffs should carry distilled, schema-shaped results so the coordinator's context stays lean and focused on the three facts it needs. The tempting near-miss is keeping everything and leaning on prompt caching: caching lowers cost but the tokens still occupy the window and dilute attention, which is the actual problem here.",
+      "scenario": 3
     },
     {
       "domain": "CI/CD",
@@ -368,7 +393,8 @@
         "Pipe plain output through an appended system prompt asking for CSV rows, then split each returned line on commas in the script."
       ],
       "correct": 1,
-      "explain": "--output-format json (with a schema when you need a guaranteed shape) gives the downstream script structured findings instead of brittle text parsing. The tempting near-miss is stream-json: it is structured, but it is a stream of message events that requires --verbose in print mode and yields no single findings document, so the script cannot just read one final object."
+      "explain": "--output-format json (with a schema when you need a guaranteed shape) gives the downstream script structured findings instead of brittle text parsing. The tempting near-miss is stream-json: it is structured, but it is a stream of message events that requires --verbose in print mode and yields no single findings document, so the script cannot just read one final object.",
+      "scenario": 5
     },
     {
       "domain": "Agentic Arch",
@@ -381,7 +407,8 @@
         "Check the stop_reason field instead of content type — continue while it is 'tool_use' and terminate when it is 'end_turn'."
       ],
       "correct": 3,
-      "explain": "stop_reason is the only authoritative loop-control signal, and it stays correct when text and tool_use blocks arrive in the same turn. The tempting near-miss is checking the last block rather than the first: block ordering is not guaranteed, a turn can carry several tool_use blocks, and it still cannot distinguish end_turn from max_tokens, which stop_reason reports directly."
+      "explain": "stop_reason is the only authoritative loop-control signal, and it stays correct when text and tool_use blocks arrive in the same turn. The tempting near-miss is checking the last block rather than the first: block ordering is not guaranteed, a turn can carry several tool_use blocks, and it still cannot distinguish end_turn from max_tokens, which stop_reason reports directly.",
+      "scenario": 1
     },
     {
       "domain": "Agentic Arch",
@@ -394,7 +421,8 @@
         "tool_choice was left at 'auto', so the follow-up request lets Claude answer from memory instead of reading the tool output."
       ],
       "correct": 0,
-      "explain": "Tool results must be appended to the message history as a user-role tool_result block; skip that and the next request contains nothing new for Claude to reason about. The tempting near-miss is a mismatched tool_use_id — that is a real bug, but it fails loudly with a 400 validation error rather than producing a model that simply seems unaware of the result."
+      "explain": "Tool results must be appended to the message history as a user-role tool_result block; skip that and the next request contains nothing new for Claude to reason about. The tempting near-miss is a mismatched tool_use_id — that is a real bug, but it fails loudly with a 400 validation error rather than producing a model that simply seems unaware of the result.",
+      "scenario": 1
     },
     {
       "domain": "Agentic Arch",
@@ -407,7 +435,8 @@
         "Subagents run with isolated context and do not inherit parent history, so needed findings must be restated in each subagent prompt."
       ],
       "correct": 3,
-      "explain": "Subagents start with isolated context and never inherit the coordinator's history, so every relevant finding has to be written into the subagent's prompt. The tempting near-miss is partial inheritance up to the last compaction — ruled out because the subagents behave as if they know nothing at all, not as if they are missing only the most recent stretch."
+      "explain": "Subagents start with isolated context and never inherit the coordinator's history, so every relevant finding has to be written into the subagent's prompt. The tempting near-miss is partial inheritance up to the last compaction — ruled out because the subagents behave as if they know nothing at all, not as if they are missing only the most recent stretch.",
+      "scenario": 3
     },
     {
       "domain": "Tool Design",
@@ -420,7 +449,8 @@
         "The tool description omits the account-number format, so the agent sent a malformed identifier that matched nothing in the store."
       ],
       "correct": 0,
-      "explain": "A successful query that found nothing must be structurally distinct from a failure to reach the data source (empty result: not an error, count zero; access failure: error plus retryable), otherwise the agent burns retries and escalates wrongly. The tempting near-miss is a malformed account identifier, which would also yield an empty array — but the analysis established the account genuinely does not exist, so the query itself was well formed."
+      "explain": "A successful query that found nothing must be structurally distinct from a failure to reach the data source (empty result: not an error, count zero; access failure: error plus retryable), otherwise the agent burns retries and escalates wrongly. The tempting near-miss is a malformed account identifier, which would also yield an empty array — but the analysis established the account genuinely does not exist, so the query itself was well formed.",
+      "scenario": 1
     },
     {
       "domain": "Tool Design",
@@ -433,7 +463,8 @@
         "errorCategory 'transient' with isRetryable true and a short backoff, since approval limits may be widened later in the day."
       ],
       "correct": 1,
-      "explain": "A policy-limit rejection is a business error that no retry can resolve, so it should be non-retryable with a description pointing the agent to escalation. The tempting near-miss labels it a validation error: it correctly marks it non-retryable, but validation implies a malformed request and invites the agent to quietly reissue a smaller refund instead of escalating a policy decision."
+      "explain": "A policy-limit rejection is a business error that no retry can resolve, so it should be non-retryable with a description pointing the agent to escalation. The tempting near-miss labels it a validation error: it correctly marks it non-retryable, but validation implies a malformed request and invites the agent to quietly reissue a smaller refund instead of escalating a policy decision.",
+      "scenario": 1
     },
     {
       "domain": "Tool Design",
@@ -446,7 +477,8 @@
         "Put the 18 tools behind one dispatcher tool taking an action name, so the model only ever has a single tool to choose from."
       ],
       "correct": 2,
-      "explain": "Selection reliability falls as the tool count grows, and an agent cannot misuse a tool it was never given, so scoping each role to a handful of tools is the structural fix. The tempting near-miss is grouping all 18 by role in the system prompt — the synthesis subagent still has web search available, so a soft instruction is all that stands between it and the same wrong call."
+      "explain": "Selection reliability falls as the tool count grows, and an agent cannot misuse a tool it was never given, so scoping each role to a handful of tools is the structural fix. The tempting near-miss is grouping all 18 by role in the system prompt — the synthesis subagent still has web search available, so a soft instruction is all that stands between it and the same wrong call.",
+      "scenario": 3
     },
     {
       "domain": "Claude Code",
@@ -459,7 +491,8 @@
         "Register it in .claude/settings.json under a commands array that points at the markdown file, so the repo publishes it."
       ],
       "correct": 0,
-      "explain": "Project-scoped commands in .claude/commands/ are version-controlled, so cloning or pulling the repo gives every developer the command automatically. The tempting near-miss is a user-level file symlinked into the repo — the symlink can be committed but its target lives outside version control, so a fresh clone resolves to nothing on a machine that lacks the home-directory file."
+      "explain": "Project-scoped commands in .claude/commands/ are version-controlled, so cloning or pulling the repo gives every developer the command automatically. The tempting near-miss is a user-level file symlinked into the repo — the symlink can be committed but its target lives outside version control, so a fresh clone resolves to nothing on a machine that lacks the home-directory file.",
+      "scenario": 2
     },
     {
       "domain": "Claude Code",
@@ -472,7 +505,8 @@
         "Path-scoped files in .claude/rules/ with glob frontmatter such as paths ['**/*.test.tsx'], loading whenever a match is edited."
       ],
       "correct": 3,
-      "explain": "Glob-scoped rule files attach conventions to a filename pattern rather than a directory, so they load for every matching test file wherever it sits. The tempting near-miss is per-directory CLAUDE.md files, which really do load hierarchically — but with tests beside every component you would duplicate that file across the whole tree, and it still applies to all files in the folder rather than to test files specifically."
+      "explain": "Glob-scoped rule files attach conventions to a filename pattern rather than a directory, so they load for every matching test file wherever it sits. The tempting near-miss is per-directory CLAUDE.md files, which really do load hierarchically — but with tests beside every component you would duplicate that file across the whole tree, and it still applies to all files in the folder rather than to test files specifically.",
+      "scenario": 2
     },
     {
       "domain": "Claude Code",
@@ -485,7 +519,8 @@
         "disable-model-invocation — removing automatic triggering means the dump only enters context when a user asks for it."
       ],
       "correct": 2,
-      "explain": "context: fork executes the skill in an isolated subagent context and returns only its result, so verbose exploration never lands in the main session. The tempting near-miss is disable-model-invocation: it does cut how often the skill fires, but every explicit invocation still dumps the full verbose output into the main conversation, so the pollution is unchanged when the skill is actually used."
+      "explain": "context: fork executes the skill in an isolated subagent context and returns only its result, so verbose exploration never lands in the main session. The tempting near-miss is disable-model-invocation: it does cut how often the skill fires, but every explicit invocation still dumps the full verbose output into the main conversation, so the pollution is unchanged when the skill is actually used.",
+      "scenario": 4
     },
     {
       "domain": "Claude Code",
@@ -498,7 +533,8 @@
         "CLAUDE.md @path imports resolve only on the author's machine, so the standards file referenced from it was never loaded."
       ],
       "correct": 0,
-      "explain": "A user-level CLAUDE.md applies to that one user's machine and is never distributed, so shared standards belong in the project so they arrive on clone or pull; /memory shows which files loaded. The tempting near-miss blames a gitignored .claude/ directory — ruled out because the stem states the rules were placed in ~/.claude/CLAUDE.md, which was never in the repository at all."
+      "explain": "A user-level CLAUDE.md applies to that one user's machine and is never distributed, so shared standards belong in the project so they arrive on clone or pull; /memory shows which files loaded. The tempting near-miss blames a gitignored .claude/ directory — ruled out because the stem states the rules were placed in ~/.claude/CLAUDE.md, which was never in the repository at all.",
+      "scenario": 2
     },
     {
       "domain": "Prompt Eng",
@@ -511,7 +547,8 @@
         "Switch to strict tool use so schema validation rejects any date that does not literally appear in the source document text."
       ],
       "correct": 2,
-      "explain": "A required field with no source value pushes the model to fabricate one; making it nullable gives 'absent' a legal representation. The tempting near-miss is a paired confidence score — it still forces a date into the required field, and self-reported confidence is poorly calibrated, so fabricated dates keep flowing downstream with respectable-looking scores."
+      "explain": "A required field with no source value pushes the model to fabricate one; making it nullable gives 'absent' a legal representation. The tempting near-miss is a paired confidence score — it still forces a date into the required field, and self-reported confidence is poorly calibrated, so fabricated dates keep flowing downstream with respectable-looking scores.",
+      "scenario": 6
     },
     {
       "domain": "Prompt Eng",
@@ -524,7 +561,8 @@
         "Add 'be conservative' and 'report only high-confidence findings' to the review prompt so the model raises its own bar."
       ],
       "correct": 2,
-      "explain": "Explicit categories with worked examples give the model a consistent classification boundary, which is what actually raises precision; you can also mute a noisy category while you refine it. The tempting near-miss is threshold-filtering self-rated confidence — model confidence is poorly calibrated, so it hides genuine bugs while confidently-worded false positives sail through."
+      "explain": "Explicit categories with worked examples give the model a consistent classification boundary, which is what actually raises precision; you can also mute a noisy category while you refine it. The tempting near-miss is threshold-filtering self-rated confidence — model confidence is poorly calibrated, so it hides genuine bugs while confidently-worded false positives sail through.",
+      "scenario": 5
     },
     {
       "domain": "Tool Design",
@@ -537,12 +575,13 @@
         "Rename each tool and rewrite its description to state its purpose, expected input, and when to use it rather than the other one"
       ],
       "correct": 3,
-      "explain": "Tool descriptions are the primary signal Claude uses to select a tool, so near-identical wording is the actual defect; renaming and differentiating them by purpose, input format, and boundary resolves it at the source. The system prompt rule is the tempting near-miss: it can steer selection, but it leaves the ambiguous descriptions in place, so the misrouting returns wherever the rule does not explicitly reach."
+      "explain": "Tool descriptions are the primary signal Claude uses to select a tool, so near-identical wording is the actual defect; renaming and differentiating them by purpose, input format, and boundary resolves it at the source. The system prompt rule is the tempting near-miss: it can steer selection, but it leaves the ambiguous descriptions in place, so the misrouting returns wherever the rule does not explicitly reach.",
+      "scenario": 3
     },
     {
       "domain": "Context Mgmt",
       "d": 3,
-      "q": "SCENARIO — Customer Support Resolution Agent. Claude's answer quality degrades on important details (amounts, dates, order numbers) buried in the middle of a long conversation. What's the best mitigation?",
+      "q": "Claude's answer quality degrades on important details (amounts, dates, order numbers) buried in the middle of a long conversation. What's the best mitigation?",
       "options": [
         "Keep transactional facts — amounts, dates, order numbers, statuses — in a persistent case-facts block placed at the prompt edges.",
         "Reverse the message order each turn so the oldest turns sit last, moving buried details into the recency window instead.",
@@ -550,12 +589,13 @@
         "Progressively summarise older turns into a running recap so the whole history stays short enough to be attended to reliably."
       ],
       "correct": 0,
-      "explain": "Because attention is weakest in the middle of long inputs, pinning exact transactional values into a structured facts block near the start or end keeps them reliably available. The tempting near-miss is progressive summarisation: it does shorten history, but summaries paraphrase and blur precise amounts, dates and order numbers — exactly the details the agent is getting wrong."
+      "explain": "Because attention is weakest in the middle of long inputs, pinning exact transactional values into a structured facts block near the start or end keeps them reliably available. The tempting near-miss is progressive summarisation: it does shorten history, but summaries paraphrase and blur precise amounts, dates and order numbers — exactly the details the agent is getting wrong.",
+      "scenario": 1
     },
     {
       "domain": "Context Mgmt",
       "d": 3,
-      "q": "SCENARIO — Multi-Agent Research System. While Claude synthesises findings from multiple sources, two credible sources report conflicting revenue figures ($4M vs $6M). How should the synthesis handle this?",
+      "q": "While Claude synthesises findings from multiple sources, two credible sources report conflicting revenue figures ($4M vs $6M). How should the synthesis handle this?",
       "options": [
         "Reconcile to a single $5M midpoint and footnote that the underlying sources disagreed on the exact revenue total",
         "Report both figures with the source attached to each rather than picking one, keeping claim-to-source mappings intact for the reader",
@@ -563,7 +603,8 @@
         "Withhold both figures and report only the qualitative findings the two sources agree on, flagging revenue as unresolved"
       ],
       "correct": 1,
-      "explain": "Conflicting values from credible sources should be surfaced with their attribution so the reader or coordinator can adjudicate using dates and methodology. The tempting answer is the footnoted midpoint, but averaging invents a figure no source reported and destroys the claim-source mapping the scenario depends on."
+      "explain": "Conflicting values from credible sources should be surfaced with their attribution so the reader or coordinator can adjudicate using dates and methodology. The tempting answer is the footnoted midpoint, but averaging invents a figure no source reported and destroys the claim-source mapping the scenario depends on.",
+      "scenario": 3
     },
     {
       "domain": "Context Mgmt",
@@ -576,7 +617,8 @@
         "Re-read every relevant source file at the start of each question so the discovery output is always freshly in context"
       ],
       "correct": 1,
-      "explain": "Drift toward generic 'typical patterns' is context degradation: the specific findings have aged out or been buried. A scratchpad plus /compact persists conclusions across context boundaries. Re-reading every file each question is tempting and does re-ground the model, but it re-floods the same context that is already overfull, so the degradation returns immediately."
+      "explain": "Drift toward generic 'typical patterns' is context degradation: the specific findings have aged out or been buried. A scratchpad plus /compact persists conclusions across context boundaries. Re-reading every file each question is tempting and does re-ground the model, but it re-floods the same context that is already overfull, so the degradation returns immediately.",
+      "scenario": 4
     },
     {
       "domain": "Agentic Arch",
@@ -589,7 +631,8 @@
         "Restrict the allowed tool set so the agent has fewer actions available and therefore fewer opportunities to keep looping"
       ],
       "correct": 1,
-      "explain": "Unattended loops need explicit in-loop ceilings (max_turns, max_budget_usd) plus cost telemetry from ResultMessage. The external wall-clock kill is the strong near-miss: it does bound runtime, but it bounds only time, not spend, and it terminates mid-task with no cost figure, so nobody learns what the run cost."
+      "explain": "Unattended loops need explicit in-loop ceilings (max_turns, max_budget_usd) plus cost telemetry from ResultMessage. The external wall-clock kill is the strong near-miss: it does bound runtime, but it bounds only time, not spend, and it terminates mid-task with no cost figure, so nobody learns what the run cost.",
+      "scenario": 1
     },
     {
       "domain": "Agentic Arch",
@@ -602,12 +645,13 @@
         "Every call re-sends the full history plus all subagent descriptions, so per-turn cost grows with session length; cap turns, use cheaper subagent models, reset sessions"
       ],
       "correct": 3,
-      "explain": "Cost climbs because the orchestrator re-sends accumulated history and all subagent descriptions on every call, so mitigation is turn caps, cheaper subagent models, and session resets. Cache expiry is the tempting answer, but a lapsed cache would produce a spike and reset, not the steady per-turn growth described in the scenario."
+      "explain": "Cost climbs because the orchestrator re-sends accumulated history and all subagent descriptions on every call, so mitigation is turn caps, cheaper subagent models, and session resets. Cache expiry is the tempting answer, but a lapsed cache would produce a spike and reset, not the steady per-turn growth described in the scenario.",
+      "scenario": 3
     },
     {
       "domain": "Agentic Arch",
       "d": 2,
-      "q": "SCENARIO - Multi-Agent Research System. A long coordinator-driven analysis pipeline was interrupted partway through. The next run must pick up where it stopped instead of repeating work that already finished. How do you design for this?",
+      "q": "A long coordinator-driven analysis pipeline was interrupted partway through. The next run must pick up where it stopped instead of repeating work that already finished. How do you design for this?",
       "options": [
         "Have each subagent append findings into the final report file, then rebuild the pipeline's state by parsing that report back",
         "Have the coordinator hold each subagent's returned summary in its own context, so a restart can replay those summaries from it",
@@ -615,12 +659,13 @@
         "Have each subagent persist its completed findings and a status marker to a shared state file the coordinator reads on restart"
       ],
       "correct": 3,
-      "explain": "Durable resumption needs state written outside any agent's context: a shared file recording per-subtask findings and completion status lets the coordinator restart and skip finished work. The near-miss is keeping summaries in the coordinator's context, which is exactly the thing an interruption or a compaction destroys."
+      "explain": "Durable resumption needs state written outside any agent's context: a shared file recording per-subtask findings and completion status lets the coordinator restart and skip finished work. The near-miss is keeping summaries in the coordinator's context, which is exactly the thing an interruption or a compaction destroys.",
+      "scenario": 3
     },
     {
       "domain": "Agentic Arch",
       "d": 2,
-      "q": "SCENARIO - Multi-Agent Research System. A discovery subagent must read widely across the repository during a planning phase, and you need a guarantee that it cannot modify anything while it explores. How do you configure it?",
+      "q": "A discovery subagent must read widely across the repository during a planning phase, and you need a guarantee that it cannot modify anything while it explores. How do you configure it?",
       "options": [
         "Give the coordinator the write tools and have the subagent request each edit through it once the discovery pass has finished",
         "Give the subagent the full tool set but a system prompt instructing it never to write or edit files during the discovery pass",
@@ -628,12 +673,13 @@
         "Give the subagent a tool set restricted to read-only tools, plus a system prompt constraining its role to reporting findings"
       ],
       "correct": 3,
-      "explain": "A guarantee comes from the tool allowlist: if write tools are not granted, the subagent cannot write, and the role-constraining prompt keeps its output on task. The near-miss grants everything and forbids writing in the prompt, which is instruction rather than enforcement and fails exactly when the model misreads the task."
+      "explain": "A guarantee comes from the tool allowlist: if write tools are not granted, the subagent cannot write, and the role-constraining prompt keeps its output on task. The near-miss grants everything and forbids writing in the prompt, which is instruction rather than enforcement and fails exactly when the model misreads the task.",
+      "scenario": 3
     },
     {
       "domain": "Claude Code",
       "d": 2,
-      "q": "SCENARIO - Developer Productivity with Claude. A lead wants every clone of the repo to pick up the same coding standards automatically, while each engineer keeps personal preferences that nobody else should inherit. How should this be split?",
+      "q": "A lead wants every clone of the repo to pick up the same coding standards automatically, while each engineer keeps personal preferences that nobody else should inherit. How should this be split?",
       "options": [
         "Commit the shared standards as project-level configuration, and keep personal preferences in each engineer's user-level config",
         "Commit the shared standards as project-level configuration, and have engineers add personal preferences under their own headings",
@@ -641,12 +687,13 @@
         "Keep the standards on a wiki page and ask engineers to paste the relevant section into their prompt at the start of a session"
       ],
       "correct": 0,
-      "explain": "Project-level configuration is committed and therefore shared on clone, while user-level configuration is per-machine and never travels through version control, which is precisely the split the lead wants. The near-miss keeps the project file but folds personal preferences into it, so one engineer's preferences get committed and imposed on everyone."
+      "explain": "Project-level configuration is committed and therefore shared on clone, while user-level configuration is per-machine and never travels through version control, which is precisely the split the lead wants. The near-miss keeps the project file but folds personal preferences into it, so one engineer's preferences get committed and imposed on everyone.",
+      "scenario": 4
     },
     {
       "domain": "Claude Code",
       "d": 2,
-      "q": "SCENARIO - Claude Code for Continuous Integration. CLAUDE.md tells Claude to run the test suite before it reports a task finished. It usually does, but under long sessions it sometimes skips it. You need this to happen every time.",
+      "q": "CLAUDE.md tells Claude to run the test suite before it reports a task finished. It usually does, but under long sessions it sometimes skips it. You need this to happen every time.",
       "options": [
         "Add the instruction to each engineer's user-level memory, so it applies in every repository where they run Claude Code locally",
         "Repeat the instruction in the session prompt as well as CLAUDE.md, so the requirement stays close to the model at decision time",
@@ -654,7 +701,8 @@
         "Configure a hook so the suite runs automatically as part of the workflow, rather than depending on the model deciding to run it"
       ],
       "correct": 3,
-      "explain": "When a step must happen deterministically, it belongs in a hook, because hooks execute as part of the workflow instead of relying on the model to choose the action. The near-miss reinforces the same instruction in the prompt: it improves the odds but leaves the step discretionary, which is the failure already being observed."
+      "explain": "When a step must happen deterministically, it belongs in a hook, because hooks execute as part of the workflow instead of relying on the model to choose the action. The near-miss reinforces the same instruction in the prompt: it improves the odds but leaves the step discretionary, which is the failure already being observed.",
+      "scenario": 5
     },
     {
       "domain": "Claude Code",
@@ -667,7 +715,8 @@
         "Project settings merge in only at the first tool call, so a session started elsewhere keeps user-scope configuration for its whole lifetime"
       ],
       "correct": 0,
-      "explain": "Project-scope discovery is directory-based: launched from /tmp, the repo's .mcp.json and .claude/settings.json are never found. The approval-prompt answer is tempting since unapproved .mcp.json servers really are skipped, but that would not also drop project settings, and the developer reports both are missing."
+      "explain": "Project-scope discovery is directory-based: launched from /tmp, the repo's .mcp.json and .claude/settings.json are never found. The approval-prompt answer is tempting since unapproved .mcp.json servers really are skipped, but that would not also drop project settings, and the developer reports both are missing.",
+      "scenario": 4
     },
     {
       "domain": "Claude Code",
@@ -680,7 +729,8 @@
         "managed-settings.json, so the hook is applied consistently and can be withdrawn centrally once the trial is finished"
       ],
       "correct": 1,
-      "explain": "settings.local.json is the experimentation layer: repo-scoped, higher precedence than project settings, and automatically gitignored. User-level settings.json is the tempting near-miss since it also avoids a commit, but it applies the untested hook to every project you touch instead of just this repo."
+      "explain": "settings.local.json is the experimentation layer: repo-scoped, higher precedence than project settings, and automatically gitignored. User-level settings.json is the tempting near-miss since it also avoids a commit, but it applies the untested hook to every project you touch instead of just this repo.",
+      "scenario": 2
     },
     {
       "domain": "Structured Output",
@@ -693,7 +743,8 @@
         "Set temperature to 0 and pin the model version so the prose layout stays stable enough for a fixed field parser"
       ],
       "correct": 2,
-      "explain": "The SDK takes a JSON Schema via outputFormat and exposes the parsed object as structured_output, which is the supported path. The tool-schema trick is a genuinely used pattern and tempting, but it constrains a tool call rather than the run's result, so the consumer still has to dig the payload out of the transcript."
+      "explain": "The SDK takes a JSON Schema via outputFormat and exposes the parsed object as structured_output, which is the supported path. The tool-schema trick is a genuinely used pattern and tempting, but it constrains a tool call rather than the run's result, so the consumer still has to dig the payload out of the transcript.",
+      "scenario": 6
     },
     {
       "domain": "Structured Output",
@@ -706,7 +757,8 @@
         "Input validation: confirm each source document was fully extracted and legible first, so the model is never asked to read a partial or skewed page"
       ],
       "correct": 2,
-      "explain": "Schema validation guarantees structure, not truth: it cannot confirm the document said the number or that line items sum to the total, so business-rule and provenance checks are required. Tighter schema constraints are the tempting answer, but range and enum rules are still shape checks and pass cleanly on a confidently wrong figure."
+      "explain": "Schema validation guarantees structure, not truth: it cannot confirm the document said the number or that line items sum to the total, so business-rule and provenance checks are required. Tighter schema constraints are the tempting answer, but range and enum rules are still shape checks and pass cleanly on a confidently wrong figure.",
+      "scenario": 6
     },
     {
       "domain": "Prompt Eng",
@@ -719,7 +771,8 @@
         "Use tool_choice: 'none' and put the schema in the prompt, then validate the returned JSON text against that schema in the consumer"
       ],
       "correct": 0,
-      "explain": "With one known document type, naming the tool eliminates conversational replies and wrong-tool selection together. tool_choice 'any' is the strong near-miss: it does forbid text, but it leaves selection to the model, which matters as soon as a second tool is added and is not the guarantee the scenario asks for."
+      "explain": "With one known document type, naming the tool eliminates conversational replies and wrong-tool selection together. tool_choice 'any' is the strong near-miss: it does forbid text, but it leaves selection to the model, which matters as soon as a second tool is added and is not the guarantee the scenario asks for.",
+      "scenario": 6
     },
     {
       "domain": "Prompt Eng",
@@ -732,7 +785,8 @@
         "Raise max_tokens so the reviewer is never truncated mid-analysis and always reaches the later sections of the diff under review"
       ],
       "correct": 1,
-      "explain": "Run-to-run variation on identical input usually reflects underspecified criteria, so explicit categories and severity definitions with worked examples give the model a repeatable rubric. Temperature 0 is the tempting fix and does reduce sampling variance, but it makes an ambiguous rubric consistently applied rather than correctly applied, so borderline patterns stay mis-scored."
+      "explain": "Run-to-run variation on identical input usually reflects underspecified criteria, so explicit categories and severity definitions with worked examples give the model a repeatable rubric. Temperature 0 is the tempting fix and does reduce sampling variance, but it makes an ambiguous rubric consistently applied rather than correctly applied, so borderline patterns stay mis-scored.",
+      "scenario": 5
     },
     {
       "domain": "Tool Design",
@@ -745,7 +799,8 @@
         "Wrap the queries so results are written to a file and only the file path is returned, keeping the full result set available on disk"
       ],
       "correct": 1,
-      "explain": "MCP tool output is warned about near 10,000 tokens and hard-capped by default, so the fix belongs on the tool side: scoped fields, row limits and pagination. Raising the cap is tempting and removes the warning, but it just moves more tokens into the same finite context window and worsens the limit problem described."
+      "explain": "MCP tool output is warned about near 10,000 tokens and hard-capped by default, so the fix belongs on the tool side: scoped fields, row limits and pagination. Raising the cap is tempting and removes the warning, but it just moves more tokens into the same finite context window and worsens the limit problem described.",
+      "scenario": 4
     },
     {
       "domain": "Tool Design",
@@ -758,12 +813,13 @@
         "Switch the server from remote http to stdio behind a local wrapper that reads the token from the OS keychain at process start"
       ],
       "correct": 2,
-      "explain": "The credential is already public, so rotation comes first, then env-var expansion in .mcp.json or moving the server to local/user scope keeps secrets out of the commit. History rewriting is the tempting near-miss, but it does not invalidate a key that clones, forks and caches may already hold."
+      "explain": "The credential is already public, so rotation comes first, then env-var expansion in .mcp.json or moving the server to local/user scope keeps secrets out of the commit. History rewriting is the tempting near-miss, but it does not invalidate a key that clones, forks and caches may already hold.",
+      "scenario": 4
     },
     {
       "domain": "Context Mgmt",
       "d": 3,
-      "q": "SCENARIO - Structured Data Extraction. In a long Agent SDK run, summarisation of older turns has blurred the normalisation conventions the agent had been following, and extraction output has started to drift. What is the durable fix?",
+      "q": "In a long Agent SDK run, summarisation of older turns has blurred the normalisation conventions the agent had been following, and extraction output has started to drift. What is the durable fix?",
       "options": [
         "Keep the conventions in a compact structured state object that is re-injected on every turn, outside whatever gets summarised",
         "Have the agent restate the conventions in each of its own replies, so the most recent turns always carry them forward intact",
@@ -771,7 +827,8 @@
         "Split the run into shorter sessions and let each one rediscover the conventions from the documents that it happens to process"
       ],
       "correct": 0,
-      "explain": "Critical instructions should be held in a small structured state block that is selectively retained and re-injected, so summarisation of the conversation cannot erode them. The near-miss has the agent restate conventions each turn: it survives a sliding window, but the restatement is itself model output that drifts and is eventually summarised too."
+      "explain": "Critical instructions should be held in a small structured state block that is selectively retained and re-injected, so summarisation of the conversation cannot erode them. The near-miss has the agent restate conventions each turn: it survives a sliding window, but the restatement is itself model output that drifts and is eventually summarised too.",
+      "scenario": 6
     },
     {
       "domain": "Context Mgmt",
@@ -784,7 +841,8 @@
         "The first several thousand tokens of exploration followed by the conclusions, keeping the early framing that shaped the later analysis"
       ],
       "correct": 2,
-      "explain": "Handoffs should carry distilled, schema-shaped results with attribution so the coordinator's context stays lean; the audit trail survives because subagent transcripts persist and can be resumed via agentId. Attaching the supporting tool results is the tempting near-miss, but that re-imports the bulk the boundary exists to keep out, and the 25,000 tokens remain retrievable anyway."
+      "explain": "Handoffs should carry distilled, schema-shaped results with attribution so the coordinator's context stays lean; the audit trail survives because subagent transcripts persist and can be resumed via agentId. Attaching the supporting tool results is the tempting near-miss, but that re-imports the bulk the boundary exists to keep out, and the 25,000 tokens remain retrievable anyway.",
+      "scenario": 3
     },
     {
       "domain": "Agentic Arch",
@@ -797,7 +855,8 @@
         "Collapse the three sources behind one composite tool that fetches all of them, so the model spends only one turn on retrieval"
       ],
       "correct": 0,
-      "explain": "Independent fetches with no data dependency should be issued as multiple tool_use blocks in a single turn so they run in parallel, collapsing three round trips into one. The composite-tool answer is the tempting near-miss — it does cut turns, but the scenario says the three sources are independent and already exist as separate tools, so batching the calls gets the same win without rewriting integrations."
+      "explain": "Independent fetches with no data dependency should be issued as multiple tool_use blocks in a single turn so they run in parallel, collapsing three round trips into one. The composite-tool answer is the tempting near-miss — it does cut turns, but the scenario says the three sources are independent and already exist as separate tools, so batching the calls gets the same win without rewriting integrations.",
+      "scenario": 3
     },
     {
       "domain": "Agentic Arch",
@@ -810,7 +869,8 @@
         "Set tool_choice to 'any' so each turn yields exactly one tool_use block and your serial executor matches the model's output shape"
       ],
       "correct": 0,
-      "explain": "Multiple tool_use blocks in one turn mean Claude has already judged those calls independent; executing them concurrently and returning all tool_result blocks in one follow-up message recovers the latency win. The tool_choice='any' option is the near-miss — it does force tool use but does not cap a response at one tool call, and it fixes the symptom by removing the parallelism instead of using it."
+      "explain": "Multiple tool_use blocks in one turn mean Claude has already judged those calls independent; executing them concurrently and returning all tool_result blocks in one follow-up message recovers the latency win. The tool_choice='any' option is the near-miss — it does force tool use but does not cap a response at one tool call, and it fixes the symptom by removing the parallelism instead of using it.",
+      "scenario": 3
     },
     {
       "domain": "Multi-Agent",
@@ -823,7 +883,8 @@
         "Give a procedural script but allow the subagent to skip any step it judges unnecessary, reporting afterwards which steps it dropped"
       ],
       "correct": 0,
-      "explain": "Goal-oriented delegation lets the subagent adapt as it learns, while a required output contract preserves the coordinator's visibility. The tempting near-miss is topic-plus-schema with no success criteria: it keeps the coordinator's visibility but drops the definition of done, so the subagent cannot judge sufficiency — the scenario explicitly asks for balance, not maximal autonomy."
+      "explain": "Goal-oriented delegation lets the subagent adapt as it learns, while a required output contract preserves the coordinator's visibility. The tempting near-miss is topic-plus-schema with no success criteria: it keeps the coordinator's visibility but drops the definition of done, so the subagent cannot judge sufficiency — the scenario explicitly asks for balance, not maximal autonomy.",
+      "scenario": 3
     },
     {
       "domain": "Multi-Agent",
@@ -836,7 +897,8 @@
         "Web search should be dropped from the subagent's toolset in favour of a curated document store that the coordinator assembles and supplies"
       ],
       "correct": 2,
-      "explain": "A fixed procedural sequence executes regardless of intermediate findings, so a subagent told to read the top three results reads them even when they are irrelevant; a goal-oriented brief with reformulation criteria lets it adapt. The missing-history option is the near-miss — background can help relevance judgements, but the scenario shows the subagent completing all three prescribed steps, which is scripted compliance rather than a knowledge gap."
+      "explain": "A fixed procedural sequence executes regardless of intermediate findings, so a subagent told to read the top three results reads them even when they are irrelevant; a goal-oriented brief with reformulation criteria lets it adapt. The missing-history option is the near-miss — background can help relevance judgements, but the scenario shows the subagent completing all three prescribed steps, which is scripted compliance rather than a knowledge gap.",
+      "scenario": 3
     },
     {
       "domain": "Multi-Agent",
@@ -849,7 +911,8 @@
         "The Task/Agent tool is absent from the coordinator's allowedTools, so it has no mechanism to delegate and silently does the work inline"
       ],
       "correct": 3,
-      "explain": "Delegation is explicit wiring: with no Task (Agent) tool in the coordinator's allowed tool list there is no mechanism to spawn anything, so it completes the work inline without erroring. The vague-description option is the strong near-miss — a poor description really can suppress selection, but that usually shows up as inconsistent delegation, whereas here the subagent is never spawned at all."
+      "explain": "Delegation is explicit wiring: with no Task (Agent) tool in the coordinator's allowed tool list there is no mechanism to spawn anything, so it completes the work inline without erroring. The vague-description option is the strong near-miss — a poor description really can suppress selection, but that usually shows up as inconsistent delegation, whereas here the subagent is never spawned at all.",
+      "scenario": 3
     },
     {
       "domain": "Multi-Agent",
@@ -862,7 +925,8 @@
         "The working directory the subagent inherits, which may resolve the coordinator's relative paths outside the mounted project tree"
       ],
       "correct": 1,
-      "explain": "Subagents receive their own tool access scoped by their definition, so a role that must inspect files needs Read/Grep/Glob granted explicitly; check tool permissions first, then AgentDefinition parameters, then coordinator wiring. The working-directory option is the near-miss — a wrong cwd does produce missing-file errors, but the subagent reports it cannot access files at all and fails every task, not just path-relative ones."
+      "explain": "Subagents receive their own tool access scoped by their definition, so a role that must inspect files needs Read/Grep/Glob granted explicitly; check tool permissions first, then AgentDefinition parameters, then coordinator wiring. The working-directory option is the near-miss — a wrong cwd does produce missing-file errors, but the subagent reports it cannot access files at all and fails every task, not just path-relative ones.",
+      "scenario": 3
     },
     {
       "domain": "Agentic Arch",
@@ -875,7 +939,8 @@
         "Insert a coverage-check step at the end that flags gaps, then rerun the whole five-step sequence with those gaps appended to the brief"
       ],
       "correct": 2,
-      "explain": "A predetermined sequence cannot respond to what it learns; dynamic decomposition lets the coordinator generate new subtasks from intermediate findings, which is what produces full coverage when the topic's shape is unknown. The end-of-run coverage check is the tempting near-miss — it eventually catches gaps, but only after a full wasted pass, and the scenario's problem is that findings surfacing mid-run are ignored."
+      "explain": "A predetermined sequence cannot respond to what it learns; dynamic decomposition lets the coordinator generate new subtasks from intermediate findings, which is what produces full coverage when the topic's shape is unknown. The end-of-run coverage check is the tempting near-miss — it eventually catches gaps, but only after a full wasted pass, and the scenario's problem is that findings surfacing mid-run are ignored.",
+      "scenario": 3
     },
     {
       "domain": "Agentic Arch",
@@ -888,7 +953,8 @@
         "Pre-generate a subtask list but attach a confidence score to each, dropping the low-confidence ones once exploration begins"
       ],
       "correct": 1,
-      "explain": "Explore-then-decompose fits: a scoping pass establishes the real shape of the problem, subtasks are generated from actual findings, and coverage is re-evaluated as results arrive. Pre-generating with confidence scores is the near-miss — it looks adaptive, but it can only prune assumptions made before exploration and never adds the subtasks nobody could have predicted."
+      "explain": "Explore-then-decompose fits: a scoping pass establishes the real shape of the problem, subtasks are generated from actual findings, and coverage is re-evaluated as results arrive. Pre-generating with confidence scores is the near-miss — it looks adaptive, but it can only prune assumptions made before exploration and never adds the subtasks nobody could have predicted.",
+      "scenario": 3
     },
     {
       "domain": "Agentic Arch",
@@ -901,7 +967,8 @@
         "Parallel execution under a coordinator, since the three analyses are independent; a sequential pipeline serialises work that has no dependencies"
       ],
       "correct": 3,
-      "explain": "Pattern choice follows the dependency graph: independent tasks with a final merge map to coordinator-managed parallel execution. Single-context processing is the tempting near-miss — continuity sounds useful for the merge step, but the scenario states the documents are independent, so one shared context just serialises the work and burns context window."
+      "explain": "Pattern choice follows the dependency graph: independent tasks with a final merge map to coordinator-managed parallel execution. Single-context processing is the tempting near-miss — continuity sounds useful for the merge step, but the scenario states the documents are independent, so one shared context just serialises the work and burns context window.",
+      "scenario": 3
     },
     {
       "domain": "Agentic Arch",
@@ -914,7 +981,8 @@
         "A single tool call performing extraction, validation, and reporting internally, so no orchestration layer is needed around it at all"
       ],
       "correct": 0,
-      "explain": "Each stage strictly consumes the previous stage's output, so the stages must run sequentially; parallelism only helps where tasks are genuinely independent. The one-big-tool option is the near-miss — it does preserve the ordering internally, but the question asks which orchestration pattern fits, and hiding all three stages in one call gives up the per-stage validation and visibility the workflow needs."
+      "explain": "Each stage strictly consumes the previous stage's output, so the stages must run sequentially; parallelism only helps where tasks are genuinely independent. The one-big-tool option is the near-miss — it does preserve the ordering internally, but the question asks which orchestration pattern fits, and hiding all three stages in one call gives up the per-stage validation and visibility the workflow needs.",
+      "scenario": 6
     },
     {
       "domain": "Claude Code",
@@ -927,7 +995,8 @@
         "Supply existing test files as context to fix fixture conventions, and state criteria separating meaningful behavioural assertions from trivial ones"
       ],
       "correct": 3,
-      "explain": "Quality comes from concrete context plus explicit criteria: sample tests transfer fixture and naming conventions, and stated criteria define what counts as a meaningful behavioural assertion rather than an existence check. The coverage-threshold option is the strong near-miss — branch coverage does force more code paths to be touched, but a test can execute a branch and still only assert the result is defined, which is exactly the observed failure."
+      "explain": "Quality comes from concrete context plus explicit criteria: sample tests transfer fixture and naming conventions, and stated criteria define what counts as a meaningful behavioural assertion rather than an existence check. The coverage-threshold option is the strong near-miss — branch coverage does force more code paths to be touched, but a test can execute a branch and still only assert the result is defined, which is exactly the observed failure.",
+      "scenario": 5
     },
     {
       "domain": "Claude Code",
@@ -940,7 +1009,8 @@
         "Point Claude at the test runner's configuration file so that it can infer the available fixtures from the suite's setup entries"
       ],
       "correct": 2,
-      "explain": "The model invents plausible fixtures because it has never seen yours; representative example files are the reliable way to transfer convention. The config-file option is the near-miss — runner config does list setup files and paths, but it does not show helper signatures or usage patterns, which is what the generated tests are getting wrong."
+      "explain": "The model invents plausible fixtures because it has never seen yours; representative example files are the reliable way to transfer convention. The config-file option is the near-miss — runner config does list setup files and paths, but it does not show helper signatures or usage patterns, which is what the generated tests are getting wrong.",
+      "scenario": 5
     },
     {
       "domain": "CI/CD",
@@ -953,7 +1023,8 @@
         "Keep the single pass and raise temperature so the model explores more angles and surfaces findings it would otherwise rank as marginal"
       ],
       "correct": 0,
-      "explain": "Competing concerns in one prompt force recall trade-offs; separate passes with concern-specific examples let each dimension get full attention, at the cost of extra calls. Grouping the output by concern is the tempting near-miss — it improves report structure, but the model is still reasoning about all three concerns in one pass, so recall on each stays mediocre."
+      "explain": "Competing concerns in one prompt force recall trade-offs; separate passes with concern-specific examples let each dimension get full attention, at the cost of extra calls. Grouping the output by concern is the tempting near-miss — it improves report structure, but the model is still reasoning about all three concerns in one pass, so recall on each stays mediocre.",
+      "scenario": 5
     },
     {
       "domain": "CI/CD",
@@ -966,7 +1037,8 @@
         "Run each pass twice with different phrasings and take the union of findings, so anything either run surfaced reaches the report"
       ],
       "correct": 1,
-      "explain": "Splitting passes pays off only when each gets concern-specific examples and explicit inclusion/exclusion boundaries, which is what defines the category for that pass. Running each pass twice and unioning is the near-miss — it can add recall, but it doubles cost and amplifies false positives without ever telling a pass what belongs in its category."
+      "explain": "Splitting passes pays off only when each gets concern-specific examples and explicit inclusion/exclusion boundaries, which is what defines the category for that pass. Running each pass twice and unioning is the near-miss — it can add recall, but it doubles cost and amplifies false positives without ever telling a pass what belongs in its category.",
+      "scenario": 5
     },
     {
       "domain": "Structured Output",
@@ -979,7 +1051,8 @@
         "Retype the field as a plain string and defer all interpretation to the consumer, which already knows which locale each source uses"
       ],
       "correct": 1,
-      "explain": "The schema types the field loosely enough that every observed form validates, so the canonical representation has to be specified in the extraction instructions — state ISO 8601 and consistency is produced at source. The format:'date' option is the strong near-miss: it names a real JSON Schema annotation, but format is advisory and commonly unenforced, and the scenario already reports validation passing on every variant."
+      "explain": "The schema types the field loosely enough that every observed form validates, so the canonical representation has to be specified in the extraction instructions — state ISO 8601 and consistency is produced at source. The format:'date' option is the strong near-miss: it names a real JSON Schema annotation, but format is advisory and commonly unenforced, and the scenario already reports validation passing on every variant.",
+      "scenario": 6
     },
     {
       "domain": "Structured Output",
@@ -992,12 +1065,13 @@
         "Spell out the four allowed values in the field's description text, so the model is told plainly which statuses are acceptable here"
       ],
       "correct": 0,
-      "explain": "An enum constrains the field to a fixed value set at the schema level, making out-of-set values invalid rather than just disfavoured. The few-shot option is the tempting near-miss — examples do steer vocabulary and would reduce 'in transit', but they remain guidance, so an unlisted value still validates; only the enum enforces the closed set."
+      "explain": "An enum constrains the field to a fixed value set at the schema level, making out-of-set values invalid rather than just disfavoured. The few-shot option is the tempting near-miss — examples do steer vocabulary and would reduce 'in transit', but they remain guidance, so an unlisted value still validates; only the enum enforces the closed set.",
+      "scenario": 6
     },
     {
       "domain": "Context Mgmt",
       "d": 3,
-      "q": "SCENARIO — Customer Support Resolution Agent. A conversation runs long and the full history no longer fits Claude's context. Which retention strategy preserves answer quality best?",
+      "q": "A conversation runs long and the full history no longer fits Claude's context. Which retention strategy preserves answer quality best?",
       "options": [
         "Pair a sliding window of recent turns with a structured state object holding durable facts (order IDs, amounts, entitlements) plus key decisions",
         "Truncate to just the most recent N messages and discard everything older, keeping the window small enough to stay well under the limit",
@@ -1005,7 +1079,8 @@
         "Keep a sliding window and re-summarise the dropped turns into a rolling prose recap that is prepended to every new request"
       ],
       "correct": 0,
-      "explain": "A sliding window alone silently drops facts established early; pairing it with a structured state object for durable values plus selective retention of decisions keeps the transactional details addressable while bounding token growth. The rolling prose recap is the strong near-miss — it does preserve some history, but repeated re-summarisation blurs exactly the order IDs and amounts a support agent must quote precisely."
+      "explain": "A sliding window alone silently drops facts established early; pairing it with a structured state object for durable values plus selective retention of decisions keeps the transactional details addressable while bounding token growth. The rolling prose recap is the strong near-miss — it does preserve some history, but repeated re-summarisation blurs exactly the order IDs and amounts a support agent must quote precisely.",
+      "scenario": 1
     },
     {
       "domain": "Context Mgmt",
@@ -1018,7 +1093,8 @@
         "Structured state can be validated against a schema, letting the runtime reject any compaction whose output has dropped a required field"
       ],
       "correct": 1,
-      "explain": "Structured fields stay individually readable, updatable, and verifiable, so specific values survive repeated compaction, whereas each re-summarisation of prose loses precision. Schema validation of the state is the near-miss — it is a genuine side benefit, but the core reason is addressability of the values themselves, and validation alone would not stop prose from blurring."
+      "explain": "Structured fields stay individually readable, updatable, and verifiable, so specific values survive repeated compaction, whereas each re-summarisation of prose loses precision. Schema validation of the state is the near-miss — it is a genuine side benefit, but the core reason is addressability of the values themselves, and validation alone would not stop prose from blurring.",
+      "scenario": 3
     },
     {
       "domain": "CI/CD",
@@ -1031,7 +1107,8 @@
         "Run `claude --continue` with the review prompt so the job reuses the previous run's session and prints its final result to standard out."
       ],
       "correct": 2,
-      "explain": "Print mode (`-p`/`--print`) is the non-interactive entry point, and `--output-format json` gives the later step a stable structure to parse. The near-miss is invoking `claude` with a positional prompt: without print mode Claude Code starts an interactive session, which a TTY-less runner cannot drive."
+      "explain": "Print mode (`-p`/`--print`) is the non-interactive entry point, and `--output-format json` gives the later step a stable structure to parse. The near-miss is invoking `claude` with a positional prompt: without print mode Claude Code starts an interactive session, which a TTY-less runner cannot drive.",
+      "scenario": 5
     },
     {
       "domain": "CI/CD",
@@ -1044,7 +1121,8 @@
         "Set `--fallback-model` to a cheaper model and lower the reasoning effort, so each turn costs less even when the agent loops on a bad test."
       ],
       "correct": 0,
-      "explain": "`--max-turns` and `--max-budget-usd` are print-mode caps that stop the run on turns and on dollars respectively, and subagent spend counts toward the budget cap. The near-miss pairs the right turn cap with a runner timeout: wall-clock termination bounds job duration but not the spend already incurred, and it gives no graceful exit."
+      "explain": "`--max-turns` and `--max-budget-usd` are print-mode caps that stop the run on turns and on dollars respectively, and subagent spend counts toward the budget cap. The near-miss pairs the right turn cap with a runner timeout: wall-clock termination bounds job duration but not the spend already incurred, and it gives no graceful exit.",
+      "scenario": 5
     },
     {
       "domain": "CI/CD",
@@ -1057,7 +1135,8 @@
         "Pipe the printed markdown into a second print-mode Claude Code call that reformats it as JSON before the posting step reads the findings."
       ],
       "correct": 0,
-      "explain": "`--json-schema` in print mode makes the run emit output validated against the schema you supply, so the posting step parses fields instead of prose. The near-miss is pinning the markdown format via the system prompt: formatting instructions are best-effort, so the scraper stays one wording drift away from breaking again."
+      "explain": "`--json-schema` in print mode makes the run emit output validated against the schema you supply, so the posting step parses fields instead of prose. The near-miss is pinning the markdown format via the system prompt: formatting instructions are best-effort, so the scraper stays one wording drift away from breaking again.",
+      "scenario": 5
     },
     {
       "domain": "CI/CD",
@@ -1070,7 +1149,8 @@
         "Instruct the reviewer to be conservative and report only issues it is highly confident about, which will suppress the repeated comments."
       ],
       "correct": 2,
-      "explain": "Feeding prior findings and the codebase's accepted patterns into each run stops the agent re-deriving the same issue, and persistent convention context is what keeps a deliberate pattern from being flagged at all. The near-miss is text-matching comments before posting: it hides exact repeats but not reworded ones, and the agent still spends the run rediscovering them."
+      "explain": "Feeding prior findings and the codebase's accepted patterns into each run stops the agent re-deriving the same issue, and persistent convention context is what keeps a deliberate pattern from being flagged at all. The near-miss is text-matching comments before posting: it hides exact repeats but not reworded ones, and the agent still spends the run rediscovering them.",
+      "scenario": 5
     },
     {
       "domain": "CI/CD",
@@ -1083,7 +1163,8 @@
         "Keep the single session but require a confidence score per file, and escalate only the files scoring below a fixed review threshold."
       ],
       "correct": 1,
-      "explain": "An independent instance reviews the diff without the authoring session's rationale in context, so it does not inherit the assumptions that produced the defect. The near-miss is a skeptical-persona turn in the same session: the flawed reasoning is still in context, so the model tends to re-justify its own work rather than challenge it."
+      "explain": "An independent instance reviews the diff without the authoring session's rationale in context, so it does not inherit the assumptions that produced the defect. The near-miss is a skeptical-persona turn in the same session: the flawed reasoning is still in context, so the model tends to re-justify its own work rather than challenge it.",
+      "scenario": 5
     },
     {
       "domain": "CI/CD",
@@ -1096,7 +1177,8 @@
         "Switch generation to plan mode so the agent proposes a test plan for approval before writing any assertions against the new modules."
       ],
       "correct": 2,
-      "explain": "Existing tests show the mocking library and fixture factory by example, and explicit criteria for a behavioral assertion stop the model settling for non-null checks. The near-miss is the lint gate: it can reject the wrong import but cannot teach fixture conventions or turn a trivial assertion into a meaningful one."
+      "explain": "Existing tests show the mocking library and fixture factory by example, and explicit criteria for a behavioral assertion stop the model settling for non-null checks. The near-miss is the lint gate: it can reject the wrong import but cannot teach fixture conventions or turn a trivial assertion into a meaningful one.",
+      "scenario": 5
     },
     {
       "domain": "Tool Design",
@@ -1109,7 +1191,8 @@
         "Add it at project scope so the definition lands in the repository's checked-in `.mcp.json` and is reviewed and shared like any other change."
       ],
       "correct": 3,
-      "explain": "Project scope writes the server into `.mcp.json` at the repo root, which is committed, so every clone gets the same definition and changes go through code review. The near-miss is user scope plus documentation: it works per machine but drifts silently, since nothing keeps each developer's private configuration in step with the repo."
+      "explain": "Project scope writes the server into `.mcp.json` at the repo root, which is committed, so every clone gets the same definition and changes go through code review. The near-miss is user scope plus documentation: it works per machine but drifts silently, since nothing keeps each developer's private configuration in step with the repo.",
+      "scenario": 4
     },
     {
       "domain": "Tool Design",
@@ -1122,7 +1205,8 @@
         "Reference the key as `${ANALYTICS_API_KEY}` in the server's env block, so each developer supplies the value from their own environment."
       ],
       "correct": 3,
-      "explain": "Claude Code expands `${VAR}` references in `.mcp.json`, so the shared file stays secret-free while each developer's environment supplies the value. The near-miss is a committed placeholder edited locally: it puts real credentials in a tracked file, where a routine commit leaks them."
+      "explain": "Claude Code expands `${VAR}` references in `.mcp.json`, so the shared file stays secret-free while each developer's environment supplies the value. The near-miss is a committed placeholder edited locally: it puts real credentials in a tracked file, where a routine commit leaks them.",
+      "scenario": 4
     },
     {
       "domain": "Tool Design",
@@ -1135,7 +1219,8 @@
         "Check the server's connection status in the MCP server listing, since a server that fails to connect or awaits approval exposes no tools."
       ],
       "correct": 3,
-      "explain": "Listing the MCP servers shows a per-server status such as connected, needs authentication, or failed to connect, which separates a config problem from a connection or approval problem. The near-miss is asking Claude what tools it has: the symptom is confirmed but the cause is not, and a model's self-report of its tool list is not a diagnostic."
+      "explain": "Listing the MCP servers shows a per-server status such as connected, needs authentication, or failed to connect, which separates a config problem from a connection or approval problem. The near-miss is asking Claude what tools it has: the symptom is confirmed but the cause is not, and a model's self-report of its tool list is not a diagnostic.",
+      "scenario": 4
     },
     {
       "domain": "Tool Design",
@@ -1148,7 +1233,8 @@
         "Drop the tool and inline the handbook text into the agent's system prompt at the start of every support case the agent picks up."
       ],
       "correct": 2,
-      "explain": "Resources are addressable content the client can fetch and attach, which is the right fit for a small stable corpus and removes the exploratory search loop entirely. The near-miss is adding `get_policy_section`: it shortens the loop but still spends a model turn and a tool call to retrieve content that could simply be attached."
+      "explain": "Resources are addressable content the client can fetch and attach, which is the right fit for a small stable corpus and removes the exploratory search loop entirely. The near-miss is adding `get_policy_section`: it shortens the loop but still spends a model turn and a tool call to retrieve content that could simply be attached.",
+      "scenario": 1
     },
     {
       "domain": "Tool Design",
@@ -1161,7 +1247,8 @@
         "Force `record_invoice` with `tool_choice`, and sequence the work so the vendor lookup happens in an earlier call whose result is passed in."
       ],
       "correct": 3,
-      "explain": "Forcing the specific tool guarantees the structured call instead of prose, and because the forced turn cannot also call `fetch_vendor`, the prerequisite lookup has to be its own earlier step whose result is fed forward. The near-miss relies on a required schema field to force the lookup: a required field only makes the model fill the slot, which it can do by guessing rather than by calling `fetch_vendor`."
+      "explain": "Forcing the specific tool guarantees the structured call instead of prose, and because the forced turn cannot also call `fetch_vendor`, the prerequisite lookup has to be its own earlier step whose result is fed forward. The near-miss relies on a required schema field to force the lookup: a required field only makes the model fill the slot, which it can do by guessing rather than by calling `fetch_vendor`.",
+      "scenario": 6
     },
     {
       "domain": "Agentic Arch",
@@ -1174,7 +1261,8 @@
         "Start a new session with the merge diff attached, discarding the earlier mapping because a resumed session's context cannot be corrected."
       ],
       "correct": 1,
-      "explain": "Resumption preserves the expensive mapping, and injecting the list of changed files scopes re-analysis to exactly the stale portion. The near-miss is having the agent diff its own notes against the repo: it is targeted in spirit but spends many turns rediscovering what the merge already told you precisely."
+      "explain": "Resumption preserves the expensive mapping, and injecting the list of changed files scopes re-analysis to exactly the stale portion. The near-miss is having the agent diff its own notes against the repo: it is targeted in spirit but spends many turns rediscovering what the merge already told you precisely.",
+      "scenario": 4
     },
     {
       "domain": "Agentic Arch",
@@ -1187,7 +1275,8 @@
         "Resume the session and compact the history, trusting compaction to drop the obsolete schema output while retaining the useful conclusions."
       ],
       "correct": 0,
-      "explain": "When most of the accumulated context is actively wrong, a fresh session seeded with a curated summary is both cheaper and safer than carrying contradictory material forward. The near-miss is resuming and compacting: compaction shrinks the transcript but you do not control what it keeps, so the outdated schema can survive into the summary and keep misleading the agent."
+      "explain": "When most of the accumulated context is actively wrong, a fresh session seeded with a curated summary is both cheaper and safer than carrying contradictory material forward. The near-miss is resuming and compacting: compaction shrinks the transcript but you do not control what it keeps, so the outdated schema can survive into the summary and keep misleading the agent.",
+      "scenario": 2
     },
     {
       "domain": "Agentic Arch",
@@ -1200,7 +1289,8 @@
         "Have the coordinator hold every per-repository result in its own context and emit them at the end, so a restart can reuse that state."
       ],
       "correct": 1,
-      "explain": "Externalising per-unit progress as work completes makes the pipeline resumable: a restart reads the manifest and skips everything already done. The near-miss keeps results in the coordinator's context, which dies with the process and also grows the context window until quality degrades."
+      "explain": "Externalising per-unit progress as work completes makes the pipeline resumable: a restart reads the manifest and skips everything already done. The near-miss keeps results in the coordinator's context, which dies with the process and also grows the context window until quality degrades.",
+      "scenario": 3
     },
     {
       "domain": "Context Mgmt",
@@ -1213,7 +1303,8 @@
         "Route the documents that needed the most extraction retries, since retry count is the clearest signal available that a document was hard."
       ],
       "correct": 1,
-      "explain": "Targeting review at low-confidence fields and at document characteristics known to be difficult puts human attention where the errors actually are, instead of spending it on easy documents. The near-miss is a single document-level confidence threshold: it is confidence-driven but a document with one badly ambiguous field can still score high overall and bypass review."
+      "explain": "Targeting review at low-confidence fields and at document characteristics known to be difficult puts human attention where the errors actually are, instead of spending it on easy documents. The near-miss is a single document-level confidence threshold: it is confidence-driven but a document with one badly ambiguous field can still score high overall and bypass review.",
+      "scenario": 6
     },
     {
       "domain": "Context Mgmt",
@@ -1226,7 +1317,8 @@
         "Field accuracy weights every field equally, so the number says nothing about whether throughput can absorb a reduction in human review."
       ],
       "correct": 2,
-      "explain": "A volume-weighted aggregate is dominated by the easy majority, so a 4% class could be near-random and still leave the headline near 96%. The near-miss is the circularity objection: reviewer-corrected ground truth is a real methodological caveat, but it does not explain why a small hard class is invisible in the aggregate."
+      "explain": "A volume-weighted aggregate is dominated by the easy majority, so a 4% class could be near-random and still leave the headline near 96%. The near-miss is the circularity objection: reviewer-corrected ground truth is a real methodological caveat, but it does not explain why a small hard class is invisible in the aggregate.",
+      "scenario": 6
     },
     {
       "domain": "Context Mgmt",
@@ -1239,7 +1331,8 @@
         "Accuracy measured per document type and per field against ground truth, with review retained for the type-and-field pairs that fall short."
       ],
       "correct": 3,
-      "explain": "Segmenting accuracy by document type and field shows exactly which slices are safe to automate and which must stay under review, rather than trading a blanket decision on one number. The near-miss is the calibration check: well-calibrated confidence is necessary but not sufficient, because a type can be confidently and consistently wrong."
+      "explain": "Segmenting accuracy by document type and field shows exactly which slices are safe to automate and which must stay under review, rather than trading a blanket decision on one number. The near-miss is the calibration check: well-calibrated confidence is necessary but not sufficient, because a type can be confidently and consistently wrong.",
+      "scenario": 6
     },
     {
       "domain": "Structured Output",
@@ -1252,7 +1345,17 @@
         "Retry the same call with the validation error fed back, so the model emits a shorter array that fits within the available response budget."
       ],
       "correct": 0,
-      "explain": "Truncation is an output-length problem, and scoping each call to a slice of the diff keeps every response comfortably inside the limit while the merge reconstructs the full finding set. The near-miss is raising the token ceiling: it may buy headroom for this diff but the failure returns on the next larger one, and it does nothing about quality loss over a very long single response."
+      "explain": "Truncation is an output-length problem, and scoping each call to a slice of the diff keeps every response comfortably inside the limit while the merge reconstructs the full finding set. The near-miss is raising the token ceiling: it may buy headroom for this diff but the failure returns on the next larger one, and it does nothing about quality loss over a very long single response.",
+      "scenario": 5
     }
-  ]
+  ],
+  "scenarioPick": 3,
+  "scenarioWeights": {
+    "5": 4,
+    "4": 2,
+    "2": 2,
+    "1": 1,
+    "3": 1,
+    "6": 1
+  }
 }

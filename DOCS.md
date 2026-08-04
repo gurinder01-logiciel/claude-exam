@@ -47,6 +47,10 @@ Coverage by domain:
 | Prompt Engineering (explicit criteria, few-shot) | 5 |
 | Official scenario sets (Support Agent, Code Gen, Dev Productivity) | 7 |
 
+Counts above describe the original bank. The current bank is **143 questions**,
+every one tagged to a scenario; see `SCOPE.md` for the scope map and `AUDIT.md`
+for the rewrite and verification history.
+
 ### Sources
 
 - The **12 official sample questions** published in the CCAR-F Exam Guide,
@@ -92,17 +96,33 @@ It's configured in the level JSON, not in code:
 { "key": "scenario", "requires": "basic", ... }
 ```
 
-- **Full Mock Exam** pools every other level's questions, so each sitting is a
-  genuinely different paper. This is the one to use for realistic practice.
-- **Basic** covers foundations plus the official sample questions. Its bank is
-  exactly 60, so every question appears every time.
-- **Scenario Practice** draws 60 from 78 — production scenarios and trap
-  questions.
+- **Full Mock Exam** pools every other level's questions and presents them as
+  **4 scenarios drawn from the official 6**, weighted toward the agentic-heavy
+  scenarios. 60 questions. This is the one to use for realistic practice.
+- **Foundations** is an ungrouped warm-up across all five domains. Its bank is
+  49, so every question appears every time.
+- **Scenario Practice** draws 40 questions as **3 scenario blocks**, weighted
+  toward Claude Code for CI/CD — the cluster candidates most often report.
+
+### Scenario blocks
+
+The real exam presents 4 scenarios out of 6, with each scenario framing a run of
+consecutive questions. A level opts into this with `scenarioPick`, and biases
+which scenarios get drawn with `scenarioWeights`. Questions from one scenario
+always arrive as a single unbroken block — never interleaved — and the first
+question of each block carries the full scenario context, with later questions
+in the block showing a compact reminder.
+
+If the drawn scenarios don't between them hold enough questions for the paper,
+extra scenarios are pulled in rather than shipping a short paper.
 
 ### The difficulty ramp
 
 Papers open easy and finish hard. The target shape is **15 easy → 20 medium →
-25 hard**, scaled to the paper length.
+25 hard**, scaled to the paper length. Tier quotas are allocated by largest
+remainder so a paper is always exactly its requested length. Within a scenario
+paper the ramp applies inside each block, and blocks are ordered by mean
+difficulty so the paper as a whole still opens gently.
 
 If a bank doesn't have enough in one tier, the shortfall is **backfilled from
 the nearest tier with spares** rather than padding the paper or shrinking it.
@@ -201,8 +221,8 @@ index.html         app shell, all logic, no build step (~1030 lines)
 questions/
   index.json       load order — the manifest
   mock.json        pool config (no questions of its own)
-  basic.json       60 questions
-  scenario.json    78 questions
+  basic.json       49 questions (Foundations)
+  scenario.json    94 questions (Scenario Practice)
 api/scores.js      serverless leaderboard endpoint
 package.json       declares the Node runtime for Vercel
 .env.example       template for local Redis credentials
@@ -220,6 +240,7 @@ const SECONDS_PER_QUESTION = 120;  // real exam pace
 const FULL_EXAM_COUNT = 60;        // real exam length
 const PASS_SCORE = 720;            // out of 1000
 const RAMP = [{d:1,n:15},{d:2,n:20},{d:3,n:25}];
+const SCENARIOS = { 1: …, 6: … };  // the six official exam scenarios
 ```
 
 ---
@@ -230,7 +251,8 @@ const RAMP = [{d:1,n:15},{d:2,n:20},{d:3,n:25}];
 {
   "domain": "CI/CD",
   "d": 3,
-  "q": "SCENARIO — Claude Code for Continuous Integration. A CI job runs claude -p …",
+  "scenario": 5,
+  "q": "A CI job runs claude -p …",
   "options": ["…", "…", "…", "…"],
   "correct": 1,
   "explain": "Why this is right and why the tempting distractor isn't."
@@ -241,7 +263,8 @@ const RAMP = [{d:1,n:15},{d:2,n:20},{d:3,n:25}];
 |---|---|
 | `domain` | Free text; drives the results breakdown and the tag shown on each question |
 | `d` | Difficulty: `1` easy, `2` medium, `3` hard. Drives the ramp — **tag honestly**, inflating it just makes your practice scores misleading |
-| `q` | Question text. Prefix with `SCENARIO — <name>.` to render a context banner |
+| `scenario` | Which of the six official exam scenarios this belongs to, `1`–`6`. Use `0` for a standalone concept check with no narrative. Drives scenario grouping and the context banner |
+| `q` | Question text. The legacy `SCENARIO — <name>.` prefix still renders a banner, but prefer the `scenario` field |
 | `options` | Four options recommended. Order as written; shuffled at runtime |
 | `correct` | Index into `options` **as written**. No need to vary the position by hand |
 | `explain` | Shown in the review. Explain why distractors fail, not just why the answer is right — that's where the exam's difficulty lives |
@@ -254,8 +277,10 @@ const RAMP = [{d:1,n:15},{d:2,n:20},{d:3,n:25}];
   "name": "Scenario Practice",
   "desc": "Shown on the level card",
   "ready": true,
-  "count": 60,
+  "count": 40,
   "pool": false,
+  "scenarioPick": 3,
+  "scenarioWeights": { "5": 4, "4": 2, "2": 2, "1": 1, "3": 1, "6": 1 },
   "blueprint": [{ "label": "Claude Code Config & Workflows", "pct": 17 }],
   "questions": [ … ]
 }
@@ -265,6 +290,10 @@ const RAMP = [{d:1,n:15},{d:2,n:20},{d:3,n:25}];
   Omit to use the whole bank.
 - `pool: true` — draw from every *other* level's bank instead of this file's own
   questions. That's how Full Mock Exam works.
+- `scenarioPick` — draw this many scenarios and group the paper into blocks.
+  Omit for a flat, ungrouped paper.
+- `scenarioWeights` — bias which scenarios get drawn, keyed by scenario id as a
+  string. Higher is likelier; unlisted scenarios default to 1.
 - `blueprint` — the scenario-mix bar on the level card. Percentages should total
   100.
 - `ready: false` — shows the level as "Soon" and disables it.

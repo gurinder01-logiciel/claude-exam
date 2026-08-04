@@ -14,8 +14,11 @@ exam: 60 scenario questions in 120 minutes, with a shared team leaderboard.
   revealing the correct answer
 - **Score out of 1000** with a domain breakdown and per-question explanations
 - **Team leaderboard** showing each person's best score
-- **Levels unlock in order** — Basic first, then Scenario Practice, then the Full
-  Mock Exam, so nobody skips the foundations
+- **Scenario blocks like the real exam** — the Full Mock draws 4 of the 6
+  official scenarios, each framing a run of consecutive questions under a shared
+  context banner
+- **Levels unlock in order** — Foundations first, then Scenario Practice, then
+  the Full Mock Exam, so nobody skips the fundamentals
 
 Full reference: **[DOCS.md](DOCS.md)**
 

@@ -186,6 +186,23 @@
     border-left: 3px solid var(--lime); border-radius: 0 6px 6px 0;
     padding: 7px 12px; margin-bottom: 14px;
   }
+  .review-scenario {
+    display: inline-block; font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--text-dim); background: var(--surface-2);
+    border-radius: 4px; padding: 2px 7px; margin-right: 4px; vertical-align: middle;
+  }
+  .scenario-intro {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-left: 3px solid var(--lime); border-radius: 0 8px 8px 0;
+    padding: 12px 16px; margin-bottom: 16px;
+  }
+  .scenario-intro-label {
+    font-size: 0.74rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-dim); margin-bottom: 6px;
+  }
+  .scenario-intro p {
+    margin: 0; font-size: 0.92rem; line-height: 1.5; color: var(--text);
+  }
   .opt {
     display: flex; align-items: flex-start; gap: 12px; width: 100%; text-align: left;
     background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
@@ -339,6 +356,8 @@ async function loadLevels() {
       requires: lv.requires || null,
       pool: Boolean(lv.pool),
       count: lv.count,
+      scenarioPick: lv.scenarioPick || null,
+      scenarioWeights: lv.scenarioWeights || null,
       blueprint: lv.blueprint,
       questions: Array.isArray(lv.questions) ? lv.questions : []
     };
@@ -374,12 +393,22 @@ function buildRampedPaper(bank, n) {
                   2: shuffle(bank.filter(q => (q.d || 2) === 2)),
                   3: shuffle(bank.filter(q => (q.d || 2) === 3)) };
 
-  const scale = n / RAMP.reduce((a, b) => a + b.n, 0);
+  // Split n across the tiers by largest remainder, so the quotas sum to exactly
+  // n. Rounding each tier independently could overshoot and return n+1 items.
+  const rampTotal = RAMP.reduce((a, b) => a + b.n, 0);
+  const exact = RAMP.map(({ d, n: q }) => ({ d, want: n * q / rampTotal }));
+  const quotas = {};
+  exact.forEach(e => { quotas[e.d] = Math.floor(e.want); });
+  let remainder = n - exact.reduce((a, e) => a + quotas[e.d], 0);
+  exact.slice()
+    .sort((a, b) => (b.want - Math.floor(b.want)) - (a.want - Math.floor(a.want)))
+    .forEach(e => { if (remainder > 0) { quotas[e.d]++; remainder--; } });
+
   const picked = { 1: [], 2: [], 3: [] };
 
   // First pass: take up to quota from each tier.
-  RAMP.forEach(({ d, n: quota }) => {
-    picked[d] = pools[d].splice(0, Math.round(quota * scale));
+  RAMP.forEach(({ d }) => {
+    picked[d] = pools[d].splice(0, quotas[d]);
   });
 
   // Second pass: backfill any shortfall from whichever tier still has spares,
@@ -396,11 +425,105 @@ function buildRampedPaper(bank, n) {
   return [...picked[1], ...picked[2], ...picked[3]];
 }
 
+// The six official exam scenarios. The real exam presents 4 of these, and every
+// question sits inside one; a question's `scenario` field is the id below.
+// Scenario 0 means the question is a standalone concept check with no narrative.
+const SCENARIOS = {
+  1: { name: 'Customer Support Resolution Agent',
+       blurb: 'You are building a customer support resolution agent with the Claude Agent SDK. It handles returns, billing disputes, and account issues, reaching your backend through MCP tools (get_customer, lookup_order, process_refund, escalate_to_human). Target: 80%+ first-contact resolution, while knowing when to escalate.' },
+  2: { name: 'Code Generation with Claude Code',
+       blurb: 'Your team uses Claude Code for code generation, refactoring, debugging, and documentation. You are integrating it into the development workflow with custom slash commands and CLAUDE.md configuration, and deciding when to use plan mode over direct execution.' },
+  3: { name: 'Multi-Agent Research System',
+       blurb: 'You are building a multi-agent research system with the Claude Agent SDK. A coordinator delegates to specialised subagents: one searches the web, one analyses documents, one synthesises findings, one generates reports. The system produces comprehensive, cited reports.' },
+  4: { name: 'Developer Productivity with Claude',
+       blurb: 'You are building developer productivity tools with the Claude Agent SDK. The agent helps engineers explore unfamiliar codebases, understand legacy systems, generate boilerplate, and automate repetitive work, using built-in tools (Read, Write, Bash, Grep, Glob) and MCP servers.' },
+  5: { name: 'Claude Code for Continuous Integration',
+       blurb: 'You are integrating Claude Code into your CI/CD pipeline. It runs automated code reviews, generates test cases, and comments on pull requests. Your prompts need to give actionable feedback while minimising false positives.' },
+  6: { name: 'Structured Data Extraction',
+       blurb: 'You are building a structured data extraction system with Claude. It pulls information out of unstructured documents, validates against JSON schemas, and must stay accurate, handle edge cases gracefully, and feed downstream systems.' }
+};
+
+// Weighted pick of `k` distinct scenario ids. `weights` biases which scenarios
+// get drawn (higher = likelier); unlisted scenarios default to 1.
+function pickScenarios(available, k, weights = {}) {
+  const pool = available.slice();
+  const out = [];
+  while (out.length < k && pool.length) {
+    const total = pool.reduce((a, s) => a + (weights[s] || 1), 0);
+    let r = Math.random() * total;
+    let idx = pool.length - 1;
+    for (let i = 0; i < pool.length; i++) {
+      r -= (weights[pool[i]] || 1);
+      if (r <= 0) { idx = i; break; }
+    }
+    out.push(pool.splice(idx, 1)[0]);
+  }
+  return out;
+}
+
+// Build a paper as scenario blocks, mirroring the real exam: a handful of
+// scenarios, each contributing a run of consecutive questions under one shared
+// context. Difficulty still ramps inside each block, and blocks are ordered
+// easiest-first so the paper as a whole still opens gently.
+function buildScenarioPaper(bank, n, { pick, weights }) {
+  const byScenario = {};
+  bank.forEach(q => {
+    const s = q.scenario || 0;
+    if (!s) return;                       // foundations items sit outside scenarios
+    (byScenario[s] = byScenario[s] || []).push(q);
+  });
+
+  const available = Object.keys(byScenario).map(Number);
+  if (!available.length) return buildRampedPaper(bank, n);
+
+  const chosen = pickScenarios(available, Math.min(pick, available.length), weights);
+
+  // If the chosen scenarios between them hold fewer questions than the paper
+  // needs, pull in extra scenarios rather than shipping a short paper.
+  const capacity = () => chosen.reduce((a, s) => a + byScenario[s].length, 0);
+  const spare = available.filter(s => !chosen.includes(s));
+  while (capacity() < n && spare.length) chosen.push(spare.shift());
+
+  // Split n across the chosen scenarios, weighted the same way, but never asking
+  // a scenario for more questions than it actually has.
+  const wTotal = chosen.reduce((a, s) => a + (weights[s] || 1), 0);
+  const quota = {};
+  chosen.forEach(s => {
+    quota[s] = Math.min(byScenario[s].length, Math.max(1, Math.round(n * (weights[s] || 1) / wTotal)));
+  });
+
+  // Reconcile rounding and shortfalls against the scenarios that still have spares.
+  const sum = () => chosen.reduce((a, s) => a + quota[s], 0);
+  let guard = 500;
+  while (sum() !== n && guard-- > 0) {
+    if (sum() < n) {
+      const s = chosen.find(s => quota[s] < byScenario[s].length);
+      if (s === undefined) break;
+      quota[s]++;
+    } else {
+      const s = chosen.slice().reverse().find(s => quota[s] > 1);
+      if (s === undefined) break;
+      quota[s]--;
+    }
+  }
+
+  const blocks = chosen
+    .map(s => ({ scenario: s, questions: buildRampedPaper(byScenario[s], quota[s]) }))
+    .filter(b => b.questions.length);
+
+  // Order blocks by mean difficulty so the paper still ramps overall.
+  blocks.sort((a, b) => mean(a.questions) - mean(b.questions));
+  function mean(qs) { return qs.reduce((a, q) => a + (q.d || 2), 0) / (qs.length || 1); }
+
+  return blocks.flatMap(b => b.questions);
+}
+
 // Build the question pool for a level.
-//  - pool: true  → draw `count` from every other level's bank (fresh paper each sitting)
-//  - count set   → draw `count` from this level's own bank
-//  - otherwise   → use the whole bank
-// In all cases the paper is ordered as a difficulty ramp.
+//  - pool: true         → draw from every other level's bank (fresh paper each sitting)
+//  - scenarioPick set   → draw that many scenarios and group their questions
+//  - count set          → draw `count` from the bank
+//  - otherwise          → use the whole bank
+// In all cases difficulty ramps across the paper.
 function buildQuestions(level) {
   let bank;
   if (level.pool) {
@@ -410,7 +533,10 @@ function buildQuestions(level) {
     bank = level.questions;
   }
   const n = Math.min(level.count || bank.length, bank.length);
-  return prepQuestions(buildRampedPaper(bank, n), { keepOrder: true });
+  const raw = level.scenarioPick
+    ? buildScenarioPaper(bank, n, { pick: level.scenarioPick, weights: level.scenarioWeights || {} })
+    : buildRampedPaper(bank, n);
+  return prepQuestions(raw, { keepOrder: true });
 }
 
 // ========================= STATE =========================
@@ -636,6 +762,24 @@ function formatQuestion(text) {
   return `<div class="scenario-banner">Scenario · ${m[1]}</div>${m[2]}`;
 }
 
+// Questions are drawn in scenario blocks. The first question of a block carries
+// the full context; the rest get a compact reminder of which scenario they're in.
+// `index` is the question's position in the current paper.
+function scenarioHeader(q, index) {
+  const s = SCENARIOS[q.scenario];
+  if (!s) return '';
+  // On an ungrouped level consecutive questions rarely share a scenario, so the
+  // full context would reappear on almost every question. Show the compact tag.
+  if (!state.grouped) return `<div class="scenario-banner">Scenario · ${s.name}</div>`;
+  const prev = index > 0 ? state.questions[index - 1] : null;
+  const isFirst = !prev || prev.scenario !== q.scenario;
+  if (!isFirst) return `<div class="scenario-banner">Scenario · ${s.name}</div>`;
+  return `<div class="scenario-intro">
+      <div class="scenario-intro-label">Scenario · ${s.name}</div>
+      <p>${s.blurb}</p>
+    </div>`;
+}
+
 function resetToMenu() {
   stopTimer();
   // remove any lingering overlays
@@ -744,6 +888,7 @@ function renderStart() {
 function beginExam(levelKey) {
   const lv = LEVELS[levelKey];
   state.level = levelKey;
+  state.grouped = Boolean(lv.scenarioPick);
   state.questions = buildQuestions(lv);
   state.answers = new Array(state.questions.length).fill(null);
   state.struck = state.questions.map(() => new Set());
@@ -782,6 +927,7 @@ function renderExam() {
     <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
 
     <div class="card">
+      ${scenarioHeader(q, state.current)}
       <div class="qtext">${formatQuestion(q.q)}</div>
       ${q.options.map((opt, i) => {
         const sel = ans === i ? ' selected' : '';
@@ -1032,7 +1178,7 @@ function renderReviewList() {
           <span class="domain-tag">${q.domain}</span>
           <span>${tag} ${state.flagged[i] ? '<span class="tag-mini" style="background:#e8b04b22;color:var(--amber)">★ Flagged</span>' : ''}</span>
         </div>
-        <div class="review-q">Q${i+1}. ${formatQuestion(q.q)}</div>
+        <div class="review-q">Q${i+1}.${SCENARIOS[q.scenario] ? ` <span class="review-scenario">${SCENARIOS[q.scenario].name}</span>` : ''} ${formatQuestion(q.q)}</div>
         ${opts}
         <div class="review-explain"><b style="color:var(--lime)">Why:</b> ${q.explain}</div>
       </div>`;

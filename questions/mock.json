@@ -1,7 +1,7 @@
 {
   "key": "mock",
   "name": "Full Mock Exam",
-  "desc": "The real thing: 60 questions in 120 minutes, drawn fresh from every question bank each sitting. Pass mark 720/1000.",
+  "desc": "The real thing: 60 questions in 120 minutes, presented as 4 scenarios drawn from the official 6, weighted toward agentic architecture. Pass mark 720/1000.",
   "ready": true,
   "requires": "scenario",
   "pool": true,
@@ -28,5 +28,14 @@
       "pct": 15
     }
   ],
-  "questions": []
+  "questions": [],
+  "scenarioPick": 4,
+  "scenarioWeights": {
+    "1": 3,
+    "3": 3,
+    "5": 2,
+    "2": 1,
+    "4": 1,
+    "6": 1
+  }
 }

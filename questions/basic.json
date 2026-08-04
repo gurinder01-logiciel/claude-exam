@@ -1,7 +1,7 @@
 {
   "key": "basic",
-  "name": "Basic",
-  "desc": "Foundation concepts across Claude API, Claude Code and MCP — plus the 12 official sample questions published in the CCAR-F Exam Guide",
+  "name": "Foundations",
+  "desc": "Warm-up across all five domains, ungrouped. Build the fundamentals before sitting a scenario paper.",
   "ready": true,
   "blueprint": [
     {
@@ -33,7 +33,8 @@
         "One synchronous request that packs all tickets into a single prompt-cached context"
       ],
       "correct": 2,
-      "explain": "The Message Batches API is purpose-built for large asynchronous workloads and costs less per token than live calls. High-concurrency streaming is the tempting near-miss: it does raise throughput but bills at standard rates and adds rate-limit pressure, so it misses the cost-efficiency requirement."
+      "explain": "The Message Batches API is purpose-built for large asynchronous workloads and costs less per token than live calls. High-concurrency streaming is the tempting near-miss: it does raise throughput but bills at standard rates and adds rate-limit pressure, so it misses the cost-efficiency requirement.",
+      "scenario": 6
     },
     {
       "domain": "Claude API",
@@ -46,12 +47,13 @@
         "A schema in the system prompt with temperature raised so Claude explores valid variants"
       ],
       "correct": 1,
-      "explain": "Reliability comes from combining a clear schema, prefilling the assistant turn to anchor the format, and programmatically retrying on validation failure. The extended-thinking option is the strong near-miss: internal reasoning can improve quality but provides no guarantee of schema conformance, so you still need external validation."
+      "explain": "Reliability comes from combining a clear schema, prefilling the assistant turn to anchor the format, and programmatically retrying on validation failure. The extended-thinking option is the strong near-miss: internal reasoning can improve quality but provides no guarantee of schema conformance, so you still need external validation.",
+      "scenario": 6
     },
     {
       "domain": "Claude API",
       "d": 1,
-      "q": "SCENARIO - Customer Support Resolution Agent. Your Messages API loop receives stop_reason 'tool_use', runs lookup_order locally, and must let Claude continue the same turn. What must the next request contain?",
+      "q": "Your Messages API loop receives stop_reason 'tool_use', runs lookup_order locally, and must let Claude continue the same turn. What must the next request contain?",
       "options": [
         "The full prior message list plus an assistant message restating the tool output as plain prose for the model to read",
         "Only the tool_result block for that call, because the service retains the earlier turns of this conversation for you",
@@ -59,7 +61,8 @@
         "Only the original user question and the tool output, letting the model reconstruct the intervening reasoning itself"
       ],
       "correct": 2,
-      "explain": "The loop continues by appending the assistant's tool_use turn and then a user turn whose tool_result block carries the matching id, with the whole history resent each time. The near-miss is sending only the tool_result: it uses the right block but assumes the prior turns are held for you, so the model loses the request it was answering."
+      "explain": "The loop continues by appending the assistant's tool_use turn and then a user turn whose tool_result block carries the matching id, with the whole history resent each time. The near-miss is sending only the tool_result: it uses the right block but assumes the prior turns are held for you, so the model loses the request it was answering.",
+      "scenario": 1
     },
     {
       "domain": "Claude API",
@@ -72,7 +75,8 @@
         "You resend the same request with tool_choice set to none so Claude answers from context"
       ],
       "correct": 0,
-      "explain": "In the client-side tool loop your code runs the tool and sends back a tool_result block referencing the matching tool_use id. Returning the output as plain user text is the near-miss: Claude may cope, but the block linkage is lost and the API rejects an unanswered tool_use."
+      "explain": "In the client-side tool loop your code runs the tool and sends back a tool_result block referencing the matching tool_use id. Returning the output as plain user text is the near-miss: Claude may cope, but the block linkage is lost and the API rejects an unanswered tool_use.",
+      "scenario": 1
     },
     {
       "domain": "Claude Code",
@@ -85,7 +89,8 @@
         "Create a custom slash command that encodes the whole workflow as one invocation"
       ],
       "correct": 3,
-      "explain": "A custom slash command is the built-in way to turn a repeated multi-step procedure into one reusable, parameterized invocation. Putting it in CLAUDE.md is the tempting near-miss: it does share the steps with the team, but it burns context every session and still has to be triggered manually."
+      "explain": "A custom slash command is the built-in way to turn a repeated multi-step procedure into one reusable, parameterized invocation. Putting it in CLAUDE.md is the tempting near-miss: it does share the steps with the team, but it burns context every session and still has to be triggered manually.",
+      "scenario": 2
     },
     {
       "domain": "Claude Code",
@@ -98,7 +103,8 @@
         "Whichever file is larger is treated as authoritative for the overlapping instructions"
       ],
       "correct": 1,
-      "explain": "Memory files cascade from broad to specific, and the closest scope to the work (project, then directory) takes precedence on conflicts. 'User-level loaded last' is the near-miss: load order is real, but it runs the other way, with narrower project context taking priority."
+      "explain": "Memory files cascade from broad to specific, and the closest scope to the work (project, then directory) takes precedence on conflicts. 'User-level loaded last' is the near-miss: load order is real, but it runs the other way, with narrower project context taking priority.",
+      "scenario": 2
     },
     {
       "domain": "Claude Code",
@@ -111,7 +117,8 @@
         "Claude should use plan mode to propose an approach for review before editing any file"
       ],
       "correct": 3,
-      "explain": "For large, ambiguous, cross-file work, plan mode surfaces the intended approach so you can correct it before any write happens. Reading the repo first is the tempting near-miss: context gathering is useful but it is not a review gate, and edits can still begin from a wrong plan."
+      "explain": "For large, ambiguous, cross-file work, plan mode surfaces the intended approach so you can correct it before any write happens. Reading the repo first is the tempting near-miss: context gathering is useful but it is not a review gate, and edits can still begin from a wrong plan.",
+      "scenario": 2
     },
     {
       "domain": "Claude Code",
@@ -124,7 +131,8 @@
         "Running validation, logging, or blocking of risky actions before or after a step"
       ],
       "correct": 3,
-      "explain": "Hooks are shell commands wired to lifecycle events, letting you validate, log, or block an action deterministically. 'Injecting extra reference files' is the near-miss: some hooks can add context, but that is a side effect, not the primary purpose of enforcement and observability."
+      "explain": "Hooks are shell commands wired to lifecycle events, letting you validate, log, or block an action deterministically. 'Injecting extra reference files' is the near-miss: some hooks can add context, but that is a side effect, not the primary purpose of enforcement and observability.",
+      "scenario": 2
     },
     {
       "domain": "MCP",
@@ -137,7 +145,8 @@
         "Missing tool_choice configuration; force a specific tool on every turn to remove doubt"
       ],
       "correct": 1,
-      "explain": "Large sets of overlapping tools make selection ambiguous, so the fix is consolidating and narrowing tool surface area. Tightening parameter schemas is the tempting near-miss: better schemas help argument accuracy but do nothing to disambiguate which of 40 similar tools to call."
+      "explain": "Large sets of overlapping tools make selection ambiguous, so the fix is consolidating and narrowing tool surface area. Tightening parameter schemas is the tempting near-miss: better schemas help argument accuracy but do nothing to disambiguate which of 40 similar tools to call.",
+      "scenario": 4
     },
     {
       "domain": "MCP",
@@ -150,7 +159,8 @@
         "A read-only companion tool listing affected records that Claude is instructed to call first"
       ],
       "correct": 1,
-      "explain": "Destructive, irreversible operations need a real confirmation gate enforced at the tool boundary, not left to model judgment. The dry_run default is the strongest near-miss: it reduces accidents but the model can still set dry_run to false in the same turn, so nothing actually blocks the deletion."
+      "explain": "Destructive, irreversible operations need a real confirmation gate enforced at the tool boundary, not left to model judgment. The dry_run default is the strongest near-miss: it reduces accidents but the model can still set dry_run to false in the same turn, so nothing actually blocks the deletion.",
+      "scenario": 1
     },
     {
       "domain": "MCP",
@@ -163,7 +173,8 @@
         "The server exposes tools and resources; the client, such as Claude, discovers and calls them"
       ],
       "correct": 3,
-      "explain": "MCP servers publish capabilities (tools, resources, prompts) and MCP clients like Claude connect, discover, and invoke them. The symmetric-capabilities option is the near-miss: clients do expose some features such as sampling, but tools and resources flow from server to client, not both ways."
+      "explain": "MCP servers publish capabilities (tools, resources, prompts) and MCP clients like Claude connect, discover, and invoke them. The symmetric-capabilities option is the near-miss: clients do expose some features such as sampling, but tools and resources flow from server to client, not both ways.",
+      "scenario": 0
     },
     {
       "domain": "Claude Code",
@@ -176,7 +187,8 @@
         "Document it in a skill's reference.md that Claude reads whenever git operations come up"
       ],
       "correct": 0,
-      "explain": "Only a pre-tool-use hook enforces the rule in code, inspecting the command and denying it deterministically. Project CLAUDE.md marked IMPORTANT is the tempting near-miss: it strongly influences behavior but remains guidance a model can overlook under pressure."
+      "explain": "Only a pre-tool-use hook enforces the rule in code, inspecting the command and denying it deterministically. Project CLAUDE.md marked IMPORTANT is the tempting near-miss: it strongly influences behavior but remains guidance a model can overlook under pressure.",
+      "scenario": 2
     },
     {
       "domain": "Claude Code",
@@ -189,12 +201,13 @@
         "Package it as a skill with every step and the full reference material written inline in skill.md"
       ],
       "correct": 1,
-      "explain": "Skills use progressive disclosure: a short skill.md that Claude always sees, with bulky reference files and scripts loaded only when needed. Writing everything inline in skill.md is the near-miss: it is still a skill, but it defeats progressive disclosure and consumes context on every invocation."
+      "explain": "Skills use progressive disclosure: a short skill.md that Claude always sees, with bulky reference files and scripts loaded only when needed. Writing everything inline in skill.md is the near-miss: it is still a skill, but it defeats progressive disclosure and consumes context on every invocation.",
+      "scenario": 2
     },
     {
       "domain": "Claude Code",
       "d": 2,
-      "q": "SCENARIO - Code Generation with Claude Code. A refactor of authentication touches a dozen files and the team lead must sign off on the approach before any edit lands. How should the work be run?",
+      "q": "A refactor of authentication touches a dozen files and the team lead must sign off on the approach before any edit lands. How should the work be run?",
       "options": [
         "Use plan mode so an approach is produced and approved before any edit begins, then execute the agreed plan on the files",
         "Use direct execution but ask Claude to summarise its intended approach in its first reply before it changes anything",
@@ -202,12 +215,13 @@
         "Use one prompt asking for both the refactor and a written rationale, and have the lead read that rationale afterwards"
       ],
       "correct": 0,
-      "explain": "Plan mode fits work that is broad, high risk, and gated on human approval, because the plan is reviewed while the session is still read-only. The near-miss asks for an approach summary under direct execution: the summary arrives, but nothing stops the edits from proceeding before the lead has agreed to it."
+      "explain": "Plan mode fits work that is broad, high risk, and gated on human approval, because the plan is reviewed while the session is still read-only. The near-miss asks for an approach summary under direct execution: the summary arrives, but nothing stops the edits from proceeding before the lead has agreed to it.",
+      "scenario": 2
     },
     {
       "domain": "Claude Code",
       "d": 2,
-      "q": "SCENARIO - Claude Code for Continuous Integration. A CI job must run Claude on every pull request without a terminal, emit findings a script can parse, and never let one run stall the pipeline. Which invocation fits?",
+      "q": "A CI job must run Claude on every pull request without a terminal, emit findings a script can parse, and never let one run stall the pipeline. Which invocation fits?",
       "options": [
         "Run Claude interactively in the runner and pipe the transcript to a parser, with the turn limit configured in settings",
         "Run Claude in print mode and parse the plain-text findings, relying on the CI job's own wall-clock timeout to stop runs",
@@ -215,7 +229,8 @@
         "Run Claude in print mode with no limits, then add a follow-up job that inspects the transcript the run leaves behind"
       ],
       "correct": 2,
-      "explain": "Non-interactive print mode plus a structured JSON output format plus an explicit turn or cost limit is the CI shape: parseable results and a bounded run. The near-miss keeps print mode but parses prose and outsources the bound to the job timeout, which yields brittle parsing and kills the run instead of ending it cleanly."
+      "explain": "Non-interactive print mode plus a structured JSON output format plus an explicit turn or cost limit is the CI shape: parseable results and a bounded run. The near-miss keeps print mode but parses prose and outsources the bound to the job timeout, which yields brittle parsing and kills the run instead of ending it cleanly.",
+      "scenario": 5
     },
     {
       "domain": "Claude Code",
@@ -228,7 +243,8 @@
         "Start from the diff itself and confirm from test output that the suite genuinely passed"
       ],
       "correct": 3,
-      "explain": "A self-reported success is a claim, so verification means inspecting the actual diff and the real test output. Checking the exit status is the tempting near-miss: it is objective evidence, but a run can exit cleanly while tests were skipped, filtered, or never invoked."
+      "explain": "A self-reported success is a claim, so verification means inspecting the actual diff and the real test output. Checking the exit status is the tempting near-miss: it is objective evidence, but a run can exit cleanly while tests were skipped, filtered, or never invoked.",
+      "scenario": 5
     },
     {
       "domain": "Claude Code",
@@ -241,12 +257,13 @@
         "Commit it under .claude/skills in the repo so everyone who clones the project gets it"
       ],
       "correct": 3,
-      "explain": "Skills committed to .claude/skills in the repo travel with the clone, so no installation step is needed. The plugin-marketplace option is tempting because marketplaces do distribute skills, but each teammate still has to add the marketplace and install the plugin."
+      "explain": "Skills committed to .claude/skills in the repo travel with the clone, so no installation step is needed. The plugin-marketplace option is tempting because marketplaces do distribute skills, but each teammate still has to add the marketplace and install the plugin.",
+      "scenario": 2
     },
     {
       "domain": "Claude Code",
       "d": 1,
-      "q": "SCENARIO - Developer Productivity with Claude. Your team has a rule that every SQL migration must be reversible. It matters only when a file under db/migrations is edited, and should not occupy context otherwise. Where does it belong?",
+      "q": "Your team has a rule that every SQL migration must be reversible. It matters only when a file under db/migrations is edited, and should not occupy context otherwise. Where does it belong?",
       "options": [
         "In each engineer's user-level memory file, so the rule travels with them across every repository they happen to open",
         "In the project CLAUDE.md under a migrations heading, so every session carries the rule and applies it when it is relevant",
@@ -254,7 +271,8 @@
         "In a .claude/rules/ file with a frontmatter paths glob for the migrations directory, so it loads only on matching edits"
       ],
       "correct": 3,
-      "explain": "Path-scoped guidance belongs in .claude/rules/ with a paths glob, which is exactly the mechanism for rules that should load only when matching files are touched. The near-miss is project CLAUDE.md: it does reach everyone, but it loads in every session regardless of what is being edited, spending context on guidance that usually does not apply."
+      "explain": "Path-scoped guidance belongs in .claude/rules/ with a paths glob, which is exactly the mechanism for rules that should load only when matching files are touched. The near-miss is project CLAUDE.md: it does reach everyone, but it loads in every session regardless of what is being edited, spending context on guidance that usually does not apply.",
+      "scenario": 4
     },
     {
       "domain": "Claude Code",
@@ -267,7 +285,8 @@
         "Skills become available to a sub-agent only once it has read the project's CLAUDE.md file"
       ],
       "correct": 0,
-      "explain": "Sub-agents begin with fresh context, and skills are available only to custom sub-agents that explicitly list them. The inheritance option is the strong near-miss: sub-agents do receive their task prompt from the parent, but not its loaded skills or context."
+      "explain": "Sub-agents begin with fresh context, and skills are available only to custom sub-agents that explicitly list them. The inheritance option is the strong near-miss: sub-agents do receive their task prompt from the parent, but not its loaded skills or context.",
+      "scenario": 3
     },
     {
       "domain": "MCP",
@@ -280,7 +299,8 @@
         "Direct resources expose a static URI; templated resources embed parameters parsed into your function"
       ],
       "correct": 3,
-      "explain": "A direct resource has a fixed, parameter-free URI; a templated resource carries URI parameters that are parsed and handed to your handler. The listing-based option is the near-miss: templates really do appear separately from concrete resources in listing, but via resources/templates/list, and they are still read through resources/read."
+      "explain": "A direct resource has a fixed, parameter-free URI; a templated resource carries URI parameters that are parsed and handed to your handler. The listing-based option is the near-miss: templates really do appear separately from concrete resources in listing, but via resources/templates/list, and they are still read through resources/read.",
+      "scenario": 0
     },
     {
       "domain": "MCP",
@@ -293,12 +313,13 @@
         "Resource content is exempt from tool-use permission prompts, so the read completes without approval"
       ],
       "correct": 1,
-      "explain": "Resources are application-controlled, so your app can pull the document and place it in context directly instead of waiting for Claude to decide to call a tool. The 'never costs tokens' option is tempting but wrong: injected resource content still occupies the context window."
+      "explain": "Resources are application-controlled, so your app can pull the document and place it in context directly instead of waiting for Claude to decide to call a tool. The 'never costs tokens' option is tempting but wrong: injected resource content still occupies the context window.",
+      "scenario": 4
     },
     {
       "domain": "MCP",
       "d": 1,
-      "q": "SCENARIO - Developer Productivity with Claude. Your MCP server fronts an internal wiki, and agents spend many turns listing and fetching pages just to discover what exists before real work starts. What is the fix?",
+      "q": "Your MCP server fronts an internal wiki, and agents spend many turns listing and fetching pages just to discover what exists before real work starts. What is the fix?",
       "options": [
         "Expose the wiki pages as MCP resources so the host can surface the catalogue as context instead of discovery calls",
         "Expose one search_wiki tool with a rich description so the model can locate the right page in a single call each time",
@@ -306,12 +327,13 @@
         "Expose the pages as resources but require a confirming tool call before the host may read any of them into context"
       ],
       "correct": 0,
-      "explain": "Resources are the primitive for server content the host can attach directly, which removes the exploratory round trips that tool-based discovery costs. The near-miss is one well-described search tool: better than many tools, but the model still has to spend a call, and often several, to learn what the wiki contains."
+      "explain": "Resources are the primitive for server content the host can attach directly, which removes the exploratory round trips that tool-based discovery costs. The near-miss is one well-described search tool: better than many tools, but the model still has to spend a call, and often several, to learn what the wiki contains.",
+      "scenario": 4
     },
     {
       "domain": "MCP",
       "d": 1,
-      "q": "SCENARIO - Multi-Agent Research System. Everyone on the team needs the same research MCP server available in this repository, but each developer holds a personal API key that must never be committed. How do you configure it?",
+      "q": "Everyone on the team needs the same research MCP server available in this repository, but each developer holds a personal API key that must never be committed. How do you configure it?",
       "options": [
         "Commit the project .mcp.json and reference the credential through environment variable expansion so each dev supplies it",
         "Commit the project .mcp.json with the credential written inline, and ask each developer to replace it locally after cloning",
@@ -319,12 +341,13 @@
         "Commit the server definition inside CLAUDE.md so it loads for everyone, with the credential read from the shell at startup"
       ],
       "correct": 0,
-      "explain": "Project-scoped .mcp.json shares the server definition through the repository, and ${ENV_VAR} expansion keeps the secret in each developer's environment rather than in version control. The near-miss is per-developer user-level config: it does protect the secret, but the server definition is no longer shared, so onboarding and drift become manual problems."
+      "explain": "Project-scoped .mcp.json shares the server definition through the repository, and ${ENV_VAR} expansion keeps the secret in each developer's environment rather than in version control. The near-miss is per-developer user-level config: it does protect the secret, but the server definition is no longer shared, so onboarding and drift become manual problems.",
+      "scenario": 3
     },
     {
       "domain": "MCP",
       "d": 1,
-      "q": "SCENARIO - Customer Support Resolution Agent. The agent keeps calling lookup_order when it should call get_customer. Both descriptions open with the phrase 'retrieve account information'. What is the right correction?",
+      "q": "The agent keeps calling lookup_order when it should call get_customer. Both descriptions open with the phrase 'retrieve account information'. What is the right correction?",
       "options": [
         "Merge the two into one account_info tool that branches internally on whichever identifier the caller happens to pass in",
         "Rewrite the system prompt with an ordered rule telling the agent to try get_customer first before it ever calls lookup_order",
@@ -332,7 +355,8 @@
         "Restrict this agent to lookup_order and move get_customer onto a subagent so the two can never be confused at call time"
       ],
       "correct": 2,
-      "explain": "Descriptions are the selection mechanism, so overlapping wording is fixed at the source by stating each tool's purpose, inputs, and boundary against its neighbour. The near-miss is an ordering rule in the system prompt: it patches one observed misroute with prompt guidance while the ambiguous descriptions keep misleading selection everywhere else."
+      "explain": "Descriptions are the selection mechanism, so overlapping wording is fixed at the source by stating each tool's purpose, inputs, and boundary against its neighbour. The near-miss is an ordering rule in the system prompt: it patches one observed misroute with prompt guidance while the ambiguous descriptions keep misleading selection everywhere else.",
+      "scenario": 1
     },
     {
       "domain": "Claude Code",
@@ -345,12 +369,13 @@
         "--settings with an empty JSON object, which replaces every discovered configuration layer"
       ],
       "correct": 2,
-      "explain": "--bare skips auto-discovery of hooks, skills, plugins, MCP servers, memory, and CLAUDE.md, so a run is identical on any machine (note that it also skips OAuth, so use ANTHROPIC_API_KEY). --strict-mcp-config is the near-miss: it really does control MCP discovery, but it leaves hooks, skills, and CLAUDE.md in play."
+      "explain": "--bare skips auto-discovery of hooks, skills, plugins, MCP servers, memory, and CLAUDE.md, so a run is identical on any machine (note that it also skips OAuth, so use ANTHROPIC_API_KEY). --strict-mcp-config is the near-miss: it really does control MCP discovery, but it leaves hooks, skills, and CLAUDE.md in play.",
+      "scenario": 5
     },
     {
       "domain": "Support Agent",
       "d": 3,
-      "q": "SCENARIO — Customer Support Resolution Agent (Claude + MCP tools). Production data shows that in 12% of cases, your Claude agent skips get_customer entirely and calls lookup_order using only the customer's stated name, occasionally leading to misidentified accounts and incorrect refunds. What change would most effectively address this reliability issue?",
+      "q": "Production data shows that in 12% of cases, your Claude agent skips get_customer entirely and calls lookup_order using only the customer's stated name, occasionally leading to misidentified accounts and incorrect refunds. What change would most effectively address this reliability issue?",
       "options": [
         "Add few-shot examples where the agent calls get_customer first even when an order number is given",
         "State in the system prompt that get_customer verification is mandatory before any order operation",
@@ -358,12 +383,13 @@
         "Route each request through a classifier that enables only the tools that request type should use"
       ],
       "correct": 2,
-      "explain": "Critical business ordering needs deterministic enforcement in code, not probabilistic model compliance. The few-shot option is the tempting near-miss: examples do measurably improve sequencing, but they cannot guarantee it in the 12% tail where money is at stake."
+      "explain": "Critical business ordering needs deterministic enforcement in code, not probabilistic model compliance. The few-shot option is the tempting near-miss: examples do measurably improve sequencing, but they cannot guarantee it in the 12% tail where money is at stake.",
+      "scenario": 1
     },
     {
       "domain": "Support Agent",
       "d": 3,
-      "q": "SCENARIO — Customer Support Resolution Agent. Production logs show Claude frequently calls get_customer when users ask about orders (e.g., 'check my order #12345'), instead of calling lookup_order. Both tools have minimal descriptions ('Retrieves customer information' / 'Retrieves order details') and accept similar identifier formats. What's the most effective first step to improve tool selection reliability?",
+      "q": "Production logs show Claude frequently calls get_customer when users ask about orders (e.g., 'check my order #12345'), instead of calling lookup_order. Both tools have minimal descriptions ('Retrieves customer information' / 'Retrieves order details') and accept similar identifier formats. What's the most effective first step to improve tool selection reliability?",
       "options": [
         "Parse each user message for order-number patterns and pre-select the tool before the turn runs",
         "Expand each description with input formats, sample queries, edge cases, and when-not-to-use bounds",
@@ -371,12 +397,13 @@
         "Add five to eight few-shot exchanges to the system prompt showing correct selection between them"
       ],
       "correct": 1,
-      "explain": "Descriptions are the model's primary signal for choosing between tools, so enriching the two thin descriptions attacks the root cause cheaply. Few-shot examples are the strong near-miss: they help, but they patch symptoms with extra tokens while the ambiguous descriptions remain."
+      "explain": "Descriptions are the model's primary signal for choosing between tools, so enriching the two thin descriptions attacks the root cause cheaply. Few-shot examples are the strong near-miss: they help, but they patch symptoms with extra tokens while the ambiguous descriptions remain.",
+      "scenario": 1
     },
     {
       "domain": "Support Agent",
       "d": 3,
-      "q": "SCENARIO — Customer Support Resolution Agent. Your Claude-powered agent achieves 55% first-contact resolution, well below the 80% target. Logs show it escalates straightforward cases (standard damage replacements with photo evidence) while attempting to autonomously handle complex situations requiring policy exceptions. What's the most effective way to improve escalation calibration?",
+      "q": "Your Claude-powered agent achieves 55% first-contact resolution, well below the 80% target. Logs show it escalates straightforward cases (standard damage replacements with photo evidence) while attempting to autonomously handle complex situations requiring policy exceptions. What's the most effective way to improve escalation calibration?",
       "options": [
         "Have the agent emit a 1-10 confidence score each turn and hand off anything below a threshold",
         "Put explicit escalation criteria in the system prompt with examples of escalate versus resolve",
@@ -384,7 +411,8 @@
         "Run sentiment analysis on the conversation and escalate automatically on strongly negative tone"
       ],
       "correct": 1,
-      "explain": "The failure is an undefined decision boundary, which explicit criteria plus contrasting examples fix directly. Self-reported confidence is the tempting near-miss: it looks like a calibration control, but the agent is already overconfident on exactly the hard cases it should escalate."
+      "explain": "The failure is an undefined decision boundary, which explicit criteria plus contrasting examples fix directly. Self-reported confidence is the tempting near-miss: it looks like a calibration control, but the agent is already overconfident on exactly the hard cases it should escalate.",
+      "scenario": 1
     },
     {
       "domain": "Code Gen",
@@ -397,7 +425,8 @@
         "Register it in .claude/settings.json under a commands array pointing at the checklist file"
       ],
       "correct": 0,
-      "explain": "Project-scoped slash commands live in .claude/commands/ in the repo, so they are version-controlled and appear for everyone who clones or pulls. The ~/.claude/commands/ option is the near-miss: that path does define working commands, but only for that one developer's machine."
+      "explain": "Project-scoped slash commands live in .claude/commands/ in the repo, so they are version-controlled and appear for everyone who clones or pulls. The ~/.claude/commands/ option is the near-miss: that path does define working commands, but only for that one developer's machine.",
+      "scenario": 2
     },
     {
       "domain": "Code Gen",
@@ -410,7 +439,8 @@
         "Execute directly and escalate into plan mode only once cross-module coupling starts causing broken builds"
       ],
       "correct": 2,
-      "explain": "Plan mode exists for exactly this shape of work: many files, several viable designs, and architectural decisions worth exploring before committing. The tempting near-miss is letting the import graph reveal boundaries incrementally — it reads like discovery-driven design but it commits you to edits before the dependency picture exists, guaranteeing rework."
+      "explain": "Plan mode exists for exactly this shape of work: many files, several viable designs, and architectural decisions worth exploring before committing. The tempting near-miss is letting the import graph reveal boundaries incrementally — it reads like discovery-driven design but it commits you to edits before the dependency picture exists, guaranteeing rework.",
+      "scenario": 2
     },
     {
       "domain": "Code Gen",
@@ -423,7 +453,8 @@
         "Add rule files under .claude/rules/ whose frontmatter globs apply each convention by file path automatically"
       ],
       "correct": 3,
-      "explain": "Rule files with glob frontmatter (e.g. **/*.test.tsx) attach conventions to path patterns, so they fire wherever a matching file lives. The strong near-miss is per-directory CLAUDE.md files: that is a real mechanism, but it is directory-bound, so tests scattered next to their sources would each need their own copy."
+      "explain": "Rule files with glob frontmatter (e.g. **/*.test.tsx) attach conventions to path patterns, so they fire wherever a matching file lives. The strong near-miss is per-directory CLAUDE.md files: that is a real mechanism, but it is directory-bound, so tests scattered next to their sources would each need their own copy.",
+      "scenario": 2
     },
     {
       "domain": "Multi-Agent",
@@ -436,7 +467,8 @@
         "The coordinator decomposed the topic too narrowly, so the subagent assignments never spanned all creative domains"
       ],
       "correct": 3,
-      "explain": "The coordinator's own logs show all three subtasks were visual-arts framings, so the omission was baked into decomposition and the subagents completed exactly what they were given. The tempting near-miss blames the synthesis agent for not auditing coverage — a gap check might surface the symptom, but the missing domains were never researched, so synthesis has nothing to recover."
+      "explain": "The coordinator's own logs show all three subtasks were visual-arts framings, so the omission was baked into decomposition and the subagents completed exactly what they were given. The tempting near-miss blames the synthesis agent for not auditing coverage — a gap check might surface the symptom, but the missing domains were never researched, so synthesis has nothing to recover.",
+      "scenario": 3
     },
     {
       "domain": "Multi-Agent",
@@ -449,12 +481,13 @@
         "Let the timeout bubble to a top-level handler that halts the research workflow and reports the stage reached"
       ],
       "correct": 1,
-      "explain": "Structured context is what lets the coordinator choose intelligently between narrowing the query, substituting a source, or proceeding on partial results. The tempting near-miss is in-subagent retry with backoff: retrying is reasonable, but collapsing the outcome to a generic status destroys the query and partial results the coordinator needs to recover."
+      "explain": "Structured context is what lets the coordinator choose intelligently between narrowing the query, substituting a source, or proceeding on partial results. The tempting near-miss is in-subagent retry with backoff: retrying is reasonable, but collapsing the outcome to a generic status destroys the query and partial results the coordinator needs to recover.",
+      "scenario": 3
     },
     {
       "domain": "Multi-Agent",
       "d": 3,
-      "q": "SCENARIO — Multi-Agent Research System built on the Claude Agent SDK. The synthesis subagent frequently needs to verify claims while combining findings. Currently it returns control to the coordinator, which invokes web search, then re-invokes synthesis — adding 2-3 round trips and 40% latency. 85% of verifications are simple fact-checks (dates, names, statistics); 15% need deeper investigation. Most effective approach?",
+      "q": "The synthesis subagent frequently needs to verify claims while combining findings. Currently it returns control to the coordinator, which invokes web search, then re-invokes synthesis — adding 2-3 round trips and 40% latency. 85% of verifications are simple fact-checks (dates, names, statistics); 15% need deeper investigation. Most effective approach?",
       "options": [
         "Have the search agent cache extra surrounding context per source, anticipating what synthesis will later ask",
         "Grant the synthesis agent the full web search toolset so it can resolve any verification without a round trip",
@@ -462,7 +495,8 @@
         "Have synthesis collect every verification need and hand them back to the coordinator as one batch at the end"
       ],
       "correct": 2,
-      "explain": "A scoped verify_fact tool removes the round trips for the 85% simple case while leaving genuine investigation with the specialist agent — least privilege plus latency win. The tempting near-miss is handing synthesis the whole search toolset: it does kill the round trips, but it over-provisions and dissolves the separation of concerns that keeps the 15% deep cases reliable."
+      "explain": "A scoped verify_fact tool removes the round trips for the 85% simple case while leaving genuine investigation with the specialist agent — least privilege plus latency win. The tempting near-miss is handing synthesis the whole search toolset: it does kill the round trips, but it over-provisions and dissolves the separation of concerns that keeps the 15% deep cases reliable.",
+      "scenario": 3
     },
     {
       "domain": "CI/CD",
@@ -475,7 +509,8 @@
         "Pass --output-format json, which implies non-interactive execution because streamed UI output is disabled"
       ],
       "correct": 1,
-      "explain": "-p (--print) is the documented non-interactive mode: it runs the prompt, prints the result, and exits, which is what CI needs. The tempting near-miss is redirecting stdin from /dev/null — a real Unix trick that may stop the hang, but it does not select print mode, so you are relying on side effects rather than the supported flag; the env var shown is not a real setting and --output-format alone does not imply -p."
+      "explain": "-p (--print) is the documented non-interactive mode: it runs the prompt, prints the result, and exits, which is what CI needs. The tempting near-miss is redirecting stdin from /dev/null — a real Unix trick that may stop the hang, but it does not select print mode, so you are relying on side effects rather than the supported flag; the env var shown is not a real setting and --output-format alone does not imply -p.",
+      "scenario": 5
     },
     {
       "domain": "CI/CD",
@@ -488,12 +523,13 @@
         "Keep both on real-time calls, because batch responses return unordered and cannot be matched to requests"
       ],
       "correct": 0,
-      "explain": "The Batches API trades roughly 50% cost for asynchronous processing with up to a 24-hour window, which fits an overnight report and not a check developers block on. The tempting near-miss is batching both and polling because batches 'usually' finish fast: typical speed is not a guarantee, so a blocking pre-merge gate would intermittently stall; the ordering claim is also wrong since custom_id matches results back to requests."
+      "explain": "The Batches API trades roughly 50% cost for asynchronous processing with up to a 24-hour window, which fits an overnight report and not a check developers block on. The tempting near-miss is batching both and polling because batches 'usually' finish fast: typical speed is not a guarantee, so a blocking pre-merge gate would intermittently stall; the ordering claim is also wrong since custom_id matches results back to requests.",
+      "scenario": 5
     },
     {
       "domain": "CI/CD",
       "d": 3,
-      "q": "SCENARIO — Claude Code for Continuous Integration. A pull request modifies 14 files across the stock tracking module. Your single-pass Claude Code review analyzing all files together produces inconsistent results: detailed feedback for some, superficial for others, obvious bugs missed, and contradictory feedback (flagging a pattern in one file while approving identical code elsewhere in the same PR). How should you restructure?",
+      "q": "A pull request modifies 14 files across the stock tracking module. Your single-pass Claude Code review analyzing all files together produces inconsistent results: detailed feedback for some, superficial for others, obvious bugs missed, and contradictory feedback (flagging a pattern in one file while approving identical code elsewhere in the same PR). How should you restructure?",
       "options": [
         "Run the full pull request through three independent passes and report only findings that recur in two",
         "Gate the pipeline so developers must break large pull requests into 3-4 file chunks before review runs",
@@ -501,12 +537,13 @@
         "Move to a larger-context model so all 14 files fit comfortably and each receives equal analytical depth"
       ],
       "correct": 2,
-      "explain": "Per-file passes give each file consistent depth and a dedicated integration pass recovers the cross-file reasoning, addressing attention dilution directly. The tempting near-miss is a bigger context window: the 14 files likely already fit, and capacity does not fix how attention is distributed across them."
+      "explain": "Per-file passes give each file consistent depth and a dedicated integration pass recovers the cross-file reasoning, addressing attention dilution directly. The tempting near-miss is a bigger context window: the 14 files likely already fit, and capacity does not fix how attention is distributed across them.",
+      "scenario": 5
     },
     {
       "domain": "Claude Code",
       "d": 2,
-      "q": "SCENARIO - Claude Code for Continuous Integration. Your automated review job must never make outbound network calls. A line in CLAUDE.md asking Claude not to use curl has already been ignored twice. What should you do?",
+      "q": "Your automated review job must never make outbound network calls. A line in CLAUDE.md asking Claude not to use curl has already been ignored twice. What should you do?",
       "options": [
         "Move the instruction into a .claude/rules/ file with a paths glob, so it loads whenever the review touches those files",
         "Repeat the same instruction in the job's prompt as well as CLAUDE.md, so the constraint sits in context at decision time",
@@ -514,7 +551,8 @@
         "Have the review report any network access it made, so the pipeline can fail the job afterwards when such a call appears"
       ],
       "correct": 2,
-      "explain": "A hard prohibition belongs in settings permissions as a deny rule, which the tool layer enforces regardless of what the model decides. The near-miss is restating the instruction closer to the model: it raises compliance odds but is still guidance, and guidance has already failed twice here."
+      "explain": "A hard prohibition belongs in settings permissions as a deny rule, which the tool layer enforces regardless of what the model decides. The near-miss is restating the instruction closer to the model: it raises compliance odds but is still guidance, and guidance has already failed twice here.",
+      "scenario": 5
     },
     {
       "domain": "Claude Code",
@@ -527,12 +565,13 @@
         "Arrays merge, but a later scope's allow entry removes any matching deny entry contributed by an earlier scope"
       ],
       "correct": 0,
-      "explain": "Ordinary settings keys take the winning scope's value, whereas permission arrays are unioned across scopes into a single policy evaluated before each tool call — which is why a deny anywhere in the chain still bites. The tempting near-miss says arrays merge but allows cancel denies; merging is right, cancellation is not, since deny takes priority within the merged policy."
+      "explain": "Ordinary settings keys take the winning scope's value, whereas permission arrays are unioned across scopes into a single policy evaluated before each tool call — which is why a deny anywhere in the chain still bites. The tempting near-miss says arrays merge but allows cancel denies; merging is right, cancellation is not, since deny takes priority within the merged policy.",
+      "scenario": 5
     },
     {
       "domain": "Claude Code",
       "d": 3,
-      "q": "SCENARIO - Code Generation with Claude Code. An /audit-config slash command reads dozens of production configuration files. Afterwards the main session is crowded with that raw output and later work degrades. What is the right fix?",
+      "q": "An /audit-config slash command reads dozens of production configuration files. Afterwards the main session is crowded with that raw output and later work degrades. What is the right fix?",
       "options": [
         "Set an allowed-tools list on the command limiting it to Read and Grep, so it draws in less file content on every run",
         "Set context: fork on the command so it runs in an isolated subagent context and returns only its findings to the session",
@@ -540,7 +579,8 @@
         "Split the command into several smaller commands so each invocation only ever loads one slice of the configuration tree"
       ],
       "correct": 1,
-      "explain": "context: fork runs the command in a separate subagent context, so the bulky intermediate reads never enter the main transcript and only the result comes back. The near-miss is the scratchpad file: a real context strategy, but the files are still read into the main session first, so the crowding it is meant to prevent has already happened."
+      "explain": "context: fork runs the command in a separate subagent context, so the bulky intermediate reads never enter the main transcript and only the result comes back. The near-miss is the scratchpad file: a real context strategy, but the files are still read into the main session first, so the crowding it is meant to prevent has already happened.",
+      "scenario": 2
     },
     {
       "domain": "Claude Code",
@@ -553,7 +593,8 @@
         "It runs, because hook decisions are advisory once the session starts in bypassPermissions or skip mode"
       ],
       "correct": 0,
-      "explain": "PreToolUse hooks run before permission-mode evaluation, so a hook deny stops the command even under bypassPermissions, yet hooks can only tighten policy — an allow will not override a settings-level deny. The tempting near-miss agrees on the block but claims symmetry; that inverse does not hold."
+      "explain": "PreToolUse hooks run before permission-mode evaluation, so a hook deny stops the command even under bypassPermissions, yet hooks can only tighten policy — an allow will not override a settings-level deny. The tempting near-miss agrees on the block but claims symmetry; that inverse does not hold.",
+      "scenario": 5
     },
     {
       "domain": "Claude Code",
@@ -566,7 +607,8 @@
         "PreToolUse blocks the dangerous command before it runs; PostToolUse formats after an edit but cannot undo it"
       ],
       "correct": 3,
-      "explain": "PreToolUse is the checkpoint that can stop a call before execution, while PostToolUse fires after success and is the right place to format, lint, or test — but it cannot roll the call back, so anything that must never happen belongs in PreToolUse. The tempting near-miss has PostToolUse reverting violations; it can report and even feed back to Claude, but the tool call has already taken effect."
+      "explain": "PreToolUse is the checkpoint that can stop a call before execution, while PostToolUse fires after success and is the right place to format, lint, or test — but it cannot roll the call back, so anything that must never happen belongs in PreToolUse. The tempting near-miss has PostToolUse reverting violations; it can report and even feed back to Claude, but the tool call has already taken effect.",
+      "scenario": 2
     },
     {
       "domain": "MCP",
@@ -579,7 +621,8 @@
         "The configs are merged field by field, with narrower scopes overriding only the keys they actually define"
       ],
       "correct": 0,
-      "explain": "MCP scope precedence is local over project over user, and a local definition shadows a same-named server at a wider scope without any warning; claude mcp get <name> shows which one resolved. The tempting near-miss is field-by-field merging — plausible given how other settings behave, but same-named servers are shadowed wholesale, not blended."
+      "explain": "MCP scope precedence is local over project over user, and a local definition shadows a same-named server at a wider scope without any warning; claude mcp get <name> shows which one resolved. The tempting near-miss is field-by-field merging — plausible given how other settings behave, but same-named servers are shadowed wholesale, not blended.",
+      "scenario": 4
     },
     {
       "domain": "MCP",
@@ -592,7 +635,8 @@
         "The command has to be run from the repository root, otherwise the generated .mcp.json goes to your home"
       ],
       "correct": 1,
-      "explain": "claude mcp add defaults to local scope, stored in ~/.claude.json keyed by project path and private to you, so -s project is what writes a shareable .mcp.json at the repo root. The tempting near-miss names user scope instead: same file, wrong default, and it would misleadingly suggest the entry applies across all your projects."
+      "explain": "claude mcp add defaults to local scope, stored in ~/.claude.json keyed by project path and private to you, so -s project is what writes a shareable .mcp.json at the repo root. The tempting near-miss names user scope instead: same file, wrong default, and it would misleadingly suggest the entry applies across all your projects.",
+      "scenario": 4
     },
     {
       "domain": "MCP",
@@ -605,7 +649,8 @@
         "Project scope entries require a matching enabledMcpjsonServers entry in the user settings before loading"
       ],
       "correct": 2,
-      "explain": "Servers arriving in a repo's .mcp.json sit in a pending-approval state deliberately, since code from a clone should not auto-connect; /mcp approves them and claude mcp reset-project-choices reopens the prompt. The tempting near-miss says you must re-register each server locally — that would work by accident but misses that approval, not registration, is the missing step."
+      "explain": "Servers arriving in a repo's .mcp.json sit in a pending-approval state deliberately, since code from a clone should not auto-connect; /mcp approves them and claude mcp reset-project-choices reopens the prompt. The tempting near-miss says you must re-register each server locally — that would work by accident but misses that approval, not registration, is the missing step.",
+      "scenario": 4
     },
     {
       "domain": "MCP",
@@ -618,7 +663,8 @@
         "As mcp:<server>/<tool>, e.g. mcp:discord/send-message, mirroring the URI form used by MCP resources"
       ],
       "correct": 2,
-      "explain": "Permission rules and tool lists must use the fully qualified mcp__<server>__<tool> form. The tempting near-miss is the bare tool name on the theory that the namespace resolves at connect time — it does not, and an unqualified entry silently never matches, which is a common reason a rule appears to do nothing."
+      "explain": "Permission rules and tool lists must use the fully qualified mcp__<server>__<tool> form. The tempting near-miss is the bare tool name on the theory that the namespace resolves at connect time — it does not, and an unqualified entry silently never matches, which is a common reason a rule appears to do nothing.",
+      "scenario": 4
     },
     {
       "domain": "Claude API",
@@ -631,7 +677,8 @@
         "default only applies to interactive sessions, while dontAsk is the mode headless SDK runs select by default"
       ],
       "correct": 0,
-      "explain": "default sends tools not covered by allow rules to canUseTool for a runtime decision, while dontAsk turns every would-be prompt into a denial, so pre-approved tools run and nothing else does. The tempting near-miss keeps canUseTool firing under dontAsk with replies auto-approved; in reality the callback is bypassed entirely and the call is refused."
+      "explain": "default sends tools not covered by allow rules to canUseTool for a runtime decision, while dontAsk turns every would-be prompt into a denial, so pre-approved tools run and nothing else does. The tempting near-miss keeps canUseTool firing under dontAsk with replies auto-approved; in reality the callback is bypassed entirely and the call is refused.",
+      "scenario": 1
     },
     {
       "domain": "Claude API",
@@ -644,7 +691,8 @@
         "bypassPermissions only covers file edits, so the read-only surface holds for every other tool category"
       ],
       "correct": 0,
-      "explain": "bypassPermissions approves everything, so an allow list stops functioning as a boundary and unlisted tools run rather than being denied; a genuinely restricted surface needs dontAsk, deny rules, or a PreToolUse hook. The tempting near-miss claims bypass still narrows to allowed_tools and merely skips the prompt — that would make the config safe, but the list does not constrain it."
+      "explain": "bypassPermissions approves everything, so an allow list stops functioning as a boundary and unlisted tools run rather than being denied; a genuinely restricted surface needs dontAsk, deny rules, or a PreToolUse hook. The tempting near-miss claims bypass still narrows to allowed_tools and merely skips the prompt — that would make the config safe, but the list does not constrain it.",
+      "scenario": 1
     },
     {
       "domain": "Claude API",
@@ -657,7 +705,8 @@
         "Subagents cannot spawn subagents, so leave Agent/Task out of their tools and keep fan-out at the orchestrator"
       ],
       "correct": 3,
-      "explain": "Subagents cannot spawn further subagents, so granting them the Agent/Task tool is a dead end and parallel fan-out has to be organised by the orchestrator. The tempting near-miss is simply adding Agent/Task to the subagent's tools — the syntax is valid and the tool name is real, but the nesting it implies is not supported."
+      "explain": "Subagents cannot spawn further subagents, so granting them the Agent/Task tool is a dead end and parallel fan-out has to be organised by the orchestrator. The tempting near-miss is simply adding Agent/Task to the subagent's tools — the syntax is valid and the tool name is real, but the nesting it implies is not supported.",
+      "scenario": 3
     }
   ]
 }
