@@ -12,8 +12,10 @@
 const KEY = 'ccaf:scores';
 const MAX_ENTRIES = 500;
 
-const URL_BASE = process.env.KV_REST_API_URL;
-const TOKEN = process.env.KV_REST_API_TOKEN;
+// Older Vercel KV / Upstash connections inject KV_REST_API_*; newer Upstash
+// Marketplace connections inject UPSTASH_REDIS_REST_*. Accept either.
+const URL_BASE = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+const TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
 
 async function redis(command) {
   if (!URL_BASE || !TOKEN) {

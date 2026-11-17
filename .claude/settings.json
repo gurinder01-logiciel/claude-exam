@@ -4,7 +4,10 @@
       {
         "matcher": "Edit|Write|MultiEdit",
         "hooks": [
-          { "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard-snapshot.mjs" }
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard-snapshot.mjs"
+          }
         ]
       }
     ],
@@ -12,9 +15,23 @@
       {
         "matcher": "Edit|Write|MultiEdit",
         "hooks": [
-          { "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/check-bank.mjs" }
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/check-bank.mjs"
+          }
         ]
       }
     ]
+  },
+  "extraKnownMarketplaces": {
+    "upstash": {
+      "source": {
+        "source": "github",
+        "repo": "upstash/skills"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "upstash@upstash": true
   }
 }
