@@ -162,14 +162,21 @@ marked ✓ or ✗, the correct option(s) are highlighted, and the explanation is
 In this mode **your first pick is final**. Without that lock, seeing "wrong" and
 switching would make the score meaningless.
 
-During an exam the right-hand panel (`#prep`, which shows prep resources on the
-start screen) becomes a numbered question grid: click a number to jump to it.
+During an exam the right-hand panel (`#prep`) shows a numbered question grid:
+click a number to jump to it. It also shows "Question N / M", so on wide screens
+the count and progress bar above the card are hidden as duplicates.
 With feedback on, cells turn green/red and a live pass percentage (correct ÷
 answered, against the 72% pass mark) is shown. With feedback off, cells only mark
 "answered", so real-exam mode gives nothing away. `renderExam()` calls
 `syncPrep()` to keep it current.
 
 Turn it off for real exam conditions.
+
+**Start screen.** Compact cards so every exam fits on one screen: the Exam Path
+as three cards in a row, the Mock Exam Bank as a tile grid, then the quiz
+builder. How to prepare is a separate screen (📚 button by the title), and the
+team leaderboard sits at the bottom of the page (`.board-dock`, hidden during an
+exam on wide screens; still the 🏆 drawer at 1080px and below).
 
 **Moving between questions.** Besides Prev/Next under the card, round ‹ › arrows
 sit on either side of the question card, pinned at mid-screen (sticky inside a

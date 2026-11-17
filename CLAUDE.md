@@ -86,12 +86,16 @@ One mutable `state` object (`screen`, `questions`, `answers`, `struck`, `flagged
 rewrites `#app` wholesale and re-attaches listeners. There is no diffing — after
 mutating `state`, call the matching render.
 
-The leaderboard (`#board`, left) and the How-to-prepare panel (`#prep`, right)
-are siblings of `#app`, so `render*()` never touches them. They're kept in step
-by `syncUserMenu()` — which also calls `syncPrep()` — invoked at the end of every
-render. `#prep` is context-dependent: outside an exam it shows prep links from
-`resources.json` (loaded by `loadResources()`, hidden silently on failure);
-during `exam`/`paused` it shows `renderPalette()`, the numbered question grid.
+The leaderboard (`#board`, in `.board-dock` below the page), the right panel
+(`#prep`) and the left column (`.left-col` → `#explainSide`) are siblings of
+`#app`, so `render*()` never touches them. They're kept in step by
+`syncUserMenu()` — which also calls `syncPrep()` — invoked at the end of every
+render. `syncPrep()` stamps `body[data-screen]`, which CSS uses to show the left
+column only during an exam and widen the start screen. `#prep` is empty outside
+an exam; during `exam`/`paused` it shows `renderPalette()`, the numbered question
+grid. How to prepare (`resources.json`, loaded by `loadResources()`, hidden
+silently on failure) is its own screen, `renderPrepPage()`, opened from the
+button on the start screen.
 Adding chrome outside `#app` means wiring it in there too. See DOCS.md
 § Page layout.
 

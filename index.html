@@ -47,6 +47,13 @@
   }
   .explain-side .fb-panel { margin-top: 0; background: var(--surface); border: 1px solid var(--border); border-left-width: 3px; box-shadow: 0 2px 12px rgba(46,46,46,0.05); }
   .explain-side .section-label { margin: 4px 0 8px; }
+  /* The left column only exists during an exam; elsewhere the main column is centred. */
+  body:not([data-screen="exam"]):not([data-screen="paused"]) .left-col { display: none; }
+  body:not([data-screen="exam"]):not([data-screen="paused"]) .shell .wrap { margin: 0 auto; }
+  body[data-screen="start"] .shell .wrap { max-width: 1180px; }
+  /* Leaderboard below the page content; hidden during an exam on wide screens. */
+  .board-dock { max-width: 1180px; margin: 10px auto 40px; padding: 0 16px; }
+  @media (min-width: 1081px) { body[data-screen="exam"] .board-dock, body[data-screen="paused"] .board-dock { display: none; } }
   /* Wide screens show the explanation in the left column, so hide the inline copy. */
   @media (min-width: 1081px) { .fb-inline { display: none; } }
   @media (max-width: 1080px) {
@@ -215,11 +222,11 @@
   }
   .levels { display: grid; gap: 12px; }
   /* Start-screen sections */
-  .sec-head { margin: 30px 0 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
-  .sec-title { font-family: var(--font-display); font-size: 1.25rem; font-weight: 800; }
-  .sec-sub { font-size: 0.82rem; color: var(--text-dim); margin-top: 3px; }
+  .sec-head { margin: 18px 0 10px; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .sec-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 800; }
+  .sec-sub { font-size: 0.78rem; color: var(--text-dim); }
   /* Custom quiz builder */
-  .builder { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--lime); border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; display: grid; gap: 14px; }
+  .builder { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--lime); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; display: grid; gap: 10px; }
   .bq-title { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; }
   .bq-sub, .bq-foot { font-size: 0.78rem; color: var(--text-dim); margin-top: 2px; }
   .bq-row { display: grid; grid-template-columns: 90px 1fr; gap: 10px; align-items: start; }
@@ -248,10 +255,31 @@
   }
   .badge-ready { background: var(--lime-dim); color: var(--lime); }
   .badge-soon { background: #00000008; color: var(--text-dim); }
-  .lc-num {
-    font-family: var(--font-mono); font-size: 1.6rem; font-weight: 700; color: var(--lime);
-    opacity: 0.5; min-width: 40px;
-  }
+  .lc-num { font-family: var(--font-mono); font-size: 1.15rem; font-weight: 700; color: var(--lime); }
+  /* Compact start screen: every exam on one screen */
+  .hero-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 18px 0 4px; }
+  .hero-title { font-family: var(--font-display); font-size: 1.7rem; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 8px; }
+  .hero-title span { color: var(--lime); }
+  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .hero-chips .chip { padding: 4px 11px; font-size: 0.76rem; }
+  .prep-link { white-space: nowrap; }
+  .fb-toggle.compact { padding: 9px 14px; margin-top: 12px; }
+  .fb-toggle.compact .fb-d { display: inline; margin: 0; }
+  .levels.path { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .levels.bank { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); margin-bottom: 12px; }
+  .levels .level-card { padding: 12px 14px; gap: 6px; border-radius: 12px; }
+  .levels .lc-top { gap: 8px; }
+  .levels .lc-title { font-family: var(--font-display); font-size: 0.98rem; font-weight: 700; line-height: 1.25; }
+  .levels .lc-desc { font-size: 0.76rem; color: var(--text-dim); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .levels .lc-meta { font-size: 0.72rem; color: var(--text-dim); }
+  .levels .lc-meta b { color: var(--text); }
+  .levels .lc-badge { font-size: 0.64rem; padding: 3px 8px; border-radius: 20px; font-weight: 700; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.04em; }
+  .levels .bp-bar { height: 5px; margin-top: 2px; }
+  .start-foot { color: var(--text-dim); font-size: 0.8rem; text-align: center; margin: 18px 0 8px; }
+  .start-foot b { color: var(--text); }
+  .start-foot a { color: var(--lime); text-decoration: none; font-weight: 600; }
+  .prep-page { margin-top: 18px; }
+  @media (max-width: 760px) { .levels.path { grid-template-columns: 1fr; } }
   /* Blueprint (scenario mix) */
   .bp-bar { display: flex; height: 8px; border-radius: 5px; overflow: hidden; background: var(--surface-2); }
   .bp-seg { height: 100%; }
@@ -266,6 +294,9 @@
     display: inline-block; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em;
     color: var(--lime); background: var(--lime-dim); padding: 4px 10px; border-radius: 20px; font-weight: 700;
   }
+  /* With the palette on the right (wide screens) the question count and progress
+     bar repeat it, so they hide; the palette shows "Question N / M" instead. */
+  @media (min-width: 1341px) { .qmeta, .progress-bar { display: none; } .exam-gap { height: 14px; } }
   .progress-bar { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 20px; }
   .progress-fill { height: 100%; background: var(--lime); transition: width .3s ease; }
   .card {
@@ -479,9 +510,13 @@
   <div class="wrap" id="app"></div>
   <aside class="prep" id="prep" hidden></aside>
   <div class="left-col">
-    <aside class="sidebar" id="board"></aside>
     <aside class="explain-side" id="explainSide" hidden></aside>
   </div>
+</div>
+<!-- Leaderboard sits below the page content (it's secondary). On narrow screens
+     .sidebar becomes the 🏆 slide-out drawer, which works from here too. -->
+<div class="board-dock">
+  <aside class="sidebar" id="board"></aside>
 </div>
 <button class="board-toggle" id="boardToggle" aria-label="Toggle leaderboard">🏆</button>
 <div class="user-menu" id="userMenu" hidden>
@@ -1246,7 +1281,8 @@ function renderResources() {
 
 // The prep panel is the right-hand column of the shell, so it lives outside #app
 // and is synced on every screen transition rather than rendered into the page.
-// Start screen shows prep resources; during an exam it becomes the question palette.
+// During an exam it holds the question palette; on other screens it is empty and
+// hidden. It also stamps body[data-screen] for screen-specific layout.
 function syncPrep() {
   const panel = document.getElementById('prep');
   if (!panel) return;
@@ -1259,8 +1295,12 @@ function syncPrep() {
       renderExam();
     });
   }
-  const html = state.screen === 'start' ? renderResources()
-    : (state.screen === 'exam' || state.screen === 'paused') ? renderPalette() : '';
+  // CSS keys the layout off this: the left column only exists during an exam,
+  // and the start screen gets a wider main column.
+  document.body.dataset.screen = state.screen;
+  // Right panel: the question palette during an exam, nothing otherwise
+  // (How to prepare is its own screen now — renderPrepPage()).
+  const html = (state.screen === 'exam' || state.screen === 'paused') ? renderPalette() : '';
   panel.innerHTML = html;
   panel.toggleAttribute('hidden', !html);
   // The left-column explanation belongs to the exam screen only.
@@ -1270,16 +1310,11 @@ function syncPrep() {
 
 function renderStart() {
   stopTimer();
+  state.screen = 'start';
   const scenarioColors = ['#26d07c','#3b9ae1','#f0a828','#a678e2','#e0524d','#20c4b8'];
+  // Compact card: everything the picker needs in a few lines, so every exam fits
+  // on one screen. The full description sits in the tooltip.
   const levelCard = ([key, lv], i) => {
-    const bp = lv.section === 'path' ? (lv.blueprint || []) : []; // bank cards stay compact
-    const bpBar = bp.length ? `
-      <div class="bp-bar">
-        ${bp.map((s, si) => `<div class="bp-seg" style="width:${s.pct}%;background:${scenarioColors[si % scenarioColors.length]}" title="${s.label} ${s.pct}%"></div>`).join('')}
-      </div>
-      <div class="bp-legend">
-        ${bp.map((s, si) => `<span class="bp-item"><span class="bp-dot" style="background:${scenarioColors[si % scenarioColors.length]}"></span>${s.label} ${s.pct}%</span>`).join('')}
-      </div>` : '';
     const unlocked = isUnlocked(lv);
     const available = lv.ready && unlocked;
     const requiredName = lv.requires && LEVELS[lv.requires] ? LEVELS[lv.requires].name : lv.requires;
@@ -1287,28 +1322,30 @@ function renderStart() {
     if (!lv.ready) { badge = 'Soon'; badgeClass = 'badge-soon'; }
     else if (!unlocked) { badge = '🔒 Locked'; badgeClass = 'badge-soon'; }
     else { badge = (lv.count || lv.questions.length) + ' Qs · ' + Math.round(durationFor(lv)/60) + ' min'; badgeClass = 'badge-ready'; }
+    let meta = '';
+    if (!unlocked && lv.ready) {
+      meta = `Finish <b>${escapeHtml(requiredName || '')}</b> to unlock`;
+    } else if (available) {
+      const bank = lv.pool ? Object.values(LEVELS).filter(x => !x.pool && x.inPool).flatMap(x => x.questions) : lv.questions;
+      const n = Math.min(lv.count || bank.length, bank.length);
+      const c = { 1: 0, 2: 0, 3: 0 };
+      buildRampedPaper(bank, n).forEach(q => c[q.d || 2]++);
+      const ramp = [c[1] && `${c[1]} easy`, c[2] && `${c[2]} medium`, c[3] && `${c[3]} hard`].filter(Boolean).join(' · ');
+      meta = (bank.length > n ? `Fresh draw from ${bank.length} · ` : '') + ramp;
+    }
+    const bp = lv.section !== 'bank' ? (lv.blueprint || []) : [];
+    const bpBar = bp.length ? `<div class="bp-bar" title="${bp.map(s => `${s.label} ${s.pct}%`).join(' · ')}">
+        ${bp.map((s, si) => `<div class="bp-seg" style="width:${s.pct}%;background:${scenarioColors[si % scenarioColors.length]}"></div>`).join('')}
+      </div>` : '';
     return `
-    <button class="level-card" ${available ? '' : 'disabled'} data-level="${key}">
+    <button class="level-card" ${available ? '' : 'disabled'} data-level="${key}" title="${escapeHtml(lv.desc || '')}">
       <div class="lc-top">
-        <div class="lc-num">${String(i+1).padStart(2,'0')}</div>
-        <div style="flex:1">
-          <div class="lc-title">${lv.name}</div>
-          <div class="lc-desc">${lv.desc}</div>
-        </div>
-        <div class="lc-badge ${badgeClass}">${badge}</div>
+        <span class="lc-num">${String(i + 1).padStart(2, '0')}</span>
+        <span class="lc-badge ${badgeClass}">${badge}</span>
       </div>
-      ${!unlocked && lv.ready
-        ? `<div style="font-size:0.78rem;color:var(--text-dim);margin-top:-6px">Finish <b style="color:var(--text)">${escapeHtml(requiredName || '')}</b> to unlock this level.</div>`
-        : ''}
-      ${available ? (() => {
-        const bank = lv.pool ? Object.values(LEVELS).filter(x=>!x.pool && x.inPool).flatMap(x=>x.questions) : lv.questions;
-        const n = Math.min(lv.count || bank.length, bank.length);
-        const paper = buildRampedPaper(bank, n);
-        const c = { 1:0, 2:0, 3:0 };
-        paper.forEach(q => c[q.d || 2]++);
-        const drawn = bank.length > n ? `Drawn fresh from a bank of ${bank.length} — a different paper every sitting. ` : '';
-        return `<div style="font-size:0.74rem;color:var(--text-dim);margin-top:-6px">${drawn}Difficulty ramp: <b style="color:var(--text)">${c[1]} easy → ${c[2]} medium → ${c[3]} hard</b></div>`;
-      })() : ''}
+      <div class="lc-title">${lv.name}</div>
+      ${lv.section !== 'bank' ? `<div class="lc-desc">${lv.desc}</div>` : ''}
+      ${meta ? `<div class="lc-meta">${meta}</div>` : ''}
       ${bpBar}
     </button>`;
   };
@@ -1317,41 +1354,38 @@ function renderStart() {
   const bankCards = entries.filter(([, lv]) => lv.section === 'bank').map(levelCard).join('');
 
   app.innerHTML = `
-    <div class="hero">
-      <h1>CCAR-F <span>Exam Simulator</span></h1>
-      <p>A full mock of the Claude Certified Architect – Foundations exam (code: CCAR-F). Scenario-based, timed, and built to mirror the real thing.</p>
-      <div class="meta-row">
-        <span class="chip"><b>120 min</b> · 60 items</span>
-        <span class="chip"><b>4 of 6</b> scenarios</span>
-        <span class="chip"><b>Scenario-based</b></span>
-        <span class="chip">Pass: <b>720/1000</b></span>
+    <div class="hero-row">
+      <div>
+        <h1 class="hero-title">CCAR-F <span>Exam Simulator</span></h1>
+        <div class="hero-chips">
+          <span class="chip"><b>120 min</b> · 60 items</span>
+          <span class="chip"><b>4 of 6</b> scenarios</span>
+          <span class="chip">Pass <b>720/1000</b></span>
+          <span class="chip">2 min / question · pausable</span>
+        </div>
       </div>
+      ${RESOURCES ? `<button class="btn ghost prep-link" id="prepLink">📚 How to prepare</button>` : ''}
     </div>
-    <button class="fb-toggle" id="fbToggle">
-      <span>
-        <span class="fb-t">Instant feedback</span>
+    <button class="fb-toggle compact" id="fbToggle">
+      <span><span class="fb-t">Instant feedback ${state.instantFeedback ? 'on' : 'off'}</span>
         <span class="fb-d">${state.instantFeedback
-          ? 'On — each answer is marked right or wrong straight away, with the correct answer and the explanation. Your first pick is final.'
-          : 'Off — real exam conditions. You only find out how you did at the end.'}</span>
-      </span>
+          ? ' — answers are marked straight away with the correct answer and explanation; first pick is final.'
+          : ' — real exam conditions; results only at the end.'}</span></span>
       <span class="switch ${state.instantFeedback ? 'on' : ''}"></span>
     </button>
     <div class="sec-head">
       <div class="sec-title">Exam Path</div>
-      <div class="sec-sub">Step by step: warm up, practise by scenario, then sit the full mock. Each level unlocks the next.</div>
+      <div class="sec-sub">Warm up, practise by scenario, then sit the full mock — each level unlocks the next.</div>
     </div>
-    <div class="levels">${pathCards}</div>
+    <div class="levels path">${pathCards}</div>
     ${bankCards ? `
     <div class="sec-head">
       <div class="sec-title">Mock Exam Bank</div>
-      <div class="sec-sub">Complete practice exams, always unlocked, plus a quiz builder that targets the domains you want to drill.</div>
+      <div class="sec-sub">Complete practice exams, always unlocked — or build a quiz on the domains you want to drill.</div>
     </div>
-    ${renderBuilder()}
-    <div class="levels">${bankCards}</div>` : ''}
-    <p style="color:var(--text-dim);font-size:0.82rem;text-align:center;margin-top:24px;line-height:1.6">
-      Every level runs at the real exam's pace — 2 minutes per question. The timer supports <b style="color:var(--text)">pause / resume</b>, so the clock stops while you're away.
-      <br><br>Taking this as <b style="color:var(--text)">${escapeHtml(user.name || '—')}</b> · <a href="#" id="changeName" style="color:var(--lime);text-decoration:none;font-weight:600">change name</a>
-    </p>
+    <div class="levels bank">${bankCards}</div>
+    ${renderBuilder()}` : ''}
+    <p class="start-foot">Taking this as <b>${escapeHtml(user.name || '—')}</b> · <a href="#" id="changeName">change name</a></p>
   `;
 
   app.querySelectorAll('.level-card:not(:disabled)').forEach(btn => {
@@ -1362,11 +1396,27 @@ function renderStart() {
     state.instantFeedback = !state.instantFeedback;
     renderStart();
   });
+  document.getElementById('prepLink')?.addEventListener('click', renderPrepPage);
   document.getElementById('changeName')?.addEventListener('click', (e) => {
     e.preventDefault();
     renderNameGate(user.name);
   });
   syncUserMenu();
+}
+
+// How to prepare: its own screen (it used to be a right-hand panel on the start
+// screen), reached from the button next to the title.
+function renderPrepPage() {
+  state.screen = 'prep';
+  app.innerHTML = `
+    <div class="topbar">
+      <div class="brand">CCAR-F <span>How to prepare</span></div>
+      <button class="icon-btn" id="prepBack">← Back to exams</button>
+    </div>
+    <div class="prep-page">${renderResources()}</div>`;
+  document.getElementById('prepBack').addEventListener('click', () => { renderStart(); window.scrollTo({ top: 0 }); });
+  syncUserMenu();
+  window.scrollTo({ top: 0 });
 }
 
 // ===================== CUSTOM QUIZ BUILDER =====================
@@ -1542,6 +1592,7 @@ function renderExam() {
       <span class="domain-tag">${q.domain}</span>
     </div>
     <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+    <div class="exam-gap"></div>
 
     <div class="q-stage">
     <div class="side-rail left">
@@ -1672,7 +1723,8 @@ function renderPalette() {
     return `<button class="pal-cell${cls}" data-jump="${i}">${i + 1}</button>`;
   }).join('');
   const answered = qs.length - unansweredCount();
-  let stats = `<div class="pal-stat"><span>Answered</span><b>${answered} / ${qs.length}</b></div>`;
+  let stats = `<div class="pal-stat"><span>Question</span><b>${state.current + 1} / ${qs.length}</b></div>
+    <div class="pal-stat"><span>Answered</span><b>${answered} / ${qs.length}</b></div>`;
   if (fbOn) {
     const acc = answered ? Math.round(correct / answered * 100) : 0;
     const onTrack = acc >= 72; // 720/1000 pass mark
