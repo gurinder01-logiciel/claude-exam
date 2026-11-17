@@ -178,6 +178,13 @@ on the last question the right arrow becomes ✓ Submit. ←/→ on the keyboard
 same, except while typing or when a pause/confirm overlay is open. Every move
 scrolls back to the top. The side arrows hide below 760px wide.
 
+**Where the explanation shows.** Wider than 1080px, the verdict, correct answer
+and explanation appear in the left column under the leaderboard (`#explainSide`,
+inside `.left-col`, which is the sticky element and scrolls if both are tall), so
+the question card stays short. At 1080px and below, where the leaderboard becomes
+a drawer, the same panel renders inline under the options. `renderExam()` writes
+both copies and CSS shows one; `syncPrep()` clears the side copy off the exam screen.
+
 ### Results
 - Score out of 1000, with pass/fail against 720
 - Correct / wrong / skipped counts and time used

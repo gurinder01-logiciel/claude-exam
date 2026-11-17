@@ -39,8 +39,22 @@
   /* Shell: leaderboard sidebar (left, via order:-1) + main column + prep panel (right) */
   .shell { display: flex; gap: 24px; max-width: 1500px; margin: 0 auto; align-items: flex-start; }
   .shell .wrap { flex: 1; min-width: 0; margin: 0; max-width: 880px; }
-  .sidebar {
+  /* Left column: leaderboard, plus the explanation panel during an exam. The
+     column (not the board) is sticky and scrolls if both together are too tall. */
+  .left-col {
     width: 290px; flex-shrink: 0; position: sticky; top: 20px; order: -1;
+    max-height: calc(100vh - 40px); overflow-y: auto; display: flex; flex-direction: column; gap: 14px;
+  }
+  .explain-side .fb-panel { margin-top: 0; background: var(--surface); border: 1px solid var(--border); border-left-width: 3px; box-shadow: 0 2px 12px rgba(46,46,46,0.05); }
+  .explain-side .section-label { margin: 4px 0 8px; }
+  /* Wide screens show the explanation in the left column, so hide the inline copy. */
+  @media (min-width: 1081px) { .fb-inline { display: none; } }
+  @media (max-width: 1080px) {
+    .left-col { width: auto; position: static; max-height: none; overflow: visible; display: block; }
+    .explain-side { display: none !important; }
+  }
+  .sidebar {
+    width: 100%;
     background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
     padding: 20px; box-shadow: 0 2px 12px rgba(46,46,46,0.05);
   }
@@ -464,7 +478,10 @@
 <div class="shell">
   <div class="wrap" id="app"></div>
   <aside class="prep" id="prep" hidden></aside>
-  <aside class="sidebar" id="board"></aside>
+  <div class="left-col">
+    <aside class="sidebar" id="board"></aside>
+    <aside class="explain-side" id="explainSide" hidden></aside>
+  </div>
 </div>
 <button class="board-toggle" id="boardToggle" aria-label="Toggle leaderboard">🏆</button>
 <div class="user-menu" id="userMenu" hidden>
@@ -1246,6 +1263,9 @@ function syncPrep() {
     : (state.screen === 'exam' || state.screen === 'paused') ? renderPalette() : '';
   panel.innerHTML = html;
   panel.toggleAttribute('hidden', !html);
+  // The left-column explanation belongs to the exam screen only.
+  const side = document.getElementById('explainSide');
+  if (side && state.screen !== 'exam' && state.screen !== 'paused') { side.innerHTML = ''; side.hidden = true; }
 }
 
 function renderStart() {
@@ -1489,6 +1509,23 @@ function renderExam() {
   // Instant feedback locks the item once it is fully answered.
   const locked = state.instantFeedback && isAnswered(q, ans);
   const letters = ['A','B','C','D','E'];
+  // Verdict + correct answer + explanation, once the question is locked. It is
+  // rendered twice: in the left column (#explainSide) on wide screens, and
+  // inline under the options on narrow ones. CSS shows exactly one of them.
+  const fbHtml = locked ? (() => {
+    const right = isRight(q, ans);
+    const answerText = q.correct.map(i => `<b>${letters[i]}.</b> ${q.options[i]}`).join('<br>');
+    return `<div class="fb-panel ${right ? 'ok' : 'no'}">
+         <div class="fb-verdict">${right ? '✓ Correct' : '✗ Incorrect'}</div>
+         ${right ? '' : `<div class="fb-answer">Correct answer${q.correct.length > 1 ? 's' : ''}:<br>${answerText}</div>`}
+         ${q.explain ? `<div class="fb-explain">${q.explain}</div>` : ''}
+       </div>`;
+  })() : '';
+  const side = document.getElementById('explainSide');
+  if (side) {
+    side.innerHTML = fbHtml ? `<div class="section-label">Explanation · Question ${state.current + 1}</div>${fbHtml}` : '';
+    side.toggleAttribute('hidden', !fbHtml);
+  }
 
   app.innerHTML = `
     <div class="topbar">
@@ -1536,15 +1573,7 @@ function renderExam() {
             <button class="strike-btn" data-strike="${i}" title="Strike out">✕</button>
           </div>`;
       }).join('')}
-      ${locked ? (() => {
-        const right = isRight(q, ans);
-        const answerText = q.correct.map(i => `<b>${letters[i]}.</b> ${q.options[i]}`).join('<br>');
-        return `<div class="fb-panel ${right ? 'ok' : 'no'}">
-             <div class="fb-verdict">${right ? '✓ Correct' : '✗ Incorrect'}</div>
-             ${right ? '' : `<div class="fb-answer">Correct answer${q.correct.length > 1 ? 's' : ''}:<br>${answerText}</div>`}
-             ${q.explain ? `<div class="fb-explain">${q.explain}</div>` : ''}
-           </div>`;
-      })() : ''}
+      ${fbHtml ? `<div class="fb-inline">${fbHtml}</div>` : ''}
       <div style="font-size:0.76rem;color:var(--text-dim);margin-top:6px">Tip: right-click (or tap ✕ on) an option to cross it out as "definitely not this" — it stays crossed for review.</div>
     </div>
     <div class="side-rail right">
