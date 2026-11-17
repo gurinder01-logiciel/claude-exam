@@ -53,6 +53,8 @@
   body[data-screen="start"] .shell .wrap { max-width: 1180px; }
   /* Leaderboard below the page content; hidden during an exam on wide screens. */
   .board-dock { max-width: 1180px; margin: 10px auto 40px; padding: 0 16px; }
+  /* Not on the How to prepare page (incl. the 🏆 drawer button on narrow screens). */
+  body[data-screen="prep"] .board-dock, body[data-screen="prep"] .board-toggle { display: none !important; }
   @media (min-width: 1081px) { body[data-screen="exam"] .board-dock, body[data-screen="paused"] .board-dock { display: none; } }
   /* Wide screens show the explanation in the left column, so hide the inline copy. */
   @media (min-width: 1081px) { .fb-inline { display: none; } }
