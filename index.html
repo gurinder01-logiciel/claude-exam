@@ -200,6 +200,23 @@
     color: var(--text-dim); margin-bottom: 12px; font-weight: 600;
   }
   .levels { display: grid; gap: 12px; }
+  /* Start-screen sections */
+  .sec-head { margin: 30px 0 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .sec-title { font-family: var(--font-display); font-size: 1.25rem; font-weight: 800; }
+  .sec-sub { font-size: 0.82rem; color: var(--text-dim); margin-top: 3px; }
+  /* Custom quiz builder */
+  .builder { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--lime); border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; display: grid; gap: 14px; }
+  .bq-title { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; }
+  .bq-sub, .bq-foot { font-size: 0.78rem; color: var(--text-dim); margin-top: 2px; }
+  .bq-row { display: grid; grid-template-columns: 90px 1fr; gap: 10px; align-items: start; }
+  .bq-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); padding-top: 8px; }
+  .bq-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .bq-chip { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); border-radius: 999px; padding: 6px 13px; font: 600 0.8rem/1.2 inherit; font-family: inherit; cursor: pointer; }
+  .bq-chip:hover { border-color: var(--lime); }
+  .bq-chip.on { background: var(--lime-dim); border-color: var(--lime); color: var(--lime); }
+  .bq-n { font-family: var(--font-mono); font-size: 0.72rem; opacity: 0.7; }
+  .bq-go { justify-self: start; }
+  @media (max-width: 560px) { .bq-row { grid-template-columns: 1fr; } .bq-label { padding-top: 0; } }
   .level-card {
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
     padding: 18px 20px; cursor: pointer; transition: all .18s; text-align: left;
@@ -377,6 +394,7 @@
     width: 320px; flex-shrink: 0; position: sticky; top: 20px;
     max-height: calc(100vh - 40px); overflow-y: auto;
     padding-top: 38px; /* clears the fixed account avatar in the top-right corner */
+    padding-right: 12px; /* keeps cards off the window edge */
   }
   .prep .section-label { margin-top: 0; }
   /* Exam-time question palette (lives in .prep) */
@@ -387,8 +405,10 @@
   .pal-pct.ok { color: var(--good); }
   .pal-pct.no { color: var(--bad); }
   .pal-sub { font-size: 0.74rem; color: var(--text-dim); margin-bottom: 8px; }
-  .pal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 6px; }
-  .pal-cell { height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: var(--font-mono); font-size: 0.8rem; font-weight: 600; cursor: pointer; position: relative; }
+  /* Fixed 6 columns that shrink with the panel; the padding keeps the current
+     cell's outline from being clipped by the panel's overflow. */
+  .pal-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; padding: 3px; }
+  .pal-cell { height: 34px; min-width: 0; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: var(--font-mono); font-size: 0.8rem; font-weight: 600; cursor: pointer; position: relative; }
   .pal-cell:hover { border-color: var(--lime); }
   .pal-cell.answered { background: var(--lime-dim); border-color: var(--lime); }
   .pal-cell.right { background: var(--good); border-color: var(--good); color: #fff; }
@@ -487,6 +507,10 @@ async function loadLevels() {
       ready: lv.ready !== false,
       requires: lv.requires || null,
       pool: Boolean(lv.pool),
+      // Start-screen section ("path" = gated exam path, "bank" = mock exam bank),
+      // and whether a pool level (Full Mock Exam) may draw from this bank.
+      section: lv.section || 'path',
+      inPool: lv.inPool !== false,
       count: lv.count,
       scenarioPick: lv.scenarioPick || null,
       scenarioWeights: lv.scenarioWeights || null,
@@ -660,7 +684,7 @@ function buildQuestions(level) {
   let bank;
   if (level.pool) {
     bank = [];
-    Object.values(LEVELS).forEach(lv => { if (!lv.pool) bank.push(...lv.questions); });
+    Object.values(LEVELS).forEach(lv => { if (!lv.pool && lv.inPool) bank.push(...lv.questions); });
   } else {
     bank = level.questions;
   }
@@ -1205,8 +1229,8 @@ function syncPrep() {
 function renderStart() {
   stopTimer();
   const scenarioColors = ['#26d07c','#3b9ae1','#f0a828','#a678e2','#e0524d','#20c4b8'];
-  const levelCards = Object.entries(LEVELS).map(([key, lv], i) => {
-    const bp = lv.blueprint || [];
+  const levelCard = ([key, lv], i) => {
+    const bp = lv.section === 'path' ? (lv.blueprint || []) : []; // bank cards stay compact
     const bpBar = bp.length ? `
       <div class="bp-bar">
         ${bp.map((s, si) => `<div class="bp-seg" style="width:${s.pct}%;background:${scenarioColors[si % scenarioColors.length]}" title="${s.label} ${s.pct}%"></div>`).join('')}
@@ -1235,7 +1259,7 @@ function renderStart() {
         ? `<div style="font-size:0.78rem;color:var(--text-dim);margin-top:-6px">Finish <b style="color:var(--text)">${escapeHtml(requiredName || '')}</b> to unlock this level.</div>`
         : ''}
       ${available ? (() => {
-        const bank = lv.pool ? Object.values(LEVELS).filter(x=>!x.pool).flatMap(x=>x.questions) : lv.questions;
+        const bank = lv.pool ? Object.values(LEVELS).filter(x=>!x.pool && x.inPool).flatMap(x=>x.questions) : lv.questions;
         const n = Math.min(lv.count || bank.length, bank.length);
         const paper = buildRampedPaper(bank, n);
         const c = { 1:0, 2:0, 3:0 };
@@ -1245,7 +1269,10 @@ function renderStart() {
       })() : ''}
       ${bpBar}
     </button>`;
-  }).join('');
+  };
+  const entries = Object.entries(LEVELS);
+  const pathCards = entries.filter(([, lv]) => lv.section !== 'bank').map(levelCard).join('');
+  const bankCards = entries.filter(([, lv]) => lv.section === 'bank').map(levelCard).join('');
 
   app.innerHTML = `
     <div class="hero">
@@ -1267,8 +1294,18 @@ function renderStart() {
       </span>
       <span class="switch ${state.instantFeedback ? 'on' : ''}"></span>
     </button>
-    <div class="section-label">Choose your level</div>
-    <div class="levels">${levelCards}</div>
+    <div class="sec-head">
+      <div class="sec-title">Exam Path</div>
+      <div class="sec-sub">Step by step: warm up, practise by scenario, then sit the full mock. Each level unlocks the next.</div>
+    </div>
+    <div class="levels">${pathCards}</div>
+    ${bankCards ? `
+    <div class="sec-head">
+      <div class="sec-title">Mock Exam Bank</div>
+      <div class="sec-sub">Complete practice exams, always unlocked, plus a quiz builder that targets the domains you want to drill.</div>
+    </div>
+    ${renderBuilder()}
+    <div class="levels">${bankCards}</div>` : ''}
     <p style="color:var(--text-dim);font-size:0.82rem;text-align:center;margin-top:24px;line-height:1.6">
       Every level runs at the real exam's pace — 2 minutes per question. The timer supports <b style="color:var(--text)">pause / resume</b>, so the clock stops while you're away.
       <br><br>Taking this as <b style="color:var(--text)">${escapeHtml(user.name || '—')}</b> · <a href="#" id="changeName" style="color:var(--lime);text-decoration:none;font-weight:600">change name</a>
@@ -1278,6 +1315,7 @@ function renderStart() {
   app.querySelectorAll('.level-card:not(:disabled)').forEach(btn => {
     btn.addEventListener('click', () => beginExam(btn.dataset.level));
   });
+  wireBuilder();
   document.getElementById('fbToggle')?.addEventListener('click', () => {
     state.instantFeedback = !state.instantFeedback;
     renderStart();
@@ -1289,11 +1327,123 @@ function renderStart() {
   syncUserMenu();
 }
 
+// ===================== CUSTOM QUIZ BUILDER =====================
+// Draws a paper from every non-pool level, filtered to the chosen official
+// domains. The original banks use loose domain labels, so DOMAIN_OF maps the
+// ones that clearly belong to an official domain; labels that don't (Claude API,
+// Support Agent, Code Gen, Dev Productivity) are left out of custom quizzes.
+const OFFICIAL_DOMAINS = [
+  { key: 'agentic', label: 'Agentic Architecture', name: 'Agentic Architecture & Orchestration', pct: 27 },
+  { key: 'tools',   label: 'Tool Design & MCP',    name: 'Tool Design & MCP Integration',        pct: 18 },
+  { key: 'code',    label: 'Claude Code',          name: 'Claude Code Config & Workflows',       pct: 20 },
+  { key: 'prompt',  label: 'Prompt & Output',      name: 'Prompt Engineering & Structured Output', pct: 20 },
+  { key: 'context', label: 'Context & Reliability', name: 'Context Management & Reliability',    pct: 15 }
+];
+const DOMAIN_OF = {
+  'Agentic Architecture & Orchestration': 'agentic', 'Agentic Arch': 'agentic', 'Multi-Agent': 'agentic',
+  'Tool Design & MCP Integration': 'tools', 'Tool Design': 'tools', 'MCP': 'tools',
+  'Claude Code Config & Workflows': 'code', 'Claude Code': 'code', 'CI/CD': 'code',
+  'Prompt Engineering & Structured Output': 'prompt', 'Structured Output': 'prompt', 'Prompt Eng': 'prompt',
+  'Context Management & Reliability': 'context', 'Context Mgmt': 'context'
+};
+const BUILDER_SIZES = [10, 20, 30, 60];
+const builder = { domains: [], size: 20, mix: 'exam' }; // domains: [] = all
+
+function questionsByDomain() {
+  const by = Object.fromEntries(OFFICIAL_DOMAINS.map(d => [d.key, []]));
+  Object.values(LEVELS).forEach(lv => {
+    if (lv.pool) return;
+    lv.questions.forEach(q => { const k = DOMAIN_OF[q.domain]; if (k) by[k].push(q); });
+  });
+  return by;
+}
+
+// Split `n` across the chosen domains — by exam weight or equally — never asking
+// a domain for more than it holds, then hand leftovers to domains with spares.
+function domainQuotas(keys, n, mix, by) {
+  const w = k => mix === 'equal' ? 1 : OFFICIAL_DOMAINS.find(d => d.key === k).pct;
+  const total = keys.reduce((a, k) => a + w(k), 0);
+  const quota = Object.fromEntries(keys.map(k => [k, Math.min(by[k].length, Math.floor(n * w(k) / total))]));
+  let left = n - Object.values(quota).reduce((a, b) => a + b, 0);
+  while (left > 0) {
+    const spare = keys.filter(k => quota[k] < by[k].length);
+    if (!spare.length) break;
+    spare.sort((a, b) => w(b) - w(a)).slice(0, left).forEach(k => { quota[k]++; left--; });
+  }
+  return quota;
+}
+
+function renderBuilder() {
+  const by = questionsByDomain();
+  const keys = builder.domains.length ? builder.domains : OFFICIAL_DOMAINS.map(d => d.key);
+  const available = keys.reduce((a, k) => a + by[k].length, 0);
+  const n = Math.min(builder.size, available);
+  const chip = (attr, val, on, label, extra = '') =>
+    `<button class="bq-chip${on ? ' on' : ''}" ${attr}="${val}">${label}${extra}</button>`;
+  return `
+    <div class="builder">
+      <div class="bq-head">
+        <div class="bq-title">Build a custom quiz</div>
+        <div class="bq-sub">Pick domains to focus on; ${state.instantFeedback ? 'instant feedback is on, so it works as a review session' : 'feedback is off, so results come at the end'}.</div>
+      </div>
+      <div class="bq-row">
+        <div class="bq-label">Domains</div>
+        <div class="bq-chips">
+          ${chip('data-bq-domain', 'all', !builder.domains.length, 'All domains')}
+          ${OFFICIAL_DOMAINS.map(d => chip('data-bq-domain', d.key, builder.domains.includes(d.key), d.label, ` <span class="bq-n">${by[d.key].length}</span>`)).join('')}
+        </div>
+      </div>
+      <div class="bq-row">
+        <div class="bq-label">Balance</div>
+        <div class="bq-chips">
+          ${chip('data-bq-mix', 'exam', builder.mix === 'exam', 'Exam weighting')}
+          ${chip('data-bq-mix', 'equal', builder.mix === 'equal', 'Equal per domain')}
+        </div>
+      </div>
+      <div class="bq-row">
+        <div class="bq-label">Questions</div>
+        <div class="bq-chips">
+          ${BUILDER_SIZES.map(s => chip('data-bq-size', s, builder.size === s, s)).join('')}
+        </div>
+      </div>
+      <button class="btn bq-go" id="bqStart" ${n ? '' : 'disabled'}>Start quiz · ${n} Qs · ${Math.round(n * SECONDS_PER_QUESTION / 60)} min</button>
+      <div class="bq-foot">Drawn from all ${available} matching questions across both sections. Custom quizzes don't post to the leaderboard.</div>
+    </div>`;
+}
+
+function wireBuilder() {
+  app.querySelectorAll('[data-bq-domain]').forEach(b => b.addEventListener('click', () => {
+    const k = b.dataset.bqDomain;
+    if (k === 'all') builder.domains = [];
+    else if (builder.domains.includes(k)) builder.domains = builder.domains.filter(x => x !== k);
+    else builder.domains = [...builder.domains, k];
+    if (builder.domains.length === OFFICIAL_DOMAINS.length) builder.domains = [];
+    renderStart();
+  }));
+  app.querySelectorAll('[data-bq-mix]').forEach(b => b.addEventListener('click', () => { builder.mix = b.dataset.bqMix; renderStart(); }));
+  app.querySelectorAll('[data-bq-size]').forEach(b => b.addEventListener('click', () => { builder.size = Number(b.dataset.bqSize); renderStart(); }));
+  document.getElementById('bqStart')?.addEventListener('click', startCustomQuiz);
+}
+
+function startCustomQuiz() {
+  const by = questionsByDomain();
+  const keys = builder.domains.length ? builder.domains : OFFICIAL_DOMAINS.map(d => d.key);
+  const quota = domainQuotas(keys, builder.size, builder.mix, by);
+  // Relabel with the official domain name so the results breakdown has one row per domain.
+  const picked = keys.flatMap(k => shuffle(by[k]).slice(0, quota[k])
+    .map(q => ({ ...q, domain: OFFICIAL_DOMAINS.find(d => d.key === k).name })));
+  startPaper('custom', prepQuestions(buildRampedPaper(picked, picked.length), { keepOrder: true }), false);
+}
+
 function beginExam(levelKey) {
   const lv = LEVELS[levelKey];
+  startPaper(levelKey, buildQuestions(lv), Boolean(lv.scenarioPick));
+}
+
+function startPaper(levelKey, questions, grouped) {
   state.level = levelKey;
-  state.grouped = Boolean(lv.scenarioPick);
-  state.questions = buildQuestions(lv);
+  state.grouped = grouped;
+  state.questions = questions;
   state.answers = new Array(state.questions.length).fill(null);
   state.struck = state.questions.map(() => new Set());
   state.flagged = new Array(state.questions.length).fill(false);
@@ -1462,9 +1612,11 @@ function renderPalette() {
   if (fbOn) {
     const acc = answered ? Math.round(correct / answered * 100) : 0;
     const onTrack = acc >= 72; // 720/1000 pass mark
+    stats += answered ? `
+      <div class="pal-pct ${onTrack ? 'ok' : 'no'}">${acc}%</div>
+      <div class="pal-sub">${onTrack ? 'On track to pass (72% needed)' : 'Below the 72% pass mark'}</div>` : `
+      <div class="pal-sub" style="margin-top:8px">Your live pass percentage appears after your first answer.</div>`;
     stats += `
-      <div class="pal-pct ${answered ? (onTrack ? 'ok' : 'no') : ''}">${answered ? acc + '%' : '—'}</div>
-      <div class="pal-sub">${answered ? (onTrack ? 'On track to pass (72% needed)' : 'Below the 72% pass mark') : 'Live pass percentage'}</div>
       <div class="pal-stat"><span style="color:var(--good)">Correct</span><b>${correct}</b></div>
       <div class="pal-stat"><span style="color:var(--bad)">Incorrect</span><b>${wrong}</b></div>`;
   }
@@ -1528,10 +1680,13 @@ function renderResults() {
   const scaled = Math.round((correct / qs.length) * 1000);
   const passed = scaled >= PASS_SCORE;
   // Completing a level unlocks anything that requires it.
-  if (state.level) markCompleted(state.level);
+  // A custom quiz (state.level 'custom') is not a level: it neither unlocks
+  // anything nor posts, since a 10-question drill isn't comparable on the board.
+  const isLevel = Boolean(LEVELS[state.level]);
+  if (isLevel) markCompleted(state.level);
   // Publish this attempt to the team leaderboard (the board ranks each
   // person's most recent attempt; every attempt is kept for the profile view).
-  if (user.name && !state.submitted) {
+  if (user.name && !state.submitted && isLevel) {
     state.submitted = true;
     submitScore({
       name: user.name,

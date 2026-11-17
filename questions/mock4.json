@@ -1,0 +1,791 @@
+{
+  "key": "mock4",
+  "name": "Mock Exam 4 · Hard",
+  "desc": "A complete community mock at the harder end — long scenarios with close distractors. Grouped by scenario.",
+  "section": "bank",
+  "inPool": false,
+  "ready": true,
+  "scenarioPick": 6,
+  "blueprint": [
+    {
+      "label": "Agentic Architecture & Orchestration",
+      "pct": 27
+    },
+    {
+      "label": "Claude Code Config & Workflows",
+      "pct": 20
+    },
+    {
+      "label": "Prompt Engineering & Structured Output",
+      "pct": 20
+    },
+    {
+      "label": "Tool Design & MCP Integration",
+      "pct": 18
+    },
+    {
+      "label": "Context Management & Reliability",
+      "pct": 15
+    }
+  ],
+  "source": "Questions and rationales: https://github.com/utkarsh1agarwal/claude-architect-exam-guide (Mock exams 1-6, single-answer items only; 8 items with disputed or letter-dependent answers omitted. Per-option \"why not\" reasons were added for this page; questions, options and rationales are from the source.)",
+  "licence": "MIT License\n\nCopyright (c) 2026 Claude Architect Exam Guide Contributors\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n\n---\n\nNote: \"Claude,\" \"Claude Code,\" \"Claude Certified Architect,\" and related marks\nare trademarks of Anthropic, PBC and are not covered by this license. This\nlicense applies only to the original written content, code examples, and\nsite configuration authored by this project's contributors.",
+  "questions": [
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 3,
+      "scenario": 1,
+      "q": "Your resolution agent has a <code>PreToolUse</code> hook that blocks <code>process_refund</code> calls exceeding $750. Logs show the hook is working correctly — every blocked refund is correctly identified. However, first-contact resolution dropped 12% in the last month. Investigation reveals that many customers' refund requests between $400–$750 are now being incorrectly escalated even though policy allows them, and the agent is calling <code>escalate_to_human</code> before ever attempting <code>process_refund</code>. What's the issue?",
+      "options": [
+        "The threshold is set too high; lower it to $500 to prevent false escalations",
+        "The hook is correct, but the agent's premature escalation suggests the <code>process_refund</code> tool description doesn't make clear that it handles amounts up to the threshold",
+        "The hook should use <code>PostToolUse</code> instead of <code>PreToolUse</code> to allow the refund attempt first",
+        "Replace the hook with a system-prompt instruction that lists the threshold explicitly"
+      ],
+      "correct": 1,
+      "explain": "The hook enforcement is doing its job; the defect is upstream. The agent escalates *before* attempting <code>process_refund</code> because it doesn't understand the tool can handle refunds up to $750 — that's a description problem, not a hook problem. Lowering the threshold doesn't touch the premature-escalation behavior, and PostToolUse would let the over-threshold refund attempt happen before blocking it, which is worse, not better.<br><b>Not “The threshold is set too high; lower it to $500 to prevent false es…”</b> — Lowering the threshold to $500 would block even more legitimate refunds and does nothing about the agent escalating before it ever tries <code>process_refund</code>. The hook already works as intended.<br><b>Not “The hook should use <code>PostToolUse</code> instead of <code>PreToolUse</code> to allow …”</b> — <code>PostToolUse</code> fires after the tool has run, so an over-limit refund would already be executed before it could be blocked. That is worse, and it does not change the early escalation.<br><b>Not “Replace the hook with a system-prompt instruction that lists the th…”</b> — Replacing the hook with a prompt instruction trades a deterministic limit for a probabilistic one, and it does not explain why the agent escalates without trying the refund."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 3,
+      "scenario": 1,
+      "q": "Your support agent integrates with two MCP tools: <code>lookup_legacy_order</code> (for orders from 2+ years ago) and <code>lookup_recent_order</code> (for current orders). Both return <code>{\"isError\": true, \"message\": \"Lookup failed\"}</code> for any failure — timeout, invalid order ID, or permission denied. The agent sometimes retries timeouts unnecessarily and sometimes gives up on permission errors that should escalate instead. What's the root cause?",
+      "options": [
+        "The tools need better descriptions so the agent picks the correct one first",
+        "The tool results lack structured error metadata (<code>errorCategory</code>, <code>isRetryable</code>); the agent can't distinguish a retryable timeout from a non-retryable permission failure",
+        "The agent should use <code>tool_choice: \"any\"</code> to force it to select one of the two tools",
+        "The MCP server is responding too quickly; add artificial delays so the model sees a timeout signal"
+      ],
+      "correct": 1,
+      "explain": "A flat <code>isError: true</code> with no category tells the agent nothing about whether to retry, escalate, or move on. <code>errorCategory</code> and <code>isRetryable</code> let it distinguish a retry-safe timeout from a permission failure that needs escalation instead. Better descriptions fix tool *selection*, not recovery after a call has already failed.<br><b>Not “The tools need better descriptions so the agent picks the correct o…”</b> — Better descriptions help the agent choose between the two lookup tools. The problem here is what happens after a call fails, when every failure looks identical.<br><b>Not “The agent should use <code>tool_choice: \"any\"</code> to force it to select one…”</b> — <code>tool_choice: \"any\"</code> only forces some tool to be called. It gives the agent no way to tell a retryable timeout from a permission failure.<br><b>Not “The MCP server is responding too quickly; add artificial delays so …”</b> — Adding artificial delays would not tell the model why a call failed, and it makes the system slower. The tools need to report the failure type."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 3,
+      "scenario": 1,
+      "q": "A customer named \"Utkarsh Agarwal\" matches 5 accounts in the system: four inactive, one active from last month. The agent selects the active account without asking for clarification. That account belongs to a different customer with the same name — the agent processes a $340 refund for the wrong person. What's the correct behavior when a lookup returns multiple matches?",
+      "options": [
+        "Pick the most recently active account, since it's the most likely match",
+        "Ask the customer for an additional identifier before proceeding",
+        "Process the request against all matching accounts and let the customer confirm afterward",
+        "Escalate immediately, since multi-match lookups are inherently too ambiguous to handle autonomously"
+      ],
+      "correct": 1,
+      "explain": "Ambiguous multi-match lookups should never be resolved by a heuristic like recency; ask for another identifier (email, phone, order number) to disambiguate safely. Guessing based on recent activity is exactly the anti-pattern that caused the wrong-customer refund here.<br><b>Not “Pick the most recently active account, since it's the most likely m…”</b> — Recent activity does not show which account the caller actually owns, and this exact heuristic caused the wrong-customer refund in the scenario.<br><b>Not “Process the request against all matching accounts and let the custo…”</b> — Processing the request against every match would act on accounts belonging to other people, and a later confirmation cannot reverse those actions.<br><b>Not “Escalate immediately, since multi-match lookups are inherently too …”</b> — Multiple matches do not make a case too ambiguous to handle. Asking for one more identifier resolves it without involving a human."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 3,
+      "scenario": 1,
+      "q": "A customer messages: \"I need to return a wireless headset AND I'm being charged twice for my subscription.\" The agent decomposes this into two concerns and investigates the billing dispute first, finding a duplicate charge and auto-refunding $15. Only afterward does it address the return, discovering the headset was purchased as part of a non-refundable promotional bundle 45 days ago, and escalates the return. The customer is upset because the billing refund had already gone through before the return was found to be ineligible. What went wrong?",
+      "options": [
+        "The agent should have escalated both concerns immediately instead of attempting autonomous resolution",
+        "The agent should have investigated eligibility/prerequisites across both concerns before issuing any refund, not resolve one item to completion before even starting to investigate the other",
+        "The agent picked the wrong concern to address first; pure ordering shouldn't matter otherwise",
+        "The agent needed stronger prompting to handle multi-concern messages"
+      ],
+      "correct": 1,
+      "explain": "The failure isn't that the agent worked on the wrong concern first — it's that it fully executed one concern (issuing a refund) before checking prerequisites relevant to the other. Eligibility and prerequisite checks across all concerns should happen before any high-stakes action is taken, precisely because refunds are hard to unwind once issued.<br><b>Not “The agent should have escalated both concerns immediately instead o…”</b> — Both concerns were within the agent's ability. The flaw was the order of actions, not that autonomous handling was attempted, so escalating everything is excessive.<br><b>Not “The agent picked the wrong concern to address first; pure ordering …”</b> — The order of addressing the concerns is not the real defect. Even with a different order, a refund issued before checking the other item's eligibility could cause the same surprise.<br><b>Not “The agent needed stronger prompting to handle multi-concern messages”</b> — Stronger prompting is a probabilistic fix. The structural problem is issuing an irreversible refund before checking prerequisites that relate to the other concern."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 3,
+      "scenario": 1,
+      "q": "Your agent has access to four tools: <code>get_customer</code>, <code>lookup_order</code>, <code>process_refund</code>, and <code>escalate_to_human</code>. Metrics show 65% of cases that call <code>escalate_to_human</code> are actually routine refunds that could have been auto-resolved, while autonomous resolution succeeds 78% of the time on the clear-cut cases it does attempt. The agent is over-escalating standard cases while handling some genuinely ambiguous ones autonomously. What's the most direct structural fix?",
+      "options": [
+        "Rewrite tool descriptions to be more explicit about when to escalate",
+        "Remove <code>get_customer</code> and <code>lookup_order</code> from the toolset, leaving only <code>process_refund</code> and <code>escalate_to_human</code>, to reduce tool confusion",
+        "Keep all four tools, but restrict <code>escalate_to_human</code> so it can only be called after both <code>get_customer</code> and <code>lookup_order</code> have already returned substantive data",
+        "Rewrite the system prompt's escalation criteria in more detail"
+      ],
+      "correct": 2,
+      "explain": "Restricting when <code>escalate_to_human</code> can be called — only after <code>get_customer</code> and <code>lookup_order</code> have already returned something substantive — directly targets premature escalation without removing tools the agent still needs for legitimate investigation. Stripping investigative tools would make *every* case harder to resolve, not just the over-escalated ones.<br><b>Not “Rewrite tool descriptions to be more explicit about when to escalate”</b> — More explicit descriptions only nudge behaviour. They do not stop the agent from calling <code>escalate_to_human</code> before it has investigated, which is the structural gap here.<br><b>Not “Remove <code>get_customer</code> and <code>lookup_order</code> from the toolset, leaving …”</b> — Removing the investigative tools leaves the agent unable to gather the information needed to resolve cases, making every case harder to handle, not just the over-escalated ones.<br><b>Not “Rewrite the system prompt's escalation criteria in more detail”</b> — More detailed escalation criteria in the system prompt are followed only probabilistically, so premature escalation would still happen."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 3,
+      "scenario": 1,
+      "q": "A 12-turn conversation about a disputed order involves: the customer claims a $60 charge on order #7742, the agent verifies the charge exists, and by turn 8 a running summary has condensed the details down to \"customer disputes a charge.\" On turn 11, the customer references \"like the $50 I got back last month for the same vendor,\" but the agent has lost the original $60 figure in the summarized history and asks the customer to repeat the amount. What fix would prevent this?",
+      "options": [
+        "Never summarize; keep the full raw conversation history in every turn",
+        "Maintain a persistent \"case facts\" block (amount, order ID, dates) carried alongside every message, outside the narrative summary that gets condensed",
+        "Increase the context window size",
+        "Lower the temperature to make behavior more consistent across long conversations"
+      ],
+      "correct": 1,
+      "explain": "A persistent case-facts block (amount, order ID, dates) carried alongside the narrative prevents exactly this kind of detail loss during summarization. Keeping the full raw history forever avoids the problem but doesn't scale, and neither context-window size nor temperature address progressive detail loss from summarization itself.<br><b>Not “Never summarize; keep the full raw conversation history in every turn”</b> — Keeping the entire raw history in every turn avoids the loss but does not scale, and it discards the benefits of summarising long conversations.<br><b>Not “Increase the context window size”</b> — A larger window does not change what the summary keeps. The $60 figure was dropped by summarisation, not by running out of space.<br><b>Not “Lower the temperature to make behavior more consistent across long …”</b> — Temperature governs randomness and does not prevent summarisation from stripping details such as the amount and order number."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 3,
+      "scenario": 1,
+      "q": "Your policy requires that refunds under $100 can be auto-approved, but refunds of $100+ must first have the customer's identity verified via <code>get_customer</code>. Some <code>get_customer</code> calls fail due to network timeouts, and the agent currently retries the same call several times before eventually calling <code>escalate_to_human</code>. You want to *guarantee* that <code>process_refund</code> can never be called for $100+ unless <code>get_customer</code> has already returned a verified ID in the conversation — not just make it likely. Which mechanism enforces this?",
+      "options": [
+        "A <code>PostToolUse</code> hook that appends a reminder to the agent after <code>process_refund</code> succeeds, noting that identity should have been verified first",
+        "A <code>PreToolUse</code> hook that blocks <code>process_refund</code> for amounts at or above $100 until a verified-ID flag from <code>get_customer</code> is present in the conversation",
+        "A <code>PostToolUse</code> hook that normalizes <code>get_customer</code> results into a canonical verified/unverified format",
+        "A system-prompt instruction stating that identity verification is required before large refunds"
+      ],
+      "correct": 1,
+      "explain": "Only a <code>PreToolUse</code> hook can block <code>process_refund</code> *before* it executes, which is what \"guarantee\" requires here. A <code>PostToolUse</code> hook fires after the refund has already gone through, and a prompt instruction is followed probabilistically, not deterministically — exactly the gap the team wants closed.<br><b>Not “A <code>PostToolUse</code> hook that appends a reminder to the agent after `pr…”</b> — A <code>PostToolUse</code> reminder arrives after <code>process_refund</code> has already succeeded, so it can only note the mistake, not prevent it.<br><b>Not “A <code>PostToolUse</code> hook that normalizes <code>get_customer</code> results into a …”</b> — Normalising <code>get_customer</code> output does not stop <code>process_refund</code> from running, and a <code>PostToolUse</code> hook acts after the fact, so it guarantees nothing about ordering.<br><b>Not “A system-prompt instruction stating that identity verification is r…”</b> — A prompt instruction is followed probabilistically, which the team has said is not enough, since they want a guarantee."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 3,
+      "scenario": 1,
+      "q": "Your team escalates any case that reaches 8 conversational turns, on the theory that long conversations indicate complex cases. Data shows this rule escalates many routine multi-step refunds (identity verification + refund processing routinely takes 6–8 turns) while some genuinely ambiguous policy-exception cases stay in autonomous resolution because they happen to resolve in fewer turns. What's wrong with using turn count as an escalation signal?",
+      "options": [
+        "It's actually a reasonable proxy for complexity; just raise the threshold to 12 turns",
+        "Turn count is orthogonal to case complexity — the same routine workflow can take 3 turns or 10 depending on how the customer communicates. Escalation should trigger on an actual policy gap or ambiguity the agent can't resolve, not on conversation length",
+        "Escalate based on customer sentiment instead of turn count",
+        "Add a per-turn confidence score and escalate when the average drops below a threshold"
+      ],
+      "correct": 1,
+      "explain": "Turn count doesn't track complexity — the same routine workflow can span very different numbers of turns depending on the customer's communication style. Escalation should be triggered by an actual unresolved ambiguity or policy gap, not by how long the conversation happened to run.<br><b>Not “It's actually a reasonable proxy for complexity; just raise the thr…”</b> — Raising the turn threshold to 12 keeps a signal that does not track complexity. Routine workflows would still be escalated or missed based on how long the customer takes.<br><b>Not “Escalate based on customer sentiment instead of turn count”</b> — Customer sentiment is another unreliable proxy for case complexity, and it would escalate routine cases just because the customer sounded annoyed.<br><b>Not “Add a per-turn confidence score and escalate when the average drops…”</b> — An average of self-reported per-turn confidence rests on poorly calibrated scores, so it would not reliably separate complex cases from routine ones."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 3,
+      "scenario": 1,
+      "q": "A case is escalated to a human with a structured handoff containing: customer ID, disputed order number, refund amount, and a recommended action (\"Approve $85 refund, order is within the 30-day window\"). The human approves the refund. Two days later, the customer says the refund never arrived and demands to know why the agent didn't just process it. Investigation shows the AI agent never actually called <code>process_refund</code> — it only reasoned that a human should approve one. What element is missing from the escalation structure that would have prevented this confusion?",
+      "options": [
+        "The full unedited transcript, so the human can re-trace the entire investigation themselves",
+        "A field documenting exactly what the agent already attempted, and explicitly stating that no refund action was taken by the agent itself — only a recommendation",
+        "The customer's original message, verbatim, to confirm the request was genuine",
+        "A confidence score, so the human knows how uncertain the agent was"
+      ],
+      "correct": 1,
+      "explain": "The handoff records *what the agent recommended* but never states *whether the agent itself took any action*. Without an explicit field for \"attempted actions\" (and confirmation that no refund was actually executed), a human reviewer has no way to know the recommendation still requires their own action to complete — which is exactly the gap that led to the refund never happening.<br><b>Not “The full unedited transcript, so the human can re-trace the entire …”</b> — A full transcript makes the human re-trace everything and still does not state whether the agent itself acted, so the confusion would remain.<br><b>Not “The customer's original message, verbatim, to confirm the request w…”</b> — The original message confirms what the customer asked for but not what the agent did or did not do, so the gap about the missing refund remains.<br><b>Not “A confidence score, so the human knows how uncertain the agent was”</b> — A confidence score tells the human how unsure the agent was, but nothing about whether any refund action had actually been taken."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 3,
+      "scenario": 2,
+      "q": "A <code>.claude/settings.json</code> hook is configured with <code>matcher: \"Bash\"</code>, <code>type: \"command\"</code>, intended to block any Bash invocation that references production credentials. The hook's script correctly detects and prints the matched credential key name in logs, but Bash commands referencing those credentials still execute anyway. What's the most likely fix?",
+      "options": [
+        "Change the matcher from <code>\"Bash\"</code> to a regex like <code>\"Bash.*\"</code> so it matches the tool name correctly",
+        "Make sure the hook's script actually exits with a non-zero exit code when it detects a match — printing a log line alone does not block the tool call",
+        "Move the hook from <code>PreToolUse</code> to <code>PostToolUse</code>, since that's when the final decision on the Bash call is made",
+        "Add a separate <code>{\"type\": \"approval\"}</code> hook entry alongside the existing command hook"
+      ],
+      "correct": 1,
+      "explain": "A command hook only blocks a tool call if its script exits non-zero; printing a detection message to logs has no effect on the tool-use decision itself. The matcher syntax is fine as written, <code>PostToolUse</code> would run after the Bash command has already executed, and <code>\"approval\"</code> isn't a valid hook type.<br><b>Not “Change the matcher from <code>\"Bash\"</code> to a regex like <code>\"Bash.*\"</code> so it m…”</b> — The matcher <code>\"Bash\"</code> already matches the Bash tool. The hook fires and finds the credential, so the matching syntax is not the cause.<br><b>Not “Move the hook from <code>PreToolUse</code> to <code>PostToolUse</code>, since that's when…”</b> — <code>PostToolUse</code> runs after the command has already executed, so it cannot prevent the Bash call from running.<br><b>Not “Add a separate <code>{\"type\": \"approval\"}</code> hook entry alongside the exis…”</b> — <code>approval</code> is not a valid hook type, so adding such an entry would not block anything."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 3,
+      "scenario": 2,
+      "q": "A developer needs to add one new database index to speed up a slow, already-diagnosed query. The change touches one file, is 5–10 lines, and the team has already agreed on which index to add. Should this go through plan mode first?",
+      "options": [
+        "Yes — plan mode should review the indexing strategy before any implementation",
+        "No — plan mode is built for exploring multiple valid approaches on complex, multi-file work; a single well-understood, already-decided change doesn't need that overhead",
+        "Yes — plan mode is required to check the index doesn't affect other queries",
+        "No, but only because this is a bug fix; any new feature work should always go through plan mode"
+      ],
+      "correct": 1,
+      "explain": "Plan mode earns its overhead on multi-file work with several genuinely valid approaches; a single-file, already-decided, five-to-ten-line change gets nothing extra from a planning pass and only adds latency. Feature-vs-bugfix isn't the relevant distinction — task complexity and decision-ambiguity are.<br><b>Not “Yes — plan mode should review the indexing strategy before any impl…”</b> — A single 5-10 line change that the team already decided on has no strategy to review, so a planning pass only adds delay.<br><b>Not “Yes — plan mode is required to check the index doesn't affect other…”</b> — Plan mode is not a requirement for checking effects on other queries, and the change is small and already agreed, so this is not a reason to plan.<br><b>Not “No, but only because this is a bug fix; any new feature work should…”</b> — Whether the work is a bug fix or a feature is not the deciding factor. Complexity and the number of valid approaches are what matter."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 3,
+      "scenario": 2,
+      "q": "A <code>/release-notes</code> skill converts raw commit messages into user-facing changelog entries. Across five runs on similar commits, the results vary: sometimes technical jargon that should be simplified is kept as-is, other times breaking-change details are oversimplified into vague language. The prompt already says \"write for a non-technical audience while preserving important details.\" What's the most effective next fix?",
+      "options": [
+        "Add a stronger prompt clause: \"Always balance technical accuracy with customer-friendly language\"",
+        "Add 2–3 concrete before/after examples that show exactly which terms to simplify, which details must survive simplification (e.g., breaking changes), and how each should be phrased",
+        "Generate five variants per commit and have a human manually pick the best one each time",
+        "Split the skill into two skills — one for breaking changes, one for routine fixes — to reduce the range of cases each has to handle"
+      ],
+      "correct": 1,
+      "explain": "When the same category of transformation produces inconsistent results despite clear prose instructions, concrete before/after examples that pin down the exact boundary (which terms to simplify, what must survive simplification) are more effective than further prose, manual cherry-picking, or splitting the task, none of which resolve the underlying ambiguity in what \"customer-friendly but accurate\" actually means here.<br><b>Not “Add a stronger prompt clause: \"Always balance technical accuracy wi…”</b> — Another prose clause restates the same vague balance between accuracy and simplicity, so the variation between runs would continue.<br><b>Not “Generate five variants per commit and have a human manually pick th…”</b> — Choosing from five variants by hand adds recurring human effort and never settles what the right boundary is.<br><b>Not “Split the skill into two skills — one for breaking changes, one for…”</b> — Splitting the skill narrows the cases each handles but does not define which terms to simplify or which details must survive."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 3,
+      "scenario": 2,
+      "q": "A convention that all new database migrations follow a specific naming/structure pattern needs to apply to files under both <code>migrations/</code> and <code>tools/legacy-migrations/</code> — two directories with no other relationship. What's the most maintainable way to enforce this?",
+      "options": [
+        "Create <code>migrations/CLAUDE.md</code> and <code>tools/legacy-migrations/CLAUDE.md</code>, each repeating the same convention",
+        "Create a single <code>.claude/rules/migrations.md</code> with <code>paths: [\"**/migrations/**/*.sql\", \"**/legacy-migrations/**/*.sql\"]</code> frontmatter",
+        "Add a \"Migration\" section to the root <code>CLAUDE.md</code>",
+        "Build a custom <code>/migration-check</code> skill that developers must remember to run before creating a migration file"
+      ],
+      "correct": 1,
+      "explain": "A single glob-scoped <code>.claude/rules/</code> file with paths covering both migration directories applies the convention wherever migration files live, without duplicating content across directory-level <code>CLAUDE.md</code> files or bloating the root <code>CLAUDE.md</code> with a rule that's only relevant to a subset of files.<br><b>Not “Create <code>migrations/CLAUDE.md</code> and `tools/legacy-migrations/CLAUDE.m…”</b> — Repeating the same convention in two directory <code>CLAUDE.md</code> files duplicates content that can drift apart and ties it to specific locations.<br><b>Not “Add a \"Migration\" section to the root <code>CLAUDE.md</code>”</b> — A root <code>CLAUDE.md</code> section loads the migration convention for every task, including those with no migration files, bloating the context.<br><b>Not “Build a custom <code>/migration-check</code> skill that developers must rememb…”</b> — A manually run skill depends on developers remembering to invoke it, so the convention would be skipped whenever someone forgets."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 3,
+      "scenario": 2,
+      "q": "A developer spends 90 minutes exploring a legacy data-processing module before asking Claude to write a new version of a core function. The generated code is syntactically clean and passes a quick smoke test, but it silently violates a constraint documented in a code comment the developer read in the first 20 minutes of exploration — a comment Claude never referenced when generating the new version. What should have been set up during the exploration phase to prevent this?",
+      "options": [
+        "Use the <code>Explore</code> subagent to keep verbose discovery output out of the main context, and have Claude maintain a scratchpad file recording critical constraints found along the way",
+        "Start a brand-new session for the implementation step so old exploration context doesn't interfere",
+        "Ask for a larger context window so nothing needs to be dropped during the session",
+        "Switch to plan mode specifically to review the findings before implementation begins"
+      ],
+      "correct": 0,
+      "explain": "A scratchpad file capturing constraints discovered during exploration — paired with the <code>Explore</code> subagent to keep the verbose search process itself out of the main context — is the direct fix for exactly this failure mode: a constraint noticed early gets silently dropped by the time implementation happens. A fresh session or a bigger context window don't capture and resurface the constraint; they just change how much gets forgotten and when.<br><b>Not “Start a brand-new session for the implementation step so old explor…”</b> — A fresh session for implementation loses everything learned during exploration, including the constraint, and does not record it anywhere.<br><b>Not “Ask for a larger context window so nothing needs to be dropped duri…”</b> — A larger context window does not make Claude re-check a comment read early on, and it does not record the constraint anywhere to be revisited.<br><b>Not “Switch to plan mode specifically to review the findings before impl…”</b> — Plan mode before implementation does not capture constraints found earlier, so a review of findings is only as good as what was written down."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 3,
+      "scenario": 2,
+      "q": "An automated PR review pipeline deliberately uses a fresh, independent Claude Code instance to review code rather than reusing the session that generated the fix. A reviewer complains that this independent reviewer still misses a subtle cross-function interaction bug that seems obvious once pointed out. Is the independent-instance design itself the problem?",
+      "options": [
+        "Yes — the independent instance should be given the original session's generation reasoning so it has more context to work with",
+        "No — the point of an independent instance is specifically to avoid the generation session's own reasoning bias, which otherwise makes it less likely to challenge its own prior decisions; this particular miss is a separate issue, not evidence the pattern is wrong",
+        "Yes — both steps should run in the same session so context carries over cleanly",
+        "No, but the reviewer instance should switch models between runs to add perspective diversity"
+      ],
+      "correct": 1,
+      "explain": "This is intentional design, not a bug: a session that generated the fix retains its own reasoning and is measurably less likely to challenge its own prior decisions, so an independent review session is used specifically to avoid that bias. This particular miss doesn't invalidate the pattern — it's a separate reliability gap. Giving the reviewer the generation reasoning or merging the two steps would reintroduce the exact bias the design is meant to avoid.<br><b>Not “Yes — the independent instance should be given the original session…”</b> — Passing along the generation reasoning would bring back the bias that makes the generating session reluctant to challenge its own decisions.<br><b>Not “Yes — both steps should run in the same session so context carries …”</b> — Running both steps in the same session reintroduces the very bias that an independent reviewer is meant to avoid.<br><b>Not “No, but the reviewer instance should switch models between runs to …”</b> — Switching models between runs does not address why one subtle miss happened, and it is not the purpose of using an independent instance."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 3,
+      "scenario": 2,
+      "q": "A skill's <code>SKILL.md</code> sets <code>context: fork</code> and <code>argument-hint: \"Describe the target API\"</code>. Invoking it with no arguments prompts the developer to describe the target API. Invoking it with a description already supplied as an argument runs the skill silently, with no follow-up prompt. Is this the correct, documented behavior of <code>argument-hint</code>?",
+      "options": [
+        "No — <code>argument-hint</code> should always prompt regardless of whether arguments were supplied; the missing prompt is a bug",
+        "Yes — <code>argument-hint</code> is autocomplete guidance shown when no arguments are given; it assumes the user has supplied what's needed once an argument is present, and does not re-validate or force a prompt",
+        "No — <code>context: fork</code> disables prompting behavior for any skill run as a sub-agent",
+        "Yes, but only because <code>argument-hint</code> silently validates the argument against a schema before deciding whether to prompt"
+      ],
+      "correct": 1,
+      "explain": "<code>argument-hint</code> is autocomplete guidance shown when a skill is invoked without arguments; once an argument is supplied, the skill proceeds on the assumption the user has provided what's needed. It isn't a schema or a validator, so it doesn't force a prompt regardless of input (ruling out A and D), and <code>context: fork</code> governs execution isolation, not prompting behavior.<br><b>Not “No — <code>argument-hint</code> should always prompt regardless of whether arg…”</b> — <code>argument-hint</code> is autocomplete guidance, not a forced prompt, so no prompt appearing when an argument is supplied is expected rather than a bug.<br><b>Not “No — <code>context: fork</code> disables prompting behavior for any skill run …”</b> — <code>context: fork</code> controls execution isolation, not whether the skill prompts for input, so it does not explain the missing prompt.<br><b>Not “Yes, but only because <code>argument-hint</code> silently validates the argume…”</b> — <code>argument-hint</code> does not validate against any schema. It is only a hint shown when no arguments are given."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 3,
+      "scenario": 2,
+      "q": "A developer spends over two hours exploring a large, unfamiliar monorepo — reading 40+ files, tracing call chains, and building a mental model of a thread-safety requirement documented in a file read early in the session. Near the end of the session, they ask Claude to refactor the module for readability. The refactor passes unit tests but breaks a downstream integration test because it violates that early thread-safety requirement — which Claude never cites or references while making the change. What should have been done differently during exploration?",
+      "options": [
+        "Run <code>/compact</code> after every new file is read, aggressively trimming context to make room for new information",
+        "Maintain a scratchpad file recording critical constraints, assumptions, and invariants discovered during exploration, so they can be explicitly rechecked before any later implementation step",
+        "Restart the session every 90 minutes to avoid context window saturation",
+        "Only ever use the <code>Explore</code> subagent for discovery, and always implement in a completely fresh session afterward"
+      ],
+      "correct": 1,
+      "explain": "A scratchpad recording constraints and invariants discovered during exploration is what lets a later implementation step recheck against them explicitly, instead of relying on the model to spontaneously recall something read an hour earlier in a long session. Aggressive <code>/compact</code> and periodic restarts both actively discard the very information that needed to be preserved.<br><b>Not “Run <code>/compact</code> after every new file is read, aggressively trimming …”</b> — Compacting after every file discards details such as the thread-safety requirement, which is exactly the kind of information that needs preserving.<br><b>Not “Restart the session every 90 minutes to avoid context window satura…”</b> — Restarting every 90 minutes throws away what was learned unless it was recorded, so the constraint would be lost as well.<br><b>Not “Only ever use the <code>Explore</code> subagent for discovery, and always impl…”</b> — Using <code>Explore</code> for discovery and a fresh session for implementation still loses any constraint that was not written down along the way."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 3,
+      "scenario": 3,
+      "q": "A coordinator delegates research on climate-policy evolution to five subagents — recent legislative news, long-form policy documents, emerging green-tech companies, synthesis, and report generation. All five complete without errors. The synthesis subagent's output is coherent, but the final report heavily emphasizes legislative updates and barely mentions green-tech market dynamics, despite the coordinator having requested balanced coverage. Each subagent's individual findings contain relevant material on their assigned topic. Where is the defect most likely located?",
+      "options": [
+        "The green-tech subagent silently failed to execute its task properly",
+        "The synthesis subagent's tool access is too narrow to retrieve the green-tech material it needs",
+        "The coordinator's decomposition never established weighting or integration instructions, so synthesis had no guidance on how to balance the two domains",
+        "The report-generation subagent is intentionally suppressing green-tech findings due to its writing style"
+      ],
+      "correct": 2,
+      "explain": "Every subagent executing correctly rules out execution-level defects; the imbalance traces back to the coordinator never giving synthesis any weighting or integration guidance for how to combine the two domains. This is the scenario's signature trap: a \"successful\" pipeline with a decomposition-level bug.<br><b>Not “The green-tech subagent silently failed to execute its task properly”</b> — All five subagents completed without errors and each produced relevant findings on its topic, so nothing indicates the green-tech agent failed.<br><b>Not “The synthesis subagent's tool access is too narrow to retrieve the …”</b> — The synthesis agent had the green-tech findings in its input. The imbalance came from missing weighting guidance, not from lack of tool access.<br><b>Not “The report-generation subagent is intentionally suppressing green-t…”</b> — Nothing suggests the report generator suppressed green-tech content intentionally. The coordinator never told synthesis how to balance the domains."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 3,
+      "scenario": 3,
+      "q": "A web-search subagent completes research on a regulatory topic and returns its findings to the coordinator. The coordinator then delegates a follow-up task to a synthesis subagent. The synthesis subagent immediately asks what \"approval timeline\" refers to — a term defined only in the earlier search results, which the coordinator has but did not include in the new invocation. Why is this the expected behavior rather than a bug?",
+      "options": [
+        "Subagents automatically inherit all prior coordinator messages and tool outputs, but only if explicitly \"enabled\" in the invocation — which wasn't done here",
+        "Subagents have isolated context by design and do not automatically receive prior conversation history; the coordinator must explicitly pass whatever context a subagent needs into its invocation prompt",
+        "The synthesis subagent's context window is smaller than the coordinator's, so large search results are silently truncated before being passed along",
+        "Passing context explicitly is optional in principle; the model's training data typically fills in plausible prior search results"
+      ],
+      "correct": 1,
+      "explain": "Subagents don't automatically inherit the coordinator's conversation history — this is by design, not a defect. Context needed by a subagent must be explicitly included in its invocation prompt, which is exactly what didn't happen here.<br><b>Not “Subagents automatically inherit all prior coordinator messages and …”</b> — Subagents have no setting that makes them inherit prior messages. Context must be written into the invocation prompt itself.<br><b>Not “The synthesis subagent's context window is smaller than the coordin…”</b> — Nothing in the scenario involves truncation by context size. The synthesis agent simply was never given the earlier results.<br><b>Not “Passing context explicitly is optional in principle; the model's tr…”</b> — Training data cannot supply the definition of a term from earlier search results, so context has to be passed explicitly."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 3,
+      "scenario": 3,
+      "q": "A coordinator needs to search academic papers, government filings, and corporate financial disclosures on a renewable-energy topic. It currently delegates to one subagent, waits, delegates to a second, waits, then delegates to a third — a fully sequential chain that takes 45 seconds per research cycle. The three lookups don't depend on each other's output. What change reduces elapsed time while keeping the coordinator in control of synthesis?",
+      "options": [
+        "Combine all three into one subagent that internally parallelizes the three lookups itself",
+        "Emit all three <code>Task</code> tool calls within a single coordinator turn so the subagents run concurrently",
+        "Use <code>Bash</code> to shell out to a script that invokes all three subagents in parallel, bypassing the <code>Task</code> tool",
+        "Reduce each subagent's context window so results come back faster"
+      ],
+      "correct": 1,
+      "explain": "Emitting multiple <code>Task</code> calls within a single coordinator turn is what runs subagents concurrently. Sequential delegation (the current setup) is what's producing the 45-second elapsed time; combining the three lookups into one subagent or shelling out via <code>Bash</code> both abandon the coordinator's oversight of the delegation itself.<br><b>Not “Combine all three into one subagent that internally parallelizes th…”</b> — Merging the three lookups into one subagent that parallelises internally takes delegation out of the coordinator's oversight instead of running the subagents concurrently.<br><b>Not “Use <code>Bash</code> to shell out to a script that invokes all three subagent…”</b> — Shelling out through <code>Bash</code> bypasses the <code>Task</code> tool and moves delegation out of the coordinator's control.<br><b>Not “Reduce each subagent's context window so results come back faster”</b> — Smaller context windows do not change how delegation is ordered, so the three lookups would still run one after another."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 3,
+      "scenario": 3,
+      "q": "A document-analysis subagent queries a restricted research database for licensing information. Every failure — expired license, database outage, malformed input, or a valid search with zero matching records — comes back as <code>{\"isError\": true, \"message\": \"Request failed\"}</code>. The coordinator can't reliably decide whether to retry, reformat the input, escalate for license renewal, or move on with a documented coverage gap. What should the tool result include instead?",
+      "options": [
+        "A generic success/failure boolean, leaving recovery logic entirely to the coordinator's judgment",
+        "Structured error context: category (expired/timeout/validation/not-found), whether retrying is worthwhile, what was attempted, and a suggested next step",
+        "A confidence score reflecting how sure the subagent is that the call actually failed",
+        "A verbose internal log of every retry the subagent already attempted, for the coordinator to replay"
+      ],
+      "correct": 1,
+      "explain": "Categorized error context — cause, retryability, what was attempted, and a suggested next step — is what lets the coordinator make an informed recovery decision instead of guessing. A bare boolean or a self-reported confidence score don't distinguish a temporary outage from a permission problem, which is exactly the ambiguity causing unpredictable recovery here.<br><b>Not “A generic success/failure boolean, leaving recovery logic entirely …”</b> — A bare success or failure flag cannot distinguish an expired license from an outage or a no-match search, so the coordinator is left guessing.<br><b>Not “A confidence score reflecting how sure the subagent is that the cal…”</b> — A confidence score about whether the call failed does not identify the type of failure or whether retrying would help.<br><b>Not “A verbose internal log of every retry the subagent already attempte…”</b> — A verbose retry log gives raw material but not a categorised cause or a recommended next step, leaving the coordinator to interpret it."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 3,
+      "scenario": 3,
+      "q": "A research coordinator's usual flow is: search → wait → analysis (with search results) → wait → synthesis. On complex topics, the coordinator sometimes needs analysis and synthesis dispatched together right after search results land; on simple topics, synthesis should start the moment analysis returns, without an extra coordinator round-trip. The right next step genuinely depends on what each stage discovers. What orchestration approach fits best?",
+      "options": [
+        "A fixed four-step prompt chain that always runs in the same order, on the theory that predictability beats adaptive logic",
+        "A dynamic orchestrator that inspects results after each step and decides which subagents to invoke next based on what it finds",
+        "Let each specialist subagent independently decide when to hand its output to the next stage, without the coordinator tracking overall progress",
+        "Merge search, analysis, and synthesis into one subagent operating in a single context window"
+      ],
+      "correct": 1,
+      "explain": "When the right next step depends on what a stage actually finds, a dynamic orchestrator that inspects results and decides subsequent delegation is the fit — this is the orchestrator-workers pattern. A fixed chain can't adapt when complex topics need a different dispatch shape than simple ones.<br><b>Not “A fixed four-step prompt chain that always runs in the same order, …”</b> — A fixed chain cannot adjust to complex topics that need a different dispatch pattern from simple ones, so it ignores the decisions made after each stage.<br><b>Not “Let each specialist subagent independently decide when to hand its …”</b> — Without the coordinator tracking overall progress, there is no central point deciding the next step, so coordination and error handling suffer.<br><b>Not “Merge search, analysis, and synthesis into one subagent operating i…”</b> — One subagent doing everything gives up specialised delegation and cannot adapt dispatch to what each stage finds."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 3,
+      "scenario": 3,
+      "q": "A finance-research system has <code>fetch_market_data</code> (stock prices, trading volumes, market indices) and <code>fetch_economic_indicators</code> (GDP, unemployment, inflation from government sources), described only as \"Retrieves market information\" and \"Retrieves economic information\" respectively. Logs show the synthesis subagent frequently calls <code>fetch_market_data</code> for inflation figures and <code>fetch_economic_indicators</code> for stock prices — both tools work correctly when called, they're just being selected for the wrong job. What's the most effective first fix?",
+      "options": [
+        "Add 10 few-shot examples showing correct tool selection for each data type",
+        "Rewrite both descriptions with specific input formats, example queries, the exact data types each returns, and explicit boundaries (e.g., \"use <code>fetch_market_data</code> only for prices and trading volumes, never macroeconomic aggregates\")",
+        "Remove one of the two tools and route all lookups through the survivor",
+        "Add a keyword-based pre-router that intercepts the request and picks the tool before the model sees it"
+      ],
+      "correct": 1,
+      "explain": "Thin, near-identical descriptions (\"Retrieves market information\" / \"Retrieves economic information\") give the model no basis for correct selection. Rewriting both with specific inputs, example queries, and explicit boundaries is the first and highest-leverage fix, ahead of few-shot examples or a pre-router.<br><b>Not “Add 10 few-shot examples showing correct tool selection for each da…”</b> — A handful of few-shot examples is the next lever only after the thin descriptions have been rewritten, so it comes later.<br><b>Not “Remove one of the two tools and route all lookups through the survivor”</b> — Removing a tool takes away a capability the system needs, when both tools work correctly and simply need clearer descriptions.<br><b>Not “Add a keyword-based pre-router that intercepts the request and pick…”</b> — A keyword pre-router adds brittle external logic when the cheaper first fix is to give the tools specific descriptions."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 3,
+      "scenario": 3,
+      "q": "A draft report synthesized from three subagents' findings states a renewable-energy adoption statistic with no source citation, even though the search subagent originally found this figure in a credible government report and passed it along with a source reference. The synthesis subagent had both the number and the source in its input; the citation was simply dropped during synthesis. What should have been required from the start to prevent this?",
+      "options": [
+        "A confidence score on each claim, so synthesis can prioritize high-confidence findings",
+        "Structured claim-source mappings — each assertion explicitly linked to its source document, excerpt, date, and methodology — that synthesis is required to preserve rather than compress away",
+        "A checklist forcing the synthesis subagent to manually copy-paste every source reference verbatim into the output",
+        "A separate \"sources\" file kept entirely outside the synthesis subagent's input context"
+      ],
+      "correct": 1,
+      "explain": "Structured claim-source mappings — claim, excerpt, source, date, methodology — carried through as a required part of the handoff are what prevent provenance from being silently dropped during synthesis. A confidence score doesn't address citation loss, and a checklist or externally-stored sources file both rely on a manual step that's easy to skip under exactly the conditions that caused the original loss.<br><b>Not “A confidence score on each claim, so synthesis can prioritize high-…”</b> — A confidence score does not preserve the citation. Synthesis dropped the source, and a score says nothing about where the figure came from.<br><b>Not “A checklist forcing the synthesis subagent to manually copy-paste e…”</b> — A copy-paste checklist relies on a manual step that is easy to skip, which is how the citation was lost in the first place.<br><b>Not “A separate \"sources\" file kept entirely outside the synthesis subag…”</b> — Keeping sources out of the synthesis agent's input removes the very information it would need to attach the citation to each claim."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 3,
+      "scenario": 3,
+      "q": "A coordinator delegates in parallel to three subagents: clinical-trial outcomes, healthcare policy documents, and emerging medical technologies. Trials and policy both return successfully. The technology subagent errors out because a source is temporarily unreachable. A report can still be produced, just with a coverage gap on emerging technologies. What should the coordinator do?",
+      "options": [
+        "Escalate the whole pipeline to a human, since any subagent failure should halt the process regardless of how much useful work the others completed",
+        "Produce the partial report from the two completed subagents, clearly annotating the coverage gap and why it exists, and let the reader judge whether that gap matters for their purposes",
+        "Retry the failed subagent indefinitely and block the report until it eventually succeeds",
+        "Discard the two successful results too, since the three-subagent pipeline was defined as all-or-nothing"
+      ],
+      "correct": 1,
+      "explain": "A partial, clearly-annotated report lets the reader judge whether the coverage gap matters for their purposes, while still delivering the value already produced by the two subagents that succeeded. Escalating over one failed subagent, retrying indefinitely, or discarding good work all destroy value the pipeline has already legitimately produced.<br><b>Not “Escalate the whole pipeline to a human, since any subagent failure …”</b> — Halting the entire pipeline over one failed subagent discards the useful work from the two that succeeded.<br><b>Not “Retry the failed subagent indefinitely and block the report until i…”</b> — Retrying forever and blocking the report holds everything up on a source that may stay unreachable, so the reader gets nothing.<br><b>Not “Discard the two successful results too, since the three-subagent pi…”</b> — Throwing away the two successful results wastes valid work, and nothing requires the pipeline to be all-or-nothing."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 3,
+      "scenario": 3,
+      "q": "A multi-turn synthesis is tracking housing-policy changes across a decade — early turns cover 2015–2018 findings, later turns add 2019–2024. By turn 5, the synthesis subagent starts referencing \"typical housing-policy patterns\" in vague generalities instead of the specific policy names, agencies, and dates it correctly cited in turn 2. The coordinator's messages keep growing, but the output keeps getting vaguer. What's the most direct fix?",
+      "options": [
+        "Restart the research from scratch with no prior context, since this kind of degradation is unavoidable in long sessions",
+        "Maintain a persistent findings-summary artifact (key facts, dates, policy names, sources) that the coordinator re-injects into every synthesis turn, countering attention loss on details buried in the middle of a growing context",
+        "Raise <code>max_tokens</code> so the model has more room to generate detailed responses",
+        "Swap in a larger model mid-session to regain synthesis quality"
+      ],
+      "correct": 1,
+      "explain": "A persistent findings-summary artifact, re-injected into every synthesis turn, is the direct countermeasure to specific facts getting buried and generalized away as a long multi-turn session grows — the classic \"lost in the middle\" pattern. Restarting, raising <code>max_tokens</code>, or swapping models don't address why the earlier, more specific findings stopped being referenced.<br><b>Not “Restart the research from scratch with no prior context, since this…”</b> — Restarting from scratch throws away all gathered findings, and the degradation is avoidable by re-injecting the key facts into each turn.<br><b>Not “Raise <code>max_tokens</code> so the model has more room to generate detailed …”</b> — <code>max_tokens</code> limits response length. It does nothing to bring back details that have become buried in a growing context.<br><b>Not “Swap in a larger model mid-session to regain synthesis quality”</b> — A larger model does not address why earlier specifics stopped being referenced, since the facts are still buried in the long context."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 3,
+      "scenario": 4,
+      "q": "A developer asks Claude to \"find all places where the request handler deserializes payloads without a null check\" while investigating intermittent null-pointer exceptions. Claude runs <code>Grep</code>, finds 14 matching files, reads three of them, and concludes with a vague \"most callers look safe.\" Asked for a specific prioritized list of entry points to review, Claude admits it only read a small fraction of the 14 matches. What's the most direct fix for the next investigation?",
+      "options": [
+        "Increase the context window so Claude can read all 14 files in one pass",
+        "Maintain a scratchpad file recording each candidate file's path, line number, and null-check status as it's checked, before synthesizing a final answer",
+        "Replace <code>Grep</code> with a more elaborate <code>Bash find</code> pipeline to pre-filter matches",
+        "Add a system-prompt instruction telling Claude to \"be thorough\" when reviewing security-sensitive code"
+      ],
+      "correct": 1,
+      "explain": "A scratchpad tracking each candidate's path, line number, and status as it's actually checked gives Claude a persistent record to synthesize from, instead of drawing a conclusion from a small, arbitrary subset of the 14 matches. A bigger context window doesn't force the remaining 11 files to actually get checked, and \"be thorough\" is a probabilistic instruction, not a structural fix.<br><b>Not “Increase the context window so Claude can read all 14 files in one …”</b> — A bigger window lets more fit in but does not force Claude to actually check each of the 14 files, so a partial review could recur.<br><b>Not “Replace <code>Grep</code> with a more elaborate <code>Bash find</code> pipeline to pre-fi…”</b> — A more elaborate <code>Bash find</code> pipeline filters differently but does not record which candidates were examined or what was found.<br><b>Not “Add a system-prompt instruction telling Claude to \"be thorough\" whe…”</b> — Telling Claude to be thorough is a probabilistic instruction. It does not create a record of each file's status to synthesise from."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 3,
+      "scenario": 4,
+      "q": "An MCP server <code>code_analyzer</code> exposes <code>find_pattern</code> (pattern/regex matching over code) and <code>trace_dataflow</code> (semantic, cross-function-boundary analysis that can follow unsanitized input to a security-critical sink). <code>trace_dataflow</code> is strictly more capable for this class of investigation, but logs show Claude consistently reaches for <code>find_pattern</code> instead, even on tasks that clearly call for cross-boundary tracing. What's the most likely cause?",
+      "options": [
+        "The built-in <code>Grep</code> tool has higher precedence than any MCP tool and is preferred by default",
+        "<code>trace_dataflow</code>'s description doesn't clearly explain its semantic, cross-boundary capability or when it should be chosen over simple pattern matching",
+        "The MCP server needs to be reconfigured at the network level to expose <code>trace_dataflow</code> with higher priority",
+        "Claude prefers MCP tools over built-ins by default, so some other, unrelated setting must be suppressing that preference here"
+      ],
+      "correct": 1,
+      "explain": "Tool selection is driven primarily by description quality; a thin or vague description for the more capable tool loses to a familiar, simpler alternative by default. Sharpening <code>trace_dataflow</code>'s description to spell out its semantic, cross-boundary capability — and when that capability actually matters — is the direct fix, well ahead of anything at the network or precedence level.<br><b>Not “The built-in <code>Grep</code> tool has higher precedence than any MCP tool an…”</b> — Built-in <code>Grep</code> does not have fixed precedence over MCP tools. A weak description is what makes the familiar alternative win.<br><b>Not “The MCP server needs to be reconfigured at the network level to exp…”</b> — Network configuration would not affect which tool Claude prefers, as the tool is exposed and callable but just not chosen.<br><b>Not “Claude prefers MCP tools over built-ins by default, so some other, …”</b> — Claude does not generally prefer MCP tools over built-ins, so this assumes a default that does not exist and leaves the thin description unaddressed."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 3,
+      "scenario": 4,
+      "q": "A developer wants to compare one function's signature across three branches (<code>main</code>, <code>develop</code>, <code>staging</code>) — just the definition line and its parameter list in each. What's the most efficient combination of built-in tools?",
+      "options": [
+        "Use <code>Bash</code> to run <code>git diff</code> across the branches and parse the raw output",
+        "Use <code>Grep</code> to locate the function's definition line in each branch, then <code>Read</code> only the small region around each match",
+        "Use <code>Glob</code> to enumerate every source file first, then <code>Read</code> each one looking for the signature",
+        "Use <code>Read</code> on the entire repository per branch, then search the combined content manually"
+      ],
+      "correct": 1,
+      "explain": "<code>Grep</code> is the right tool for finding a pattern (the function definition) inside file contents, and <code>Read</code> is then used narrowly on just the matched region. <code>Glob</code> matches file paths, not contents, and reading entire branches wastes context on code that isn't relevant to the comparison.<br><b>Not “Use <code>Bash</code> to run <code>git diff</code> across the branches and parse the raw …”</b> — <code>git diff</code> output is a different comparison, and parsing raw output is clumsy for just one function's signature across three branches.<br><b>Not “Use <code>Glob</code> to enumerate every source file first, then <code>Read</code> each o…”</b> — <code>Glob</code> matches file paths, not contents, so it cannot find a signature, and reading every file wastes effort.<br><b>Not “Use <code>Read</code> on the entire repository per branch, then search the com…”</b> — Reading the entire repository per branch floods the context with code irrelevant to a single signature comparison."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 3,
+      "scenario": 4,
+      "q": "An <code>Edit</code> call's anchor text matches three times in the target file: once in a comment, once in a docstring, and once in the actual executable line the developer wants changed. The call fails because the anchor isn't unique. What's the reliable next step?",
+      "options": [
+        "Retry <code>Edit</code> with a longer anchor string that includes more surrounding context, hoping it becomes unique",
+        "Use <code>Read</code> to load the full file, manually identify the correct occurrence, then use <code>Write</code> to save the corrected full-file version",
+        "Use <code>Bash grep -n</code> to get the line number, then build a new <code>Edit</code> call anchored on that line number",
+        "Tell the user ambiguous anchors are a hard limitation and the edit must be done manually"
+      ],
+      "correct": 1,
+      "explain": "When an <code>Edit</code> anchor isn't unique, the documented fallback is <code>Read</code> to load the whole file, manually identify the correct occurrence, then <code>Write</code> the corrected full-file version. A longer anchor might still collide, and constructing an <code>Edit</code> around a bare line number isn't how the tool matches text.<br><b>Not “Retry <code>Edit</code> with a longer anchor string that includes more surroun…”</b> — A longer anchor might still match more than once, so it is not reliable, whereas rewriting the full file avoids the ambiguity completely.<br><b>Not “Use <code>Bash grep -n</code> to get the line number, then build a new <code>Edit</code> …”</b> — <code>Edit</code> matches text, not line numbers, so anchoring it on a line number is not how the tool works.<br><b>Not “Tell the user ambiguous anchors are a hard limitation and the edit …”</b> — Ambiguous anchors are not a hard limit, since reading the file and writing the corrected version works."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 3,
+      "scenario": 4,
+      "q": "A custom MCP server queries a proprietary internal database for team-wide metrics. It needs credentials that must never be committed to git, and the server configuration itself must be shared across every developer's checkout. Where should this be configured, and how should the credential be referenced?",
+      "options": [
+        "In <code>~/.claude.json</code>, with the credential hardcoded, distributed manually to each teammate",
+        "In <code>.mcp.json</code>, referencing <code>${DATABASE_API_KEY}</code> for environment-variable expansion, with each developer setting that variable locally",
+        "In <code>CLAUDE.md</code>, inside a fenced code block, with a note asking developers not to commit it",
+        "In a root-level <code>.env</code> file, referenced from <code>.mcp.json</code> by its literal filename"
+      ],
+      "correct": 1,
+      "explain": "Project-scoped <code>.mcp.json</code>, committed to version control, with <code>${DATABASE_API_KEY}</code> expanded from each developer's own environment, is exactly the pattern that keeps the config shared while keeping the secret itself out of git. <code>~/.claude.json</code> isn't shared across the team by design.<br><b>Not “In <code>~/.claude.json</code>, with the credential hardcoded, distributed man…”</b> — <code>~/.claude.json</code> is personal and not shared by design, and hardcoding the credential puts the secret in a file passed around by hand.<br><b>Not “In <code>CLAUDE.md</code>, inside a fenced code block, with a note asking deve…”</b> — <code>CLAUDE.md</code> is committed to the repo, so the credential would end up in git, and asking people not to commit it is unenforceable.<br><b>Not “In a root-level <code>.env</code> file, referenced from <code>.mcp.json</code> by its lit…”</b> — A <code>.env</code> file referenced by its literal filename is not how <code>.mcp.json</code> picks up credentials. It expands variables from the environment."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 3,
+      "scenario": 4,
+      "q": "A developer wants to try out a prototype MCP server for dependency-graph analysis that no one else on the team needs yet, and that might be misconfigured and break things while they experiment. Where should this go so it doesn't affect teammates or clutter shared config?",
+      "options": [
+        "In <code>.mcp.json</code> at the repo root, flagged with an <code>\"experimental\": true</code> field",
+        "In <code>~/.claude.json</code> on their own machine",
+        "In a new <code>.claude/experimental-mcp.json</code> file in the project",
+        "In a <code>.mcp-local</code> file added to <code>.gitignore</code>"
+      ],
+      "correct": 1,
+      "explain": "<code>~/.claude.json</code> is the user-scoped location intended for exactly this: a personal, experimental server that shouldn't be pushed into the shared project configuration or risk breaking anything for teammates.<br><b>Not “In <code>.mcp.json</code> at the repo root, flagged with an `\"experimental\": t…”</b> — A flag inside <code>.mcp.json</code> does not keep the server out of the shared file, so teammates would still receive the prototype.<br><b>Not “In a new <code>.claude/experimental-mcp.json</code> file in the project”</b> — A new file in the project is not a recognised configuration location for MCP servers, and it would sit in the shared project.<br><b>Not “In a <code>.mcp-local</code> file added to <code>.gitignore</code>”</b> — A <code>.mcp-local</code> file is not a location Claude Code reads for server configuration, so the server would not be registered."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 3,
+      "scenario": 4,
+      "q": "After three hours exploring a monorepo's service-to-service communication, Claude has answered several detailed questions correctly, citing specific classes. On the next question — about the same system — Claude says it \"doesn't have enough context to be specific.\" Asked to recall a class name it named accurately 15 minutes earlier, it now proposes a slightly different, incorrect name. What's happening, and what's the most direct fix?",
+      "options": [
+        "The context window is full; restart the session",
+        "The agent's grip on earlier specifics is degrading as the conversation grows; maintain a scratchpad file recording key class names, interface boundaries, and dependency relationships, and reference it in later prompts",
+        "The developer's questions have become too vague; ask more specific, narrowly-scoped questions instead",
+        "Reduce <code>max_tokens</code> so responses stay short enough to avoid straining context"
+      ],
+      "correct": 1,
+      "explain": "This is context degradation over a long session — earlier specifics get lost even though the conversation is still \"about\" the same system. A scratchpad recording key class names and relationships, referenced in later prompts, is the direct mitigation. Restarting throws away three hours of legitimate exploration.<br><b>Not “The context window is full; restart the session”</b> — Restarting throws away three hours of exploration, and the issue is gradual loss of specifics, not a simple full-window condition.<br><b>Not “The developer's questions have become too vague; ask more specific,…”</b> — The questions are fine. The agent is losing specifics it already held, so rephrasing them does not restore the details.<br><b>Not “Reduce <code>max_tokens</code> so responses stay short enough to avoid straini…”</b> — <code>max_tokens</code> caps response length and does nothing to preserve earlier class names across a long session."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 3,
+      "scenario": 4,
+      "q": "A developer unfamiliar with a codebase wants to find where HTTP request validation happens before requests reach business logic, without reading every file upfront. What's the recommended exploration order?",
+      "options": [
+        "Use <code>Read</code> on every file under <code>/handlers</code> first, to understand overall structure",
+        "Use <code>Grep</code> for validation-related terms (\"validate\", \"schema\", \"middleware\") to find candidate files, then use <code>Read</code> on just those matches, following imports to trace the flow from entry points",
+        "Use <code>Bash find</code> to list files, pipe the output somewhere, and ask Claude to infer the pattern from the file list alone",
+        "Use <code>Glob</code> for <code>**/*.ts</code>, then <code>Read</code> every result and ask Claude to identify validation logic after the fact"
+      ],
+      "correct": 1,
+      "explain": "Search first, read second: <code>Grep</code> for validation-related terms surfaces candidate files, then <code>Read</code> on just those matches (following imports from there) builds understanding incrementally. Reading everything upfront front-loads irrelevant content before knowing what actually matters.<br><b>Not “Use <code>Read</code> on every file under <code>/handlers</code> first, to understand ove…”</b> — Reading every handler file first is slow and fills the context with code unrelated to validation before knowing what matters.<br><b>Not “Use <code>Bash find</code> to list files, pipe the output somewhere, and ask C…”</b> — Inferring a pattern from a file list alone gives no information about what the files contain, so it cannot locate validation logic.<br><b>Not “Use <code>Glob</code> for <code>**/*.ts</code>, then <code>Read</code> every result and ask Claude t…”</b> — Reading every file after listing them front-loads irrelevant content and defeats targeted exploration."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 3,
+      "scenario": 4,
+      "q": "A team's custom MCP server for repo analysis is configured in <code>.mcp.json</code> with <code>${GIT_API_TOKEN}</code> for credential expansion. A teammate launches Claude Code and the server fails to initialize with an error that the environment variable isn't set — even though they've added <code>export GIT_API_TOKEN=...</code> to their <code>~/.bashrc</code>. What's actually going on, and what's the fix?",
+      "options": [
+        "Credentials referenced via environment-variable expansion only work from <code>~/.claude.json</code>, not <code>.mcp.json</code>",
+        "A variable set in <code>~/.bashrc</code> only applies to shells that source that file when they start; if Claude Code was launched from a shell or process that never sourced it, the variable simply isn't in its environment — export it in the current terminal session (or set it at the OS/session level) before launching Claude Code",
+        "The syntax is wrong; it must be <code>${GIT_API_TOKEN:-default}</code>, since bare <code>${VAR}</code> isn't supported",
+        "Environment-variable expansion isn't supported in <code>.mcp.json</code> at all; the token must be hardcoded or read from a separate <code>.env</code> file"
+      ],
+      "correct": 1,
+      "explain": "A variable exported only in <code>~/.bashrc</code> is available to shells that source that file at startup — it doesn't automatically propagate to every process on the machine. If Claude Code was launched from a context that never sourced <code>.bashrc</code>, the variable simply isn't present in its environment. The fix is ensuring the variable is actually set in the shell/session Claude Code is launched from — this is standard environment-variable scoping, not an <code>.mcp.json</code> syntax or location problem.<br><b>Not “Credentials referenced via environment-variable expansion only work…”</b> — Credential expansion works in <code>.mcp.json</code>. The issue lies in where the variable exists, not in which file refers to it.<br><b>Not “The syntax is wrong; it must be <code>${GIT_API_TOKEN:-default}</code>, since …”</b> — Bare <code>${VAR}</code> is supported, so a default-value syntax is not required, and the error says the variable is unset.<br><b>Not “Environment-variable expansion isn't supported in <code>.mcp.json</code> at al…”</b> — Environment-variable expansion is supported in <code>.mcp.json</code>, and it is the right way to keep tokens out of version control."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 3,
+      "scenario": 4,
+      "q": "A team wants an exploration phase (read-only: <code>Read</code>, <code>Grep</code>, <code>Bash</code> restricted to read-only commands) to hand off to a separate modification phase (<code>Read</code>, <code>Write</code>, <code>Edit</code>) once a refactor target is identified — without maintaining two entirely disconnected agents. What's the best way to enforce this tool scoping?",
+      "options": [
+        "Configure <code>allowedTools</code> at each agent/role definition so exploration and modification each only ever have access to the tools appropriate for that phase",
+        "Build two fully separate agent definitions that share no context whatsoever between phases",
+        "Use a single agent and rely on prompt instructions telling it which tools to avoid during the exploration phase",
+        "Use hooks to dynamically intercept and block any tool call not on the current phase's approved list"
+      ],
+      "correct": 0,
+      "explain": "<code>allowedTools</code> scoped at the agent/role definition is exactly the mechanism for restricting which tools are available during which phase, without needing two fully disconnected agents or relying on prompt instructions alone to enforce what should be a hard boundary.<br><b>Not “Build two fully separate agent definitions that share no context wh…”</b> — Two fully separate agent definitions that share no context make the handoff between phases hard, which is what the team wants to avoid.<br><b>Not “Use a single agent and rely on prompt instructions telling it which…”</b> — Prompt instructions about which tools to avoid are followed probabilistically, so they cannot enforce a firm read-only boundary.<br><b>Not “Use hooks to dynamically intercept and block any tool call not on t…”</b> — Hooks can block calls but add complexity to track phases dynamically, whereas scoping <code>allowedTools</code> per role defines the boundary directly."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 3,
+      "scenario": 5,
+      "q": "A CI pipeline reuses a single Claude Code session across a queue of 6–8 PRs to amortize session startup overhead. By the third PR, review comments start referencing prior PRs (\"similar to the previous refactoring\"); by the seventh, findings are generic and don't address the actual diff in front of it. Why, and what's the fix?",
+      "options": [
+        "The session's context window is exhausted; raise <code>max_tokens</code> to give each invocation more room",
+        "The session is carrying forward reasoning and context from earlier PRs, biasing later reviews toward prior patterns; use a fresh Claude Code session per PR instead",
+        "The CI runner is incorrectly caching findings between invocations; clear the runner's cache",
+        "Run all PR reviews simultaneously in parallel instead of sequentially, to avoid context accumulation"
+      ],
+      "correct": 1,
+      "explain": "Reusing one session across multiple PRs lets earlier reasoning and context bleed into later reviews, producing generic, prior-PR-flavored comments instead of a focused read of the current diff. A fresh session per PR removes that contamination. Raising <code>max_tokens</code> doesn't address contaminated context, and parallelizing sidesteps the question of what's actually wrong with the sequential design rather than fixing it.<br><b>Not “The session's context window is exhausted; raise <code>max_tokens</code> to gi…”</b> — <code>max_tokens</code> limits response length. It does not clear earlier PRs' reasoning from the session, which is what contaminates later reviews.<br><b>Not “The CI runner is incorrectly caching findings between invocations; …”</b> — Nothing indicates the runner caches findings. The earlier PRs' context sits in the long-lived session itself.<br><b>Not “Run all PR reviews simultaneously in parallel instead of sequential…”</b> — Running reviews in parallel in the same shared session would not remove contamination, and it avoids rather than fixes the shared-context problem."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 3,
+      "scenario": 5,
+      "q": "A <code>PostToolUse</code> hook with <code>matcher: \"Bash|Read|Edit\"</code> normalizes tool responses into a consistent JSON structure to make review output more uniform. In CI, the same hook also fires on an unrelated test-execution Bash step that emits raw plain-text test output, and normalizing that output breaks the downstream test-result parser, which now fails the build. What's the most precise fix?",
+      "options": [
+        "Remove the hook entirely and give up on normalizing tool responses in CI",
+        "Narrow the hook's <code>matcher</code> (or add a condition) so it only fires on review-related tool invocations, not on the unrelated test-execution step",
+        "Move the hook from <code>PostToolUse</code> to <code>PreToolUse</code>, since that runs earlier and can skip non-review steps",
+        "Disable <code>Bash</code> tool access for the entire CI review run and use only <code>Read</code> and <code>Edit</code>"
+      ],
+      "correct": 1,
+      "explain": "The hook's logic is sound; its scope is too broad. Narrowing the <code>matcher</code> (or adding a condition) so it only fires on review-related tool calls — not on an unrelated test-execution step — fixes the interference without giving up normalization altogether or misdiagnosing the fix as a timing change.<br><b>Not “Remove the hook entirely and give up on normalizing tool responses …”</b> — Removing the hook gives up normalisation that works for review output, when the only problem is its overly broad scope.<br><b>Not “Move the hook from <code>PostToolUse</code> to <code>PreToolUse</code>, since that runs e…”</b> — Moving to <code>PreToolUse</code> changes timing but does not narrow which tool calls the hook affects, so it would still fire on the test step.<br><b>Not “Disable <code>Bash</code> tool access for the entire CI review run and use onl…”</b> — Disabling <code>Bash</code> for the whole review run removes a needed tool and does not fix the hook's scope."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 3,
+      "scenario": 5,
+      "q": "A CI review prompt spells out separate false-positive-reduction criteria for nine finding categories (security, performance, coverage, etc.), totaling roughly 280 tokens of criteria alone. Traces show the model applies these criteria inconsistently and sometimes seems to forget earlier categories' rules by the time it reaches later files in the same pass. What's the underlying issue?",
+      "options": [
+        "The criteria are too strict; loosen them so the reviewer becomes more confident overall",
+        "Packing many fine-grained, per-category rules into a single pass causes attention dilution; split the review into per-category (or per-file) passes, or move some of the criteria into a deterministic post-generation validation layer",
+        "Add 5–8 few-shot examples per category showing correct criterion application",
+        "Set <code>temperature: 0</code> to force strictly rule-following, deterministic behavior regardless of prompt length"
+      ],
+      "correct": 1,
+      "explain": "Nine categories' worth of fine-grained criteria packed into a single pass is a recipe for attention dilution — the model can't reliably hold and apply that many rules while also reading code. Splitting into per-category (or per-file) passes, or moving some of the criteria into a deterministic post-generation validation step, addresses the structural cause. More examples or forcing <code>temperature: 0</code> don't resolve rules competing for the same attention budget.<br><b>Not “The criteria are too strict; loosen them so the reviewer becomes mo…”</b> — Looser criteria would raise false positives and do nothing about the model dropping earlier rules when it handles many of them in one pass.<br><b>Not “Add 5–8 few-shot examples per category showing correct criterion ap…”</b> — Adding more examples per category lengthens the prompt further, increasing the attention load rather than reducing it.<br><b>Not “Set <code>temperature: 0</code> to force strictly rule-following, deterministi…”</b> — Temperature zero does not give the model more attention capacity, so rules would still compete for it across a long prompt."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 3,
+      "scenario": 5,
+      "q": "A team runs a blocking pre-merge review with an SLA of under 8 minutes, and a separate nightly technical-debt scan with no time constraint. They want to move workloads to the Message Batches API for the 50% cost discount. Which is the correct call?",
+      "options": [
+        "Batch both; the cost savings are worth accepting whatever latency impact results",
+        "Batch only the nightly scan; moving the pre-merge check to the Batches API would only make sense if the team is willing to accept processing delays of up to 24 hours on merge decisions, which conflicts with the stated SLA",
+        "Batch the pre-merge check too — the Batches API typically finishes within about 2 hours, which is fine for most teams' merge cadence",
+        "Keep both synchronous; the Batches API isn't appropriate for any CI-adjacent workflow"
+      ],
+      "correct": 1,
+      "explain": "The Message Batches API has no latency SLA and can take up to 24 hours; that's fundamentally incompatible with an under-8-minute blocking pre-merge check, but is a good fit for the latency-tolerant nightly scan. Assuming a typical 2-hour turnaround treats an unbounded window as if it were a guarantee, which it isn't.<br><b>Not “Batch both; the cost savings are worth accepting whatever latency i…”</b> — Batching the blocking pre-merge check would put merge decisions behind a processing window of up to 24 hours, breaking the under-8-minute requirement.<br><b>Not “Batch the pre-merge check too — the Batches API typically finishes …”</b> — Batch has no latency guarantee. A typical turnaround is not a promise, so a blocking check cannot rely on it.<br><b>Not “Keep both synchronous; the Batches API isn't appropriate for any CI…”</b> — The nightly scan has no time constraint and suits batch well, so keeping everything synchronous gives up an easy 50% saving."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 3,
+      "scenario": 5,
+      "q": "A CI reviewer is configured to emit <code>--output-format json</code> with a <code>--json-schema</code>, and a downstream bot parses that JSON to post PR comments. The bot has recently started rejecting otherwise-valid runs because a finding's text field contains a literal <code>{</code> or <code>}</code> (e.g., \"O{n} complexity\" or \"refactor: {old} → {new}\"), which trips up a naive bracket-counting step the bot added as an extra sanity check before parsing. What's the most robust fix?",
+      "options": [
+        "Have the bot search for the first <code>[</code> in the raw response and parse only from there onward",
+        "Add a prompt instruction: \"output JSON only, no prose before or after\"",
+        "Remove the bot's ad hoc bracket-sanity-check step and parse directly against the enforced <code>--json-schema</code>, since schema-enforced output is already structurally reliable and the extra heuristic is what's actually misfiring on legitimate content",
+        "Have the bot trigger a second review run with a different prompt whenever the first one fails to parse"
+      ],
+      "correct": 2,
+      "explain": "<code>--output-format json</code> with <code>--json-schema</code> already produces structurally enforced, schema-valid JSON; the bracket-counting sanity check the bot added on top is a redundant heuristic that misfires on legitimate finding text containing <code>{</code>/<code>}</code>. Removing that extra, unnecessary check and parsing directly against the enforced schema is more robust than patching around it with string-search heuristics or hoping a prompt instruction prevents <code>{</code>/<code>}</code> from ever appearing in prose.<br><b>Not “Have the bot search for the first <code>[</code> in the raw response and parse…”</b> — Patching around a redundant heuristic by searching for the first <code>[</code> is brittle, and the schema-enforced output does not need such parsing tricks.<br><b>Not “Add a prompt instruction: \"output JSON only, no prose before or after\"”</b> — The output is already schema-enforced, so more prompting is unnecessary, and instructions cannot control whether finding text contains braces.<br><b>Not “Have the bot trigger a second review run with a different prompt wh…”</b> — A second review run does nothing about the bot's faulty bracket check, which would reject the same valid output again."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 3,
+      "scenario": 5,
+      "q": "A team wants to guarantee that review never runs on a PR lacking a linked issue-tracker ticket — unlinked PRs currently produce findings that just get ignored downstream anyway. The review prompt already says \"never review PRs without a linked ticket,\" but reviews keep running regardless, since prompt instructions are followed probabilistically. What's the most deterministic enforcement point?",
+      "options": [
+        "Strengthen the prompt further: \"CRITICAL: you MUST refuse to review PRs without a confirmed linked ticket. Non-negotiable.\"",
+        "Add a <code>PreToolUse</code> hook that checks the ticket-link prerequisite via the issue tracker's API and blocks the review-related tool call outright if the check fails",
+        "Build a custom <code>/review</code> skill that checks for a linked ticket as a documented step in its instructions before invoking the reviewer",
+        "Let review run as normal, then filter out and discard any findings after the fact if the PR turns out to lack a linked ticket"
+      ],
+      "correct": 1,
+      "explain": "A non-negotiable prerequisite needs enforcement outside the model's voluntary compliance. A <code>PreToolUse</code> hook that checks the ticket-link prerequisite and blocks the review tool call deterministically is the fix; a stronger prompt, a skill that merely documents the check as a step, or post-hoc filtering all still depend on the model behaving correctly, which has already been shown to fail.<br><b>Not “Strengthen the prompt further: \"CRITICAL: you MUST refuse to review…”</b> — Stronger wording is still followed probabilistically, and the model has already been shown to ignore the existing instruction.<br><b>Not “Build a custom <code>/review</code> skill that checks for a linked ticket as a…”</b> — A skill that lists the check as a step still relies on the model following it, so it is not enforced.<br><b>Not “Let review run as normal, then filter out and discard any findings …”</b> — Filtering findings after the review has run wastes the review work and does not prevent the review from running."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 3,
+      "scenario": 5,
+      "q": "A team splits large PR reviews into (1) per-file local-analysis passes and (2) a cross-file integration pass for API-contract and shared-type issues — but both stages currently run as two prompts inside one long-lived session. In practice, the integration pass re-flags issues the per-file pass already caught, and by the time the integration prompt runs, the accumulated session context has grown large enough that its findings get noticeably less precise. What's the best architectural fix?",
+      "options": [
+        "Keep both stages in the same session, separated by a clear divider comment, and instruct the model not to repeat findings from the prior stage",
+        "Run each stage as a separate <code>-p</code> CLI invocation with fresh context, passing the per-file findings into the integration invocation's input so it can focus only on genuinely new cross-file issues",
+        "Merge both stages into one comprehensive prompt that analyzes every file at once for full consistency",
+        "Run the per-file passes in parallel, but still run the integration pass afterward inside the same accumulated session"
+      ],
+      "correct": 1,
+      "explain": "Running each stage as its own fresh <code>-p</code> invocation avoids both the session-bloat precision loss and the re-flagging problem, as long as the per-file findings are explicitly passed into the integration invocation so it knows what's already been caught and can focus on genuinely new cross-file issues. Keeping both stages in one long session preserves the very context accumulation causing the precision loss.<br><b>Not “Keep both stages in the same session, separated by a clear divider …”</b> — A divider comment and an instruction not to repeat findings leave both stages in one growing session, so the precision loss from accumulated context remains.<br><b>Not “Merge both stages into one comprehensive prompt that analyzes every…”</b> — One prompt covering every file at once recreates the attention dilution that splitting into per-file and cross-file passes was meant to solve.<br><b>Not “Run the per-file passes in parallel, but still run the integration …”</b> — Parallel per-file passes help, but running integration in the same accumulated session keeps the context bloat and the repeated findings."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 3,
+      "scenario": 5,
+      "q": "A reviewer keeps flagging functions as \"missing error handling\" even when a <code>try/catch</code> is clearly present. The instruction \"flag only critical cases where error handling is missing\" hasn't helped, and adding 4–5 illustrative good/bad examples hasn't moved the false-positive rate either. What additional specificity is actually needed?",
+      "options": [
+        "Increase the example count from 4–5 to 15+, covering more edge cases",
+        "Switch to a larger, more capable model",
+        "Replace the vague instruction with an explicit, codebase-specific rule — e.g., \"flag only when function X is called outside a try/catch, and the uncaught exception types are Y or Z, which can cause data loss or DB inconsistency\"",
+        "Disable the \"missing error handling\" category entirely until a dedicated, separately-trained classifier can be built for it"
+      ],
+      "correct": 2,
+      "explain": "\"Flag only critical cases\" is still a subjective judgment call; an explicit, codebase-specific rule (naming the function, the exception types, and the concrete consequence that matters) removes the ambiguity that examples alone hadn't resolved. More examples without a sharper rule doesn't change the boundary itself.<br><b>Not “Increase the example count from 4–5 to 15+, covering more edge cases”</b> — More examples without a sharper rule do not change the vague boundary, and a handful of examples has not moved the false-positive rate already.<br><b>Not “Switch to a larger, more capable model”</b> — A more capable model would still be guessing at an undefined threshold, so false positives stay unless the criterion itself is specific.<br><b>Not “Disable the \"missing error handling\" category entirely until a dedi…”</b> — Disabling the category until a separate classifier exists gives up the finding entirely, when a clearer rule would fix the ambiguity."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 3,
+      "scenario": 5,
+      "q": "A CI-facing project <code>CLAUDE.md</code> has grown past 650 lines: API design conventions, a deployment-readiness checklist, test-writing standards, migration guidelines, and detailed false-positive-reduction criteria for 15+ finding categories, all loaded on every single invocation regardless of what's actually being reviewed. Reviews are now missing context from the actual diff and producing vaguer findings, and logs show a large share of the context budget going to configuration rather than the code under review. What's the most effective fix?",
+      "options": [
+        "Split <code>CLAUDE.md</code> into several files connected with <code>@path</code> imports, so the content is easier for humans to navigate",
+        "Move file-type- or path-specific guidance (e.g., migration rules scoped to <code>paths: [\"**/migrations/*\"]</code>) into <code>.claude/rules/</code>, and keep only genuinely universal guidance in <code>CLAUDE.md</code>",
+        "Cut <code>CLAUDE.md</code> down to under 100 lines of high-level guidance and rely on the model's general training knowledge for the rest",
+        "Build a custom <code>/review</code> skill that dynamically selects which subset of guidance to load based on which files changed in the PR"
+      ],
+      "correct": 1,
+      "explain": "Moving path- or category-specific guidance into <code>.claude/rules/</code> with scoped frontmatter means it only loads for matching files, freeing up context budget for the actual diff being reviewed.<br><b>Not “Split <code>CLAUDE.md</code> into several files connected with <code>@path</code> imports…”</b> — <code>@path</code> imports organise the content for people but are still expanded into context, so the context budget problem remains.<br><b>Not “Cut <code>CLAUDE.md</code> down to under 100 lines of high-level guidance and …”</b> — Cutting to under 100 lines throws away guidance the team needs and relies on general knowledge instead of project-specific rules.<br><b>Not “Build a custom <code>/review</code> skill that dynamically selects which subse…”</b> — A custom skill that selects guidance adds machinery and relies on invocation, when path-scoped rules already load only for matching files."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 3,
+      "scenario": 6,
+      "q": "A receipt pipeline adds OCR to pull text from vendor logos on scanned images. The model now confidently fills the vendor field with plausible-sounding names that don't appear anywhere in the OCR text, the original image, or the email body — but schema validation passes, since <code>vendor</code> is syntactically a valid string. These hallucinated vendor names carry high confidence scores (0.92) and bypass human review entirely, surfacing only weeks later during downstream reconciliation. What should be added to the schema first to catch this?",
+      "options": [
+        "A required <code>ocr_confidence</code> field, so low-OCR-quality documents can be skipped",
+        "A <code>source_location</code> field (e.g., \"header\", \"footer\", \"email_body\", \"ocr_image\") tracking where each extracted value came from, enabling a validation step that checks the value actually appears in the identified location",
+        "An <code>is_hallucinated</code> boolean that the model self-reports",
+        "A higher <code>max_tokens</code> budget, giving the model more room to \"think\" before extracting"
+      ],
+      "correct": 1,
+      "explain": "Schema validity guarantees the JSON is well-formed, not that the value is grounded in the source. A <code>source_location</code> field lets downstream validation check that an extracted value actually appears where it claims to have come from, which is what catches a fabricated-but-plausible vendor name that a confidence score alone missed.<br><b>Not “A required <code>ocr_confidence</code> field, so low-OCR-quality documents can…”</b> — OCR confidence says how readable the image is, but does not check whether the vendor name appears anywhere in the source.<br><b>Not “An <code>is_hallucinated</code> boolean that the model self-reports”</b> — A self-reported hallucination flag relies on the same model that invented the value, which is exactly what cannot be trusted.<br><b>Not “A higher <code>max_tokens</code> budget, giving the model more room to \"think\"…”</b> — More <code>max_tokens</code> gives room for output, not grounding, so the model could still produce a plausible invented vendor."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 3,
+      "scenario": 6,
+      "q": "A pipeline has <code>extract_receipt</code>, <code>extract_invoice</code>, and <code>extract_contract</code>, each with its own schema, and uses <code>tool_choice: \"any\"</code> so a call is always guaranteed. A borderline document — a receipt-like form that also includes itemized line items — keeps getting routed to <code>extract_invoice</code>, whose required fields (like <code>PO_number</code>) don't exist on the source, so the model fabricates them. Retrying with the same <code>tool_choice: \"any\"</code> setting produces the same misrouted result again. What's the root issue and the most direct fix?",
+      "options": [
+        "Add 2–3 few-shot examples distinguishing a borderline receipt from an invoice, then retry",
+        "Switch to <code>tool_choice: \"auto\"</code> so the model has the option to fall back to a plain-text response instead of a tool call",
+        "<code>tool_choice: \"any\"</code> only guarantees *a* call, not the *right* one; add a validation step that detects field-presence mismatches against the chosen schema, returns a structured error naming the better-fitting schema, and lets the model retry against that feedback",
+        "Drop the contract schema — most real documents are receipts or invoices anyway, and fewer options should reduce misrouting"
+      ],
+      "correct": 2,
+      "explain": "<code>tool_choice: \"any\"</code> guarantees a tool call happens, but not that it's the *right* one; that requires a separate validation-retry loop that detects a field-presence mismatch, names the better-fitting schema in a structured error, and lets the model retry against that specific feedback. Few-shot examples may help marginally but don't replace direct error feedback on the actual mismatch.<br><b>Not “Add 2–3 few-shot examples distinguishing a borderline receipt from …”</b> — A few examples may help at the margin, but they do not provide direct feedback on the specific field mismatch that causes fabrication.<br><b>Not “Switch to <code>tool_choice: \"auto\"</code> so the model has the option to fall…”</b> — <code>\"auto\"</code> would allow plain-text responses and no extraction, giving up the guarantee while not fixing the misrouting.<br><b>Not “Drop the contract schema — most real documents are receipts or invo…”</b> — Dropping the contract schema removes a document type the pipeline needs and would not stop receipt-like forms being sent to the invoice tool."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 3,
+      "scenario": 6,
+      "q": "A pipeline routes extractions below 0.70 overall confidence to human review and auto-approves the rest. After 1,000 documents, fabricated vendor names almost never get caught by review — they only surface weeks later downstream — while extractions that land at 0.68–0.72 confidence (right at the boundary) turn out to be correct almost every time they're checked. What's actually wrong with the routing, and what closes the gap?",
+      "options": [
+        "The threshold is simply too high; drop it to 0.50 so more extractions get reviewed",
+        "Confidence is poorly calibrated specifically for fabrication — the model can be very confident about an invented value; add stratified random sampling of a small percentage of *high*-confidence extractions specifically to surface the failure patterns confidence scoring can't see",
+        "Field-level confidence is too fine-grained; collapse everything into one binary approve/review decision",
+        "Switch from overall confidence to the minimum field-level confidence as the routing signal instead"
+      ],
+      "correct": 1,
+      "explain": "Confidence scores are a poor signal specifically for fabrication, since a model can be highly confident about an invented value. Stratified random sampling of a slice of high-confidence extractions is designed to surface exactly the failure patterns a pure confidence threshold structurally cannot catch. Lowering the threshold doesn't target this failure mode any more precisely.<br><b>Not “The threshold is simply too high; drop it to 0.50 so more extractio…”</b> — Lowering the threshold sends more items to review but does not target fabricated values that carry high confidence and would still pass.<br><b>Not “Field-level confidence is too fine-grained; collapse everything int…”</b> — Collapsing to one binary decision discards information and does not help detect fabricated values that look confident.<br><b>Not “Switch from overall confidence to the minimum field-level confidenc…”</b> — Minimum field confidence still relies on the model's confidence, which is unreliable on invented values, so fabrications would still pass."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 3,
+      "scenario": 6,
+      "q": "An <code>amount</code> field keeps extracting as the string <code>\"1234 dollars\"</code> instead of the required numeric type. A retry loop feeds back the original document, the failed output, and the exact validation error each time, but four consecutive retries reproduce the identical mistake. What should happen next, and why is a fifth retry not the answer?",
+      "options": [
+        "Retry a fifth time with a larger <code>max_tokens</code> budget, in case the model needs more room to reason through the fix",
+        "Recognize this as a schema-design problem, not a retry problem: accept <code>amount</code> as a string, add a deterministic post-processing step to parse \"1234 dollars\" into <code>1234</code>, and move that specific validation out of the pre-approval retry loop entirely",
+        "The tokenizer is likely confusing the word \"dollars\" with the number; rephrase the validation error using only numerals and currency symbols",
+        "Persist through up to 10 retries — enough repetition eventually corrects this class of error"
+      ],
+      "correct": 1,
+      "explain": "Four identical retries hitting the same wall is a sign the problem is the schema, not the prompt: accept the value as a string and parse it deterministically afterward, moving that check out of the pre-approval retry loop entirely. Persisting with more retries repeats an approach already shown not to work.<br><b>Not “Retry a fifth time with a larger <code>max_tokens</code> budget, in case the m…”</b> — <code>max_tokens</code> does not change how the model handles a type mismatch, and four identical retries show more of the same will not work.<br><b>Not “The tokenizer is likely confusing the word \"dollars\" with the numbe…”</b> — The tokenizer is not the issue, and rewording the error message with numerals leaves the underlying schema design problem in place.<br><b>Not “Persist through up to 10 retries — enough repetition eventually cor…”</b> — Ten retries repeat an approach that has already failed four times with the same result, so persistence will not fix it."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 3,
+      "scenario": 6,
+      "q": "<code>payment_method</code> was originally required, and extraction never failed the schema — but downstream audits found it was frequently fabricated (e.g., \"Paid by credit card\" invented for documents that never mention payment method at all). Making the field nullable stopped the fabrication, but now roughly 5% of receipts extract with <code>payment_method: null</code> — and some of those actually do state \"Paid by credit card\" clearly, which the model simply missed. What schema-design principle addresses both problems at once?",
+      "options": [
+        "Revert to required and rely on better prompting to make extraction more reliable",
+        "Add a <code>payment_method_confidence</code> field so low-confidence nulls can be distinguished from high-confidence ones",
+        "Keep the field optional, but add a <code>source_location</code> (or equivalent evidence field) so \"genuinely absent from the source\" can be distinguished from \"present in source but missed by the model\" — the latter is a prompt/extraction bug worth fixing, the former isn't",
+        "Default to the string <code>\"unknown\"</code> instead of <code>null</code>, so the field is always populated"
+      ],
+      "correct": 2,
+      "explain": "Making the field optional stops fabrication, but conflates two very different situations under one <code>null</code> value; a <code>source_location</code> (or similar evidence field) lets you tell \"genuinely not in the document\" apart from \"present, but missed\" — the second of which is an extraction bug worth fixing, unlike the first.<br><b>Not “Revert to required and rely on better prompting to make extraction …”</b> — Requiring the field again brings back fabrication, and better prompting is probabilistic, so it cannot remove that incentive.<br><b>Not “Add a <code>payment_method_confidence</code> field so low-confidence nulls can…”</b> — A confidence number on the field relies on self-reported confidence and still does not show whether the value was in the source.<br><b>Not “Default to the string <code>\"unknown\"</code> instead of <code>null</code>, so the field i…”</b> — Defaulting to <code>\"unknown\"</code> hides both situations behind another placeholder, so missed values and truly absent ones stay indistinguishable."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 3,
+      "scenario": 6,
+      "q": "A single document has both receipt-like fields (vendor, total, date) and invoice-like fields (itemized line items, subtotal). Two purpose-built tools exist — <code>extract_receipt</code> and <code>extract_invoice</code> — and merging them would bloat both schemas. With <code>tool_choice: \"auto\"</code>, the model sometimes picks receipt (losing line-item detail) and sometimes picks invoice (fabricating a PO number that doesn't exist on the document). The team needs both the line-item data and the receipt-style category field, without a bloated unified schema. What's the best design?",
+      "options": [
+        "Merge into one universal schema, marking invoice-only fields as optional",
+        "Keep <code>tool_choice: \"any\"</code> with sharpened, non-overlapping descriptions distinguishing point-of-sale receipts from formal itemized invoices, and add a validation step: if the extraction doesn't match the detected document type, return a structured error and let the model retry against the corrected schema",
+        "Add a <code>classify_document_type</code> tool that must run first, before either extractor can be invoked",
+        "Keep <code>tool_choice: \"auto\"</code> and just add stronger prompt language about when each tool applies"
+      ],
+      "correct": 1,
+      "explain": "Sharpened, mutually exclusive tool descriptions reduce ambiguity up front, and a validation step that checks the extraction against the detected document type — returning a structured error and allowing a corrected retry when they don't match — handles the genuinely ambiguous cases that description quality alone won't fully resolve. A merged schema is explicitly what the team is trying to avoid.<br><b>Not “Merge into one universal schema, marking invoice-only fields as opt…”</b> — One universal schema is what the team wants to avoid, since it bloats the structure and forces the model to guess which fields apply.<br><b>Not “Add a <code>classify_document_type</code> tool that must run first, before eit…”</b> — A mandatory classification step adds a stage without solving how to detect a mismatched extraction, and the document is genuinely ambiguous.<br><b>Not “Keep <code>tool_choice: \"auto\"</code> and just add stronger prompt language ab…”</b> — Stronger prompt language with <code>\"auto\"</code> stays probabilistic, so the model can still choose the wrong tool or skip tools altogether."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 3,
+      "scenario": 6,
+      "q": "A pipeline computes per-field confidence (amount 0.95, vendor 0.93, category 0.38, date 0.87) and an <code>overall_confidence</code> as their geometric mean (0.78), auto-approving anything above 0.75. An audit finds approved receipts where category confidence was as low as 0.32 (masked by high amount/vendor scores) and the category field was wrong in downstream processing — while receipts where every field sits around 0.72, yielding an overall_confidence of 0.72, are correctly categorized every time they're checked. What's the actual design flaw?",
+      "options": [
+        "Geometric mean is the wrong statistic; switch to arithmetic mean instead",
+        "A single very low field can be masked by the rest and still cause a real downstream failure; use a minimum-field threshold (e.g., auto-approve only if every field individually clears 0.70) instead of any single aggregate statistic",
+        "Confidence scoring in general is unreliable here; replace it with a fixed percentage-based approval quota instead",
+        "The 0.75 threshold is simply too high; lowering it to 0.60 would reduce review workload without changing anything else"
+      ],
+      "correct": 1,
+      "explain": "A geometric mean lets one very weak field hide behind several strong ones, which is exactly how a category confidence of 0.32 got auto-approved. A minimum-field threshold ensures no single field is silently the weak link, which is why the flat-0.72-across-the-board receipts perform better in the audit despite a lower \"overall\" score.<br><b>Not “Geometric mean is the wrong statistic; switch to arithmetic mean in…”</b> — Switching to an arithmetic mean still lets one very low field hide behind high ones, so the same masking flaw would continue.<br><b>Not “Confidence scoring in general is unreliable here; replace it with a…”</b> — A fixed approval quota ignores actual field reliability, and abandoning confidence scoring discards a useful signal instead of fixing the aggregation.<br><b>Not “The 0.75 threshold is simply too high; lowering it to 0.60 would re…”</b> — Lowering the threshold to 0.60 would approve even more receipts with weak fields, making the masked low-confidence problem worse."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 3,
+      "scenario": 6,
+      "q": "A vendor-name extraction repeatedly returns \"AMZN\" instead of \"Amazon.\" A retry loop re-prompts with \"always expand vendor names to their full legal name\" and retries, but after five attempts on the same document, the model still returns an abbreviation roughly 20% of the time. On a different, unrelated validation failure (\"vendor missing entirely\"), a single retry with the error message resolves the issue 85% of the time. What does this contrast suggest, and what's the right fix for the abbreviation case specifically?",
+      "options": [
+        "Increase retries to 10 for this category too — persistence eventually pays off",
+        "The model is reproducing a real-world abbreviation it has strong prior associations with, and re-prompting won't reliably override that; add a deterministic post-processing step — an alias lookup table (e.g., \"AMZN\" → \"Amazon\") — applied before downstream validation, instead of relying on the retry loop",
+        "This points to a model-capability gap; switch to a different model better suited to entity extraction",
+        "Treat any abbreviation as a hard validation failure and reject the extraction outright rather than retrying"
+      ],
+      "correct": 1,
+      "explain": "A retry loop that plateaus after several attempts, especially when contrasted against a different failure class where a single retry mostly works, indicates the model is drawing on a strong learned association (\"AMZN\") that re-prompting won't reliably override. A deterministic post-processing alias lookup handles it outside the retry loop, which is more reliable than continuing to ask nicely or discarding an otherwise-good extraction outright.<br><b>Not “Increase retries to 10 for this category too — persistence eventual…”</b> — Ten retries would repeat an approach that has already plateaued after five attempts, so persistence is unlikely to remove the abbreviation.<br><b>Not “This points to a model-capability gap; switch to a different model …”</b> — A single failure type that resolves easily on retry suggests the model is capable, so switching models is not warranted.<br><b>Not “Treat any abbreviation as a hard validation failure and reject the …”</b> — Rejecting abbreviations outright discards otherwise good extractions, when a deterministic alias lookup can correct them."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 3,
+      "scenario": 6,
+      "q": "After 50,000 documents over three months, the pipeline's error tracking only records <code>validation_failed: true/false</code> — nothing about *why*. The team suspects failures cluster around specific vendors, date formats, or document types, but can't confirm it or prioritize fixes with the data they're currently logging. What should be added to enable systematic root-cause analysis?",
+      "options": [
+        "A random UUID per extraction, to trace failures back to their source documents",
+        "A <code>detected_pattern</code> field describing what characteristic triggered the extraction path taken (e.g., <code>\"date_format_ddmmyyyy\"</code>, <code>\"vendor_from_email_subject\"</code>, <code>\"amount_with_currency_symbol\"</code>), so failures can be aggregated by pattern and the highest-impact ones prioritized",
+        "A <code>retry_count</code> field, to deprioritize documents that keep failing repeatedly",
+        "A <code>model_version</code> field, to compare accuracy across model updates over time"
+      ],
+      "correct": 1,
+      "explain": "A <code>detected_pattern</code> field capturing what characteristic drove a given extraction path is what turns a flat pass/fail log into something that can actually be aggregated and prioritized by root cause (vendor, date format, document type). A trace ID or retry count don't explain *why* a failure happened, only that one did.<br><b>Not “A random UUID per extraction, to trace failures back to their sourc…”</b> — A random UUID lets you trace one record but does not describe why it failed, so failures cannot be grouped by cause.<br><b>Not “A <code>retry_count</code> field, to deprioritize documents that keep failing …”</b> — A retry count shows how often something failed repeatedly, not what characteristic caused the failure, so it cannot reveal clusters.<br><b>Not “A <code>model_version</code> field, to compare accuracy across model updates o…”</b> — A model version helps compare models over time but does not explain which vendors, date formats or document types are failing."
+    }
+  ]
+}

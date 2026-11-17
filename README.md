@@ -40,7 +40,8 @@ This matters — a flattened folder is the most common cause of a broken deploy:
 │   ├── mock.json
 │   ├── basic.json
 │   ├── scenario.json
-│   └── prep.json
+│   ├── core.json
+│   └── mock1.json … mock6.json
 ├── api/
 │   └── scores.js
 ├── package.json

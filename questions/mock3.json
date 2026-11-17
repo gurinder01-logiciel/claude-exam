@@ -1,0 +1,819 @@
+{
+  "key": "mock3",
+  "name": "Mock Exam 3",
+  "desc": "A complete community mock exam, grouped by scenario like the real thing.",
+  "section": "bank",
+  "inPool": false,
+  "ready": true,
+  "scenarioPick": 6,
+  "blueprint": [
+    {
+      "label": "Agentic Architecture & Orchestration",
+      "pct": 27
+    },
+    {
+      "label": "Claude Code Config & Workflows",
+      "pct": 20
+    },
+    {
+      "label": "Prompt Engineering & Structured Output",
+      "pct": 20
+    },
+    {
+      "label": "Tool Design & MCP Integration",
+      "pct": 18
+    },
+    {
+      "label": "Context Management & Reliability",
+      "pct": 15
+    }
+  ],
+  "source": "Questions and rationales: https://github.com/utkarsh1agarwal/claude-architect-exam-guide (Mock exams 1-6, single-answer items only; 8 items with disputed or letter-dependent answers omitted. Per-option \"why not\" reasons were added for this page; questions, options and rationales are from the source.)",
+  "licence": "MIT License\n\nCopyright (c) 2026 Claude Architect Exam Guide Contributors\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n\n---\n\nNote: \"Claude,\" \"Claude Code,\" \"Claude Certified Architect,\" and related marks\nare trademarks of Anthropic, PBC and are not covered by this license. This\nlicense applies only to the original written content, code examples, and\nsite configuration authored by this project's contributors.",
+  "questions": [
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 2,
+      "q": "A developer asks Claude to \"clean up this parsing function\" with no further detail. Three separate attempts produce three meaningfully different refactors, each reasonable in isolation but inconsistent with each other. What is the most effective way to converge on a consistent result?",
+      "options": [
+        "Reduce <code>max_tokens</code> so the model has less room to improvise",
+        "Ask for five more attempts and pick the best one",
+        "Repeat the same request with stronger emphasis (\"please be consistent this time\")",
+        "Provide 2–3 concrete before/after examples showing exactly what \"cleaned up\" means for this codebase's style"
+      ],
+      "correct": 3,
+      "explain": "Three inconsistent refactors from the same vague instruction is a definitional-ambiguity problem, not a randomness problem, so 2–3 concrete before/after examples pinning down what \"cleaned up\" means fixes the actual cause. Reducing <code>max_tokens</code> or repeating the request with more emphasis doesn't resolve what \"clean\" means for this codebase.<br><b>Not “Reduce <code>max_tokens</code> so the model has less room to improvise”</b> — <code>max_tokens</code> caps response length. It does not define what \"cleaned up\" means, so the refactors would still differ in direction, only shorter.<br><b>Not “Ask for five more attempts and pick the best one”</b> — Generating five more attempts just yields more inconsistent refactors to choose between. The vague instruction that caused the divergence is left unchanged.<br><b>Not “Repeat the same request with stronger emphasis (\"please be consiste…”</b> — Stronger emphasis on consistency restates the same ambiguous request. The model still has no concrete picture of the style the team wants."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 2,
+      "q": "Before implementing a rate-limiting feature in a service Claude hasn't seen before, a developer wants Claude to first ask about traffic patterns, failure behavior under load, and whether limits should be per-user or global. What technique does this describe, and when is it most valuable?",
+      "options": [
+        "Prompt chaining — valuable for any multi-step task regardless of familiarity",
+        "Plan mode — but only for single-file changes",
+        "Test-driven iteration — valuable only when a test suite already exists",
+        "The interview pattern — most valuable in unfamiliar domains where the developer may not have anticipated key design considerations"
+      ],
+      "correct": 3,
+      "explain": "Asking Claude to surface traffic-pattern, failure-mode, and scoping questions before writing any code is the interview pattern, and it earns its keep specifically in unfamiliar domains where the developer hasn't already anticipated every design consideration. Prompt chaining sequences already-known steps rather than surfacing unknown design questions.<br><b>Not “Prompt chaining — valuable for any multi-step task regardless of fa…”</b> — Prompt chaining sequences steps you already know. It does not have Claude surface unknown design questions, and it is not tied to unfamiliar domains.<br><b>Not “Plan mode — but only for single-file changes”</b> — Plan mode is not limited to single-file changes, and it is not what this describes. The developer wants Claude to ask questions before writing code.<br><b>Not “Test-driven iteration — valuable only when a test suite already exists”</b> — Test-driven iteration drives development from tests and does not draw out unconsidered design issues. It is not what is described, and not restricted to cases with an existing suite."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 2,
+      "q": "A team wants Claude to build a data-migration script and has already written a test suite covering expected behavior, edge cases (including null values), and performance constraints. What is the recommended way to use these tests during development?",
+      "options": [
+        "Show Claude the tests once at the start, then ignore test results during implementation",
+        "Iterate by sharing test failures with Claude after each attempt, letting it progressively correct the implementation",
+        "Convert the tests into prose requirements instead of running them",
+        "Withhold the tests until the implementation is \"done\" so Claude isn't biased toward passing them narrowly"
+      ],
+      "correct": 1,
+      "explain": "With tests already covering behavior, edge cases, and performance up front, the recommended loop is to hand Claude the actual failures after each attempt so it can progressively converge. Showing tests once and then ignoring results, or withholding them until \"done\", both break the feedback loop that makes test-driven iteration work.<br><b>Not “Show Claude the tests once at the start, then ignore test results d…”</b> — Ignoring test results after the first look removes the feedback that guides improvement. Claude cannot correct what it is never shown failing.<br><b>Not “Convert the tests into prose requirements instead of running them”</b> — Translating tests into prose gives up their precision and the ability to run them. Concrete failing output is what lets Claude converge.<br><b>Not “Withhold the tests until the implementation is \"done\" so Claude isn…”</b> — Holding the tests back until the end removes the feedback during development. Claude needs the real failures after each attempt to improve."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 2,
+      "q": "A pull request fixes three bugs that interact — fixing bug 1 changes the correct approach to fixing bug 2. Which approach to communicating these to Claude is better?",
+      "options": [
+        "Report each bug in a separate message, waiting for a fix before mentioning the next",
+        "Only describe the most severe bug and let Claude discover the other two independently",
+        "Ask Claude to guess which bugs might be related before describing any of them",
+        "Describe all three interacting issues together in one detailed message"
+      ],
+      "correct": 3,
+      "explain": "Because fixing bug 1 changes the correct approach to bug 2, the issues interact, and interacting issues must be described together in one detailed message so Claude reasons about them jointly. Reporting them one at a time risks Claude fixing bug 2 in a way bug 1's fix later invalidates, forcing rework.<br><b>Not “Report each bug in a separate message, waiting for a fix before men…”</b> — Sending bugs one at a time, waiting for each fix, hides that the first fix changes the right approach to the second, so work can need redoing.<br><b>Not “Only describe the most severe bug and let Claude discover the other…”</b> — Describing only the worst bug leaves Claude to find the others and their interactions on its own, which risks missing or conflicting fixes.<br><b>Not “Ask Claude to guess which bugs might be related before describing a…”</b> — Asking Claude to guess relationships before it has been told the issues makes it speculate without the facts it needs. The issues should simply be described together."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 2,
+      "q": "A team is deciding between a single-file bug fix (clear stack trace, one obvious cause) and a cross-service authentication redesign (multiple valid approaches, dozens of files). Which pairing is correct?",
+      "options": [
+        "Direct execution for the bug fix; plan mode for the authentication redesign",
+        "Plan mode for both, since plan mode is always safer",
+        "Direct execution for both, since Claude Code doesn't meaningfully benefit from planning",
+        "Plan mode for the bug fix; direct execution for the redesign"
+      ],
+      "correct": 0,
+      "explain": "A single-file bug fix with a clear stack trace is the well-understood, low-ambiguity case direct execution suits, while a cross-service redesign with multiple valid approaches and dozens of files benefits from planning before committing to changes. Treating plan mode as \"always safer\" ignores the needless overhead it adds on trivial, unambiguous fixes.<br><b>Not “Plan mode for both, since plan mode is always safer”</b> — Plan mode is not always the better choice. For a clear single-file fix, it adds overhead with no ambiguity to resolve.<br><b>Not “Direct execution for both, since Claude Code doesn't meaningfully b…”</b> — Planning does help on a cross-service redesign with several valid approaches and dozens of files, so dismissing it for both tasks is wrong.<br><b>Not “Plan mode for the bug fix; direct execution for the redesign”</b> — This reverses the pairing. A clear stack trace needs no planning, while a large redesign with multiple valid approaches needs it before changes start."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 2,
+      "q": "A <code>/deploy-check</code> slash command should run the team's pre-deployment checklist and be available to every developer immediately after cloning the repo. Where should it live?",
+      "options": [
+        "<code>.claude/commands/deploy-check.md</code> in the repository",
+        "A <code>.claude/config.json</code> commands array",
+        "<code>~/.claude/commands/deploy-check.md</code>",
+        "Inside the root <code>CLAUDE.md</code> file as a named section"
+      ],
+      "correct": 0,
+      "explain": "A command every developer needs immediately after cloning must be version-controlled and project-scoped, which is exactly what <code>.claude/commands/deploy-check.md</code> provides. The personal <code>~/.claude/commands/</code> location is never shared via git, so a fresh clone wouldn't have it.<br><b>Not “A <code>.claude/config.json</code> commands array”</b> — A <code>.claude/config.json</code> commands array is not how custom slash commands are defined, so the command would not be found.<br><b>Not “<code>~/.claude/commands/deploy-check.md</code>”</b> — <code>~/.claude/commands/</code> is a personal folder that is never committed. A fresh clone would not have the command.<br><b>Not “Inside the root <code>CLAUDE.md</code> file as a named section”</b> — <code>CLAUDE.md</code> holds instructions and context, not slash command definitions, so a section there would not create a runnable command."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 2,
+      "q": "A \"brainstorm alternative approaches\" skill tends to produce long, exploratory output that isn't useful to keep in the main conversation once a decision is made. Which frontmatter setting addresses this?",
+      "options": [
+        "<code>context: fork</code>",
+        "<code>allowed-tools</code>",
+        "<code>paths</code>",
+        "<code>argument-hint</code>"
+      ],
+      "correct": 0,
+      "explain": "<code>context: fork</code> runs the skill in an isolated sub-agent context, keeping the long exploratory brainstorm output out of the main conversation once a decision is made. <code>allowed-tools</code> restricts which tools a skill can call, not where its output lands.<br><b>Not “<code>allowed-tools</code>”</b> — <code>allowed-tools</code> restricts which tools the skill may call. It does nothing to keep long exploratory output out of the main conversation.<br><b>Not “<code>paths</code>”</b> — <code>paths</code> limits which files activate the skill, so it does not control where the brainstorm output ends up.<br><b>Not “<code>argument-hint</code>”</b> — <code>argument-hint</code> just displays the expected arguments to the user. It has no effect on where the output appears."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 2,
+      "q": "Two engineers on the same team have different personal preferences for commit-message style, but the team's actual required conventions live correctly in the project-level CLAUDE.md. One engineer also has their personal preferences saved in <code>~/.claude/CLAUDE.md</code>. What's true about this setup?",
+      "options": [
+        "It's broken — user-level and project-level CLAUDE.md files cannot coexist",
+        "It's fine — the user-level file applies only to that engineer and doesn't affect teammates via version control",
+        "Only one CLAUDE.md file can be active per repository",
+        "The user-level file will silently overwrite the project-level file for everyone"
+      ],
+      "correct": 1,
+      "explain": "User-level and project-level CLAUDE.md files are designed to coexist and stack; the personal file at <code>~/.claude/CLAUDE.md</code> is never checked into version control, so it only affects that one engineer's own sessions. Claiming it \"silently overwrites\" the project file for everyone misreads the hierarchy — personal preferences layer on top of, rather than replace, shared team conventions.<br><b>Not “It's broken — user-level and project-level CLAUDE.md files cannot c…”</b> — They can coexist. A personal user-level file layers alongside the project file, so having both is normal and not broken.<br><b>Not “Only one CLAUDE.md file can be active per repository”</b> — More than one <code>CLAUDE.md</code> can be active at once, with user-level and project-level files stacking together.<br><b>Not “The user-level file will silently overwrite the project-level file …”</b> — The personal file does not overwrite the project one, and it never leaves that engineer's machine, so teammates are not affected."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 2,
+      "q": "A large monorepo has different testing conventions for unit tests, integration tests, and end-to-end tests, each identifiable by filename pattern but scattered across many directories. What's the best way to load the right convention automatically based on which file is being edited?",
+      "options": [
+        "Three separate skills that must be manually invoked before editing each test type",
+        "Three separate directory-level CLAUDE.md files, duplicated into every directory containing tests",
+        "One root CLAUDE.md with three sections and hope Claude infers the right one",
+        "Three separate <code>.claude/rules/*.md</code> files, each with <code>paths</code> frontmatter matching the relevant filename pattern"
+      ],
+      "correct": 3,
+      "explain": "Because each convention is tied to a filename pattern rather than a single directory, three <code>.claude/rules/*.md</code> files with <code>paths</code> frontmatter load automatically based on which file is being edited, regardless of location. Duplicating directory-level CLAUDE.md files into every test directory doesn't scale and invites drift.<br><b>Not “Three separate skills that must be manually invoked before editing …”</b> — Skills that have to be invoked manually depend on people remembering to run them, so conventions will be skipped and not loaded automatically.<br><b>Not “Three separate directory-level CLAUDE.md files, duplicated into eve…”</b> — Duplicating a <code>CLAUDE.md</code> into every directory containing tests is hard to maintain, drifts out of sync, and ties rules to locations instead of filename patterns.<br><b>Not “One root CLAUDE.md with three sections and hope Claude infers the r…”</b> — A single root file with three sections relies on Claude guessing which one applies, so conventions are not loaded reliably for the file being edited."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 2,
+      "q": "A developer wants to compare two different caching strategies starting from the same point in their investigation of a codebase, without redoing the initial exploration twice. What capability supports this?",
+      "options": [
+        "<code>--resume</code> with two different session names created independently",
+        "<code>/compact</code> run twice",
+        "<code>fork_session</code>, branching two parallel explorations from the shared baseline",
+        "Restarting from scratch for each strategy"
+      ],
+      "correct": 2,
+      "explain": "<code>fork_session</code> is built for exactly this: branching two parallel explorations from a shared baseline so the initial investigation isn't redone. Using <code>--resume</code> with two independently created session names doesn't share a common starting point the way a fork does.<br><b>Not “<code>--resume</code> with two different session names created independently”</b> — Two independently created sessions do not share a starting point, so each would redo the initial exploration instead of branching from a common baseline.<br><b>Not “<code>/compact</code> run twice”</b> — <code>/compact</code> condenses the conversation. Running it twice does not create two parallel branches from the same point.<br><b>Not “Restarting from scratch for each strategy”</b> — Starting over for each strategy repeats the initial investigation, which is exactly the duplicated work the developer wants to avoid."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 2,
+      "q": "A developer resumes a two-day-old session to continue a refactor, but teammates modified several of the files Claude had already analyzed in that session. Claude's suggestions reference outdated function signatures. What should have been done?",
+      "options": [
+        "Used <code>fork_session</code> instead of <code>--resume</code>",
+        "Started an entirely new session with zero context",
+        "Informed the resumed session explicitly about which files changed, prompting targeted re-analysis",
+        "Increased <code>max_tokens</code> for the resumed session"
+      ],
+      "correct": 2,
+      "explain": "Resuming a session doesn't make Claude aware that files changed since last time; the fix is explicitly telling it which files changed so it can do targeted re-analysis. Switching to <code>fork_session</code> solves a different problem (parallel branching), not stale context in a resumed session.<br><b>Not “Used <code>fork_session</code> instead of <code>--resume</code>”</b> — <code>fork_session</code> branches a session into parallel explorations and does not tell Claude that files changed. It solves a different problem from stale context.<br><b>Not “Started an entirely new session with zero context”</b> — Starting a fresh session discards all the earlier analysis, when only the changed files need re-examining.<br><b>Not “Increased <code>max_tokens</code> for the resumed session”</b> — <code>max_tokens</code> limits response length. It does nothing to update Claude's outdated view of the modified files."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 2,
+      "q": "A skill for generating boilerplate files should never be allowed to run destructive shell commands, even accidentally. Which frontmatter field enforces this restriction directly?",
+      "options": [
+        "<code>argument-hint</code>",
+        "<code>paths</code>",
+        "<code>context: fork</code>",
+        "<code>allowed-tools</code>"
+      ],
+      "correct": 3,
+      "explain": "<code>allowed-tools</code> frontmatter directly restricts which tools a skill can invoke, so scoping it away from shell/<code>Bash</code> access structurally prevents destructive commands. <code>context: fork</code> isolates output/context, it doesn't restrict tool access.<br><b>Not “<code>argument-hint</code>”</b> — <code>argument-hint</code> only describes expected arguments. It does not limit which tools the skill may run.<br><b>Not “<code>paths</code>”</b> — <code>paths</code> controls which files the skill applies to. It does not stop it from running destructive shell commands.<br><b>Not “<code>context: fork</code>”</b> — <code>context: fork</code> isolates the skill's context and output. It leaves tool access unrestricted, so destructive commands remain possible."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 2,
+      "scenario": 2,
+      "q": "A developer needs to trace how a specific exported utility function is used across a codebase, including through re-export wrapper modules with different names. What's the most effective approach?",
+      "options": [
+        "First identify all exported names for the function (including wrapper re-exports), then <code>Grep</code> for each name across the codebase",
+        "<code>Read</code> every file in the repository upfront to build full context before searching",
+        "<code>Glob</code> for <code>**/*.ts</code> and manually scan the output",
+        "Ask the user to supply the call sites manually"
+      ],
+      "correct": 0,
+      "explain": "Wrapper re-exports mean the function may be called under several different names, so all of them must be enumerated before <code>Grep</code> can find every call site; grepping only the original name would miss usages through renamed re-exports. Reading every file upfront is the anti-pattern the built-in exploration pattern warns against — start with targeted search, not full reads.<br><b>Not “<code>Read</code> every file in the repository upfront to build full context b…”</b> — Reading every file upfront is slow, floods the context, and does not specifically find usages under re-exported names.<br><b>Not “<code>Glob</code> for <code>**/*.ts</code> and manually scan the output”</b> — Listing every <code>.ts</code> file only shows file names. It does not find the places that call the function, and manual scanning does not scale.<br><b>Not “Ask the user to supply the call sites manually”</b> — Asking the user for call sites hands back the very search the developer wants done, and they may not know the wrapper names."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 2,
+      "scenario": 2,
+      "q": "During a long exploration session tracing a legacy codebase's dependency graph, Claude starts giving vague answers referencing \"typical patterns\" instead of the specific classes it examined 90 minutes earlier. What's the most direct fix?",
+      "options": [
+        "Increase <code>max_tokens</code> on each subsequent call",
+        "Switch to a different underlying model mid-session",
+        "Have the agent maintain a scratchpad file recording key findings, and reference it for subsequent questions",
+        "Restart with zero context and re-explore from scratch"
+      ],
+      "correct": 2,
+      "explain": "Vague \"typical patterns\" answers after 90 minutes of exploration signal context degradation, not a capacity problem, so a scratchpad file persisting specific findings (the classes actually examined) directly counters it. Increasing <code>max_tokens</code> doesn't address the model losing track of specifics it already found.<br><b>Not “Increase <code>max_tokens</code> on each subsequent call”</b> — <code>max_tokens</code> limits response length. It does not restore the specific findings Claude lost track of during the long session.<br><b>Not “Switch to a different underlying model mid-session”</b> — Changing models mid-session loses the accumulated context and does not preserve the specific classes examined earlier.<br><b>Not “Restart with zero context and re-explore from scratch”</b> — Restarting with no context throws away 90 minutes of exploration, when a scratchpad of key findings could preserve it."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 2,
+      "scenario": 2,
+      "q": "A task requires exploring an unfamiliar codebase's structure without exhausting the main session's context on verbose file-by-file discovery output. Which capability is designed for this?",
+      "options": [
+        "<code>fork_session</code>",
+        "<code>/memory</code>",
+        "The Explore subagent",
+        "<code>context: fork</code> applied to CLAUDE.md"
+      ],
+      "correct": 2,
+      "explain": "The Explore subagent isolates verbose file-by-file discovery output during structure-mapping tasks, so the main session's context isn't exhausted by exploration noise. <code>fork_session</code> is for branching parallel investigations from a shared point, not for keeping exploration noise out of the main session in the first place.<br><b>Not “<code>fork_session</code>”</b> — <code>fork_session</code> creates parallel branches from a shared baseline. It does not keep noisy discovery output out of the main session.<br><b>Not “<code>/memory</code>”</b> — <code>/memory</code> manages remembered notes and instructions, so it does not isolate verbose exploration output from the main context.<br><b>Not “<code>context: fork</code> applied to CLAUDE.md”</b> — <code>context: fork</code> is a skill frontmatter option, not something applied to <code>CLAUDE.md</code>, and it is not the capability built for exploring a codebase."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 5,
+      "q": "A CI job runs <code>claude \"Review this PR for security issues\"</code> and hangs indefinitely. What's the fix?",
+      "options": [
+        "Redirect <code>/dev/null</code> into stdin",
+        "<code>claude -p \"Review this PR for security issues\"</code>",
+        "Set <code>CLAUDE_HEADLESS=true</code> as an environment variable",
+        "Add a <code>--batch</code> flag"
+      ],
+      "correct": 1,
+      "explain": "<code>claude -p \"...\"</code> runs non-interactively, which is exactly what prevents a CI job from blocking while waiting on a stdin prompt. A (piping <code>/dev/null</code>) is a hacky workaround at best, and C/D reference an env var and flag that don't actually exist — classic plausible-but-fictional distractors.<br><b>Not “Redirect <code>/dev/null</code> into stdin”</b> — Redirecting <code>/dev/null</code> into stdin is a hacky workaround that does not put Claude into non-interactive mode, so it is not the intended fix.<br><b>Not “Set <code>CLAUDE_HEADLESS=true</code> as an environment variable”</b> — There is no <code>CLAUDE_HEADLESS</code> environment variable, so setting it would have no effect and the job would still hang.<br><b>Not “Add a <code>--batch</code> flag”</b> — There is no <code>--batch</code> flag in Claude Code. The supported way to run non-interactively is <code>-p</code>."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 5,
+      "q": "The team wants automated review findings posted as individual inline PR comments by a script, requiring machine-parseable output rather than free-form prose. Which combination of flags supports this?",
+      "options": [
+        "<code>--resume</code> with a named session",
+        "<code>-p</code> alone is sufficient",
+        "<code>fork_session</code> for each file reviewed",
+        "<code>--output-format json</code> combined with <code>--json-schema</code>"
+      ],
+      "correct": 3,
+      "explain": "<code>--output-format json</code> combined with <code>--json-schema</code> forces genuinely schema-compliant, machine-parseable findings a script can split into individual inline comments. <code>-p</code> alone only makes the run non-interactive; it says nothing about the shape of the output.<br><b>Not “<code>--resume</code> with a named session”</b> — <code>--resume</code> continues an earlier session. It does nothing to make findings machine-parseable.<br><b>Not “<code>-p</code> alone is sufficient”</b> — <code>-p</code> only makes the run non-interactive. It does not shape the output into a structure a script can split into comments.<br><b>Not “<code>fork_session</code> for each file reviewed”</b> — <code>fork_session</code> branches sessions and has no bearing on the format of review findings."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 5,
+      "q": "A CI pipeline re-runs code review after each new commit to a PR, and developers complain about receiving duplicate comments for issues already flagged (and already acknowledged as \"won't fix\") in the previous run. What should change?",
+      "options": [
+        "Disable review entirely after the first commit",
+        "Nothing — duplicate comments are unavoidable with automated review",
+        "Include prior review findings in context on re-runs, and instruct Claude to report only new or still-unaddressed issues",
+        "Switch to <code>--output-format json</code> only, without changing the prompt"
+      ],
+      "correct": 2,
+      "explain": "Feeding prior review findings (including ones already dismissed as \"won't fix\") into context and instructing Claude to report only new/unaddressed issues fixes the actual root cause: each re-run currently has no memory of what was already flagged. Disabling review or shrugging off duplicates as unavoidable discard the tool's value instead of fixing the re-run design.<br><b>Not “Disable review entirely after the first commit”</b> — Turning off review after the first commit gives up the value of review on later commits instead of fixing the duplicate comments.<br><b>Not “Nothing — duplicate comments are unavoidable with automated review”</b> — Duplicates are not unavoidable. Each re-run simply lacks knowledge of earlier findings, which can be supplied in context.<br><b>Not “Switch to <code>--output-format json</code> only, without changing the prompt”</b> — Changing only the output format does not tell Claude what was already flagged or dismissed, so duplicates would remain."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 5,
+      "q": "A CI-triggered test-generation step keeps suggesting test cases that duplicate scenarios already covered in the existing test suite. What's the most direct fix?",
+      "options": [
+        "Increase the model's <code>max_tokens</code> for test generation",
+        "Run test generation twice and manually deduplicate",
+        "Provide the existing test files in context so generation avoids already-covered scenarios",
+        "Switch to a different CI runner"
+      ],
+      "correct": 2,
+      "explain": "Providing the existing test files in context directly closes the information gap causing redundant suggestions — the model simply can't avoid duplicating coverage it can't see. Running generation twice and manually deduping treats the symptom while doubling cost.<br><b>Not “Increase the model's <code>max_tokens</code> for test generation”</b> — <code>max_tokens</code> limits output length. It gives the model no sight of the tests already in the suite.<br><b>Not “Run test generation twice and manually deduplicate”</b> — Running generation twice and deduplicating by hand doubles cost and treats the symptom, since the model still cannot see existing coverage.<br><b>Not “Switch to a different CI runner”</b> — The CI runner has nothing to do with the model's missing information about existing tests, so changing it would not stop duplicates."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 5,
+      "q": "The same Claude Code session that generated a bug fix is also used, immediately afterward, to review that fix before merge — and subtle logic errors keep slipping through to a human reviewer instead. What's the underlying issue?",
+      "options": [
+        "The context window is too small to hold both the fix and the review",
+        "The session retains reasoning from generation and is less likely to challenge its own prior decisions; use an independent instance for review",
+        "<code>--output-format json</code> wasn't enabled during review",
+        "The prompt needs more few-shot examples of what bugs look like"
+      ],
+      "correct": 1,
+      "explain": "The session retains its own generation reasoning and is structurally less inclined to challenge decisions it just made, so an independent review instance is the fix — not a config flag or more few-shot examples. This exact pattern shows up in both the CI/CD-workflow material and the multi-instance-review material, so it genuinely straddles both domains rather than being a clean D3-vs-D4 call.<br><b>Not “The context window is too small to hold both the fix and the review”</b> — Context size is not the reason. The session simply retains its own generation reasoning and is reluctant to question it.<br><b>Not “<code>--output-format json</code> wasn't enabled during review”</b> — Output format affects how findings are returned, not how critically the code is examined, so the blind spot would remain.<br><b>Not “The prompt needs more few-shot examples of what bugs look like”</b> — More examples of bugs do not remove the bias of a session that still holds the reasoning behind the fix."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 5,
+      "q": "Your CI system wants Claude to auto-generate high-value tests rather than generic boilerplate assertions. What should be documented in CLAUDE.md to improve this?",
+      "options": [
+        "The CI provider's internal infrastructure details",
+        "Testing standards, valuable test criteria, and available fixtures/conventions",
+        "The full list of every function in the codebase",
+        "Nothing — test quality is purely a function of model capability"
+      ],
+      "correct": 1,
+      "explain": "Documenting testing standards, what makes a test valuable, and available fixtures/conventions in <code>CLAUDE.md</code> gives the model the missing project-specific judgment it needs to generate high-value tests instead of boilerplate. Dumping every function or citing CI infra details doesn't address *what makes a test worth writing*.<br><b>Not “The CI provider's internal infrastructure details”</b> — Details of the CI provider's infrastructure tell the model nothing about what makes a good test, so output would stay generic.<br><b>Not “The full list of every function in the codebase”</b> — Listing every function adds bulk without conveying what makes a test valuable, and does not supply the project-specific judgment that is missing.<br><b>Not “Nothing — test quality is purely a function of model capability”</b> — Test quality depends heavily on project-specific context such as standards and fixtures, which model capability alone cannot supply."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 5,
+      "q": "A 14-file PR review produces contradictory findings — a pattern flagged as a bug in one file and approved as fine in another file within the same PR. What's the best structural fix?",
+      "options": [
+        "Use a model with a larger context window and re-run as a single pass",
+        "Require three full-PR passes and keep majority-vote findings",
+        "Ask developers to manually pre-split the PR into under-4-file chunks",
+        "Split the review into focused per-file passes for local issues, plus a separate cross-file integration pass"
+      ],
+      "correct": 3,
+      "explain": "Splitting into focused per-file passes for local issues plus a separate cross-file integration pass directly fixes the attention-dilution problem causing contradictory findings across a 14-file review. A bigger model in a single pass or brute-force majority voting across three full-PR passes don't address the structural cause; offloading the split to developers isn't a tooling fix at all.<br><b>Not “Use a model with a larger context window and re-run as a single pass”</b> — A larger context window in one pass does not fix the thin attention across 14 files, so contradictory findings would persist.<br><b>Not “Require three full-PR passes and keep majority-vote findings”</b> — Repeating three full-PR passes and voting repeats the same dilution and can still return contradictions, without checking cross-file consistency properly.<br><b>Not “Ask developers to manually pre-split the PR into under-4-file chunks”</b> — Asking developers to split PRs shifts the burden to people and does not change how the review pipeline works on the PRs it receives."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 5,
+      "q": "A team wants to move their nightly automated code-review job for <code>main</code> (no human waiting on results) to reduce API costs. Which approach fits, and why?",
+      "options": [
+        "Message Batches API — it's non-blocking and latency-tolerant, well suited to overnight jobs, at 50% lower cost",
+        "Message Batches API is inappropriate here since it lacks multi-turn tool calling",
+        "Batch it, but only if a real-time SLA under one hour can be guaranteed",
+        "Keep it fully synchronous, since batch jobs cannot run unattended"
+      ],
+      "correct": 0,
+      "explain": "An unattended overnight job with no one waiting on results is exactly the non-blocking, latency-tolerant case the Message Batches API is built for, at roughly 50% lower cost.<br><b>Not “Message Batches API is inappropriate here since it lacks multi-turn…”</b> — A review job does not need multi-turn tool calling, so that limitation does not rule out batch for this unattended run.<br><b>Not “Batch it, but only if a real-time SLA under one hour can be guaranteed”</b> — No one waits on a nightly job, so a one-hour real-time guarantee is unnecessary and is not a condition for using batch here.<br><b>Not “Keep it fully synchronous, since batch jobs cannot run unattended”</b> — Batch jobs run unattended by design, so there is no need to stay synchronous and give up the 50% cost saving."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 5,
+      "q": "Developers report that automated review flags a specific pattern as a \"style\" issue 40% of the time incorrectly, eroding trust in the tool overall — including in categories that are actually accurate. What should be done?",
+      "options": [
+        "Turn off all automated review categories permanently",
+        "Nothing; false positives in one category don't affect trust in others",
+        "Add \"please be more careful\" to the prompt",
+        "Define explicit criteria for that category and consider temporarily disabling it while iterating, to protect trust in the accurate categories"
+      ],
+      "correct": 3,
+      "explain": "A 40%-false-positive category is actively eroding trust in categories that are accurate, so defining explicit criteria for that category (and considering temporarily disabling it while iterating) protects overall trust in the tool. Vague reinforcement like \"be more careful\" doesn't fix ill-defined criteria, and permanently killing all categories overcorrects.<br><b>Not “Turn off all automated review categories permanently”</b> — Permanently disabling every category throws away the accurate ones along with the faulty one, overcorrecting for a single problem.<br><b>Not “Nothing; false positives in one category don't affect trust in others”</b> — Trust does spread. A category wrong 40% of the time makes developers doubt the tool's other findings as well.<br><b>Not “Add \"please be more careful\" to the prompt”</b> — Asking the model to be more careful is another vague instruction that does not fix the category's poorly defined criteria."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 5,
+      "q": "A CI review prompt currently says \"flag anything that seems off.\" What change would most reduce false positives?",
+      "options": [
+        "Require unanimous agreement from three separate runs before flagging anything",
+        "Add \"only flag things you're very confident about\"",
+        "Lower the sampling temperature to 0",
+        "Replace the vague instruction with specific, categorical criteria (e.g., \"flag a comment only when claimed behavior contradicts actual code behavior\")"
+      ],
+      "correct": 3,
+      "explain": "Replacing \"flag anything that seems off\" with specific, categorical criteria (e.g., claimed vs. actual behavior contradiction) removes the ambiguity that vague instructions can't resolve. \"Only flag things you're very confident about\" is exactly the kind of vague reinforcement that's been shown not to reduce false positives.<br><b>Not “Require unanimous agreement from three separate runs before flaggin…”</b> — Requiring agreement across three runs multiplies cost and still leaves the vague criterion in place, so noisy flags can keep recurring.<br><b>Not “Add \"only flag things you're very confident about\"”</b> — Telling the model to be very confident is another vague instruction, and it has not been shown to reduce false positives.<br><b>Not “Lower the sampling temperature to 0”</b> — Temperature controls randomness, not the definition of what to flag, so an ill-defined instruction would still produce false positives."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 5,
+      "q": "A CI pipeline needs Claude to generate a PR summary, then a set of suggested reviewers, then a risk score — as three separate, dependent steps where each step's output feeds the next. Which pattern best matches this?",
+      "options": [
+        "<code>fork_session</code> to branch each step independently",
+        "Parallel subagent spawning via the Task tool",
+        "Dynamic/adaptive decomposition, since the steps are open-ended",
+        "Prompt chaining — a fixed sequential pipeline of well-understood, ordered steps"
+      ],
+      "correct": 3,
+      "explain": "Three fixed, ordered, well-understood steps where each output feeds the next is the textbook definition of prompt chaining, not open-ended/adaptive decomposition, which is for investigations where next steps depend on unknown findings.<br><b>Not “<code>fork_session</code> to branch each step independently”</b> — <code>fork_session</code> branches independent explorations. These three steps depend on each other in order, so independent branches do not fit.<br><b>Not “Parallel subagent spawning via the Task tool”</b> — Parallel subagents suit independent work. Here each step needs the prior step's output, so they cannot run side by side.<br><b>Not “Dynamic/adaptive decomposition, since the steps are open-ended”</b> — Adaptive decomposition is for open-ended work where next steps depend on what is found. These steps are fixed and known in advance."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 5,
+      "q": "Which CLI flag is specifically intended to prevent a CI job from hanging on interactive prompts?",
+      "options": [
+        "<code>--resume</code>",
+        "<code>--json-schema</code>",
+        "<code>-p</code> / <code>--print</code>",
+        "<code>--output-format</code>"
+      ],
+      "correct": 2,
+      "explain": "<code>-p</code> / <code>--print</code> is specifically the non-interactive mode flag that prevents hanging on stdin in a CI context; the other options control output formatting or session continuity, not interactivity.<br><b>Not “<code>--resume</code>”</b> — <code>--resume</code> continues a previous session and does nothing about interactive prompts that cause a hang.<br><b>Not “<code>--json-schema</code>”</b> — <code>--json-schema</code> shapes the structure of the output. It does not stop the command from waiting for input.<br><b>Not “<code>--output-format</code>”</b> — <code>--output-format</code> selects how results are formatted, and does not switch Claude into non-interactive operation."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 5,
+      "q": "A batch code-review job covering 500 files returns partial failures. What's the correct remediation?",
+      "options": [
+        "Discard failed files permanently, since batches can't be retried",
+        "Identify failures by <code>custom_id</code> and resubmit only those, adjusting for the specific failure cause",
+        "Switch the entire job to synchronous calls going forward",
+        "Resubmit the entire batch of 500 files"
+      ],
+      "correct": 1,
+      "explain": "Batch requests correlate to responses via <code>custom_id</code>, so failures can be precisely identified and only those resubmitted with an adjustment for the specific cause. Discarding failures or resubmitting the full 500-file batch wastes cost and ignores the correlation mechanism the API provides for exactly this situation.<br><b>Not “Discard failed files permanently, since batches can't be retried”</b> — Batch items can be resubmitted, so discarding the failures loses work that could be recovered.<br><b>Not “Switch the entire job to synchronous calls going forward”</b> — Moving the whole job to synchronous calls gives up the batch savings when only some requests failed.<br><b>Not “Resubmit the entire batch of 500 files”</b> — Resubmitting all 500 files repeats work and cost for those that already succeeded, ignoring that failures can be identified individually."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 5,
+      "q": "A CI test-generation job has an SLA requiring results within 30 hours of PR creation, using the Message Batches API's 24-hour processing window. How should submission timing be handled?",
+      "options": [
+        "Submit at a frequency (e.g., every 4–6 hours) that guarantees any given PR's batch completes within the 24-hour window, leaving buffer against the 30-hour SLA",
+        "Switch to real-time calls entirely, since batch has no SLA guarantee",
+        "Submit immediately when the PR opens and hope it completes in time",
+        "Submit only once daily at midnight regardless of PR volume"
+      ],
+      "correct": 0,
+      "explain": "Since the Batches API offers no latency SLA within its up-to-24-hour window, submitting on a cadence (e.g., every 4-6 hours) bounds worst-case wait-before-submission plus processing time comfortably under the 30-hour deadline. Submitting immediately \"and hoping\" or batching only once daily regardless of volume either lacks a deliberate buffer or risks a PR opened right after the daily cutoff blowing the SLA.<br><b>Not “Switch to real-time calls entirely, since batch has no SLA guarantee”</b> — Moving to real-time calls is unnecessary, since a deliberate submission cadence can keep batch completion within the 30-hour limit.<br><b>Not “Submit immediately when the PR opens and hope it completes in time”</b> — Submitting immediately and hoping gives no deliberate buffer, and with no latency guarantee the SLA could be missed.<br><b>Not “Submit only once daily at midnight regardless of PR volume”</b> — A single daily submission means a PR opened just after the cutoff waits nearly a day before processing even starts, risking the SLA."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 1,
+      "q": "Production logs show the agent skips <code>get_customer</code> in 15% of cases when the customer volunteers their name, occasionally leading to an incorrect account being modified. What is the most reliable fix?",
+      "options": [
+        "Add few-shot examples showing correct verification order",
+        "Build a routing classifier to detect which tools are relevant per request",
+        "Add a programmatic prerequisite that blocks <code>lookup_order</code>/<code>process_refund</code> until <code>get_customer</code> returns a verified ID",
+        "Strengthen the system prompt's wording around verification being \"mandatory\""
+      ],
+      "correct": 2,
+      "explain": "This mirrors the classic verify-before-refund anti-pattern: a probabilistic fix (better wording, few-shot examples) still leaves a non-zero failure rate on a task with account-modification consequences, so only a structural prerequisite hook can guarantee <code>get_customer</code> runs first. D sounds intuitive but \"mandatory\" language is exactly the kind of prompt-only fix that produced the 15% failure rate in the first place.<br><b>Not “Add few-shot examples showing correct verification order”</b> — Few-shot examples are probabilistic, so a failure rate remains. Account modification needs a guarantee that <code>get_customer</code> runs first.<br><b>Not “Build a routing classifier to detect which tools are relevant per r…”</b> — A routing classifier chooses relevant tools but does not enforce that identity is verified before account-modifying calls.<br><b>Not “Strengthen the system prompt's wording around verification being \"m…”</b> — Stronger wording is the same kind of prompt-only fix that already produced the 15% skip rate, so it cannot guarantee the order."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 2,
+      "scenario": 1,
+      "q": "A support agent has tools <code>get_customer</code> and <code>lookup_order</code> with minimal descriptions, and misroutes order-status questions to <code>get_customer</code>. What should be tried first, before adding few-shot examples or restructuring tools?",
+      "options": [
+        "Expand both descriptions with input formats, example queries, and explicit boundaries distinguishing the two",
+        "Build a pre-processing keyword router",
+        "Merge the tools into one generic tool",
+        "Force <code>tool_choice</code> to always select <code>lookup_order</code>"
+      ],
+      "correct": 0,
+      "explain": "Tool description quality is the primary, lowest-effort lever for tool-selection accuracy and should always be tried before few-shot examples, routing layers, or restructuring. Merging or forcing a single tool are overcorrections that break legitimate use cases for the other tool.<br><b>Not “Build a pre-processing keyword router”</b> — A keyword router adds brittle external logic. Clearer tool descriptions come first and are far cheaper to try.<br><b>Not “Merge the tools into one generic tool”</b> — Merging the two tools removes a useful distinction and creates a vague generic tool, instead of improving the descriptions.<br><b>Not “Force <code>tool_choice</code> to always select <code>lookup_order</code>”</b> — Forcing <code>lookup_order</code> every time would break cases where <code>get_customer</code> is the right tool."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 1,
+      "q": "A <code>PostToolUse</code> hook is used to convert <code>lookup_order</code>'s Unix timestamps and <code>get_customer</code>'s ISO 8601 dates into one consistent format before the model reasons about them. What category of problem does this solve?",
+      "options": [
+        "Tool selection ambiguity",
+        "Data-format inconsistency across tools feeding into the model's context",
+        "Batch request correlation",
+        "Escalation calibration"
+      ],
+      "correct": 1,
+      "explain": "Normalizing heterogeneous timestamp/date formats via a <code>PostToolUse</code> hook is precisely a data-format consistency fix so the model reasons over clean, comparable values instead of misinterpreting formats; it isn't about which tool to call or escalation.<br><b>Not “Tool selection ambiguity”</b> — Choosing between tools is a separate issue. The hook acts on tool results after the call, not on which tool the model picks.<br><b>Not “Batch request correlation”</b> — Batch request correlation concerns matching batch results to requests with <code>custom_id</code>, which is unrelated to date formats.<br><b>Not “Escalation calibration”</b> — Escalation calibration is about deciding when to hand off, and unifying date formats has no effect on it."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 1,
+      "q": "A refund-processing hook blocks any <code>process_refund</code> call above $500 and redirects to <code>escalate_to_human</code>. Which statement correctly characterizes this design choice?",
+      "options": [
+        "It only works if paired with the Message Batches API",
+        "It provides deterministic, guaranteed enforcement of a business rule that a prompt alone cannot guarantee",
+        "It should be replaced by a confidence-score threshold instead",
+        "It's unnecessary since the system prompt already states the $500 limit"
+      ],
+      "correct": 1,
+      "explain": "A pre-call hook that blocks and redirects above a dollar threshold provides deterministic enforcement independent of model behavior, whereas the system prompt alone or a confidence-score threshold only reduce, not eliminate, the failure rate on a rule with real financial consequences.<br><b>Not “It only works if paired with the Message Batches API”</b> — The hook works on its own at call time and has no dependency on the Message Batches API.<br><b>Not “It should be replaced by a confidence-score threshold instead”</b> — A confidence threshold is a probabilistic signal that can be wrong, so it would not give a guaranteed limit on refunds.<br><b>Not “It's unnecessary since the system prompt already states the $500 limit”</b> — The prompt statement is only followed probabilistically. The hook adds the guarantee the prompt cannot, so it is far from unnecessary."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 1,
+      "q": "A multi-issue customer message (a billing dispute and a delivery delay) is handled by resolving only the first-mentioned issue and silently dropping the second. What's the correct decomposition approach instead?",
+      "options": [
+        "Ask the customer to resend their message with only one issue at a time",
+        "Randomly pick which issue to address based on severity keywords",
+        "Escalate immediately since multi-issue messages are too complex",
+        "Decompose into the distinct items, investigate each with shared context, then synthesize one unified resolution covering both"
+      ],
+      "correct": 3,
+      "explain": "Multi-issue requests need decomposition into distinct items, investigation of each with shared context, then a single synthesized resolution — mirroring the per-item-then-synthesis pattern used elsewhere in task decomposition. Silently dropping or randomly prioritizing one issue or offloading the problem to the customer both abandon the second issue instead of resolving it.<br><b>Not “Ask the customer to resend their message with only one issue at a time”</b> — Making the customer resend their message as separate ones pushes work onto them when the agent can already handle both issues.<br><b>Not “Randomly pick which issue to address based on severity keywords”</b> — Picking by severity keywords still leaves the other issue unresolved, and keyword rules are an unreliable way to choose.<br><b>Not “Escalate immediately since multi-issue messages are too complex”</b> — Two issues are not too complex for the agent. Escalating by default wastes human time on a request that can be decomposed."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 2,
+      "scenario": 1,
+      "q": "<code>lookup_order</code> returns multiple matching orders for the identifiers given. What's the correct handling, and why?",
+      "options": [
+        "Escalate immediately without attempting disambiguation",
+        "Process the request against the first match returned",
+        "Ask for an additional identifier to disambiguate, rather than guessing",
+        "Select heuristically (e.g., most recent), since customers usually mean their latest order"
+      ],
+      "correct": 2,
+      "explain": "Multiple ambiguous matches call for requesting an additional identifier rather than guessing; picking the \"most recent\" or first result risks acting on the wrong account/order, which is exactly the kind of identity/data risk this domain flags as needing disambiguation, not heuristics.<br><b>Not “Escalate immediately without attempting disambiguation”</b> — Escalating immediately skips the simple step of asking for another identifier, which would usually resolve the ambiguity.<br><b>Not “Process the request against the first match returned”</b> — Using the first match is a guess that could act on the wrong order or customer.<br><b>Not “Select heuristically (e.g., most recent), since customers usually m…”</b> — Assuming customers mean their latest order is a heuristic that can be wrong, and acting on a wrong order has real consequences."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 1,
+      "q": "When escalating a case to a human agent who has no access to the conversation transcript, what should the structured handoff include?",
+      "options": [
+        "Just a one-line description of the customer's mood",
+        "Only the ticket's timestamp",
+        "The full raw conversation log, unformatted, with no summary",
+        "Customer details, root cause analysis, and a recommended action"
+      ],
+      "correct": 3,
+      "explain": "Since the human has no transcript access, the handoff must substitute for that missing context: customer details, root cause, and a recommended action. A raw, unformatted transcript reintroduces the token-bloat problem instead of giving the human an actionable summary.<br><b>Not “Just a one-line description of the customer's mood”</b> — A mood description tells the human nothing about the customer, cause, or next step, so they must start from scratch.<br><b>Not “Only the ticket's timestamp”</b> — A timestamp alone gives no usable context, so the human still has no idea what happened or what is needed.<br><b>Not “The full raw conversation log, unformatted, with no summary”</b> — An unformatted raw log with no summary forces the human to dig through everything and does not provide an actionable handoff."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 2,
+      "scenario": 1,
+      "q": "An agent is given 18 tools spanning billing, shipping, loyalty programs, and account management, and tool-selection accuracy for its core support tasks has dropped. What's the most appropriate fix?",
+      "options": [
+        "Add more few-shot examples covering every possible tool combination",
+        "Force <code>tool_choice: \"any\"</code> to guarantee some tool gets called",
+        "Increase <code>max_tokens</code> for reasoning about tool choice",
+        "Scope the agent to only the 4–6 tools relevant to its actual role"
+      ],
+      "correct": 3,
+      "explain": "Scoping the agent to the 4–6 tools relevant to its actual role directly addresses selection-accuracy degradation caused by tool-list bloat; adding more few-shot examples doesn't fix the root over-provisioning problem and doesn't scale to every combination of 18 tools.<br><b>Not “Add more few-shot examples covering every possible tool combination”</b> — More few-shot examples for all combinations do not fix having too many tools, and they cannot cover every combination of 18 tools.<br><b>Not “Force <code>tool_choice: \"any\"</code> to guarantee some tool gets called”</b> — <code>tool_choice: \"any\"</code> only guarantees that some tool is called. It does not help the agent pick the right one among many.<br><b>Not “Increase <code>max_tokens</code> for reasoning about tool choice”</b> — <code>max_tokens</code> limits output length and does nothing to reduce the large set of tools causing misselection."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 2,
+      "scenario": 1,
+      "q": "A <code>lookup_order</code> call fails due to a backend timeout. Which response correctly distinguishes this from a valid empty result?",
+      "options": [
+        "Return a generic \"no data\" string",
+        "Return <code>isError: true</code> with <code>errorCategory: \"transient\"</code>, <code>isRetryable: true</code>, and a description of what was attempted",
+        "Return an empty array and mark the call successful",
+        "Silently retry forever without informing the coordinator/caller"
+      ],
+      "correct": 1,
+      "explain": "A backend timeout is an access failure, not a valid empty result, so it must be reported with <code>isError: true</code>, a <code>transient</code> category, retryability, and context on what was attempted — conflating it with an empty-but-successful result hides a recoverable failure from the coordinator.<br><b>Not “Return a generic \"no data\" string”</b> — A generic \"no data\" string hides that the call failed, so the agent cannot tell a timeout from a genuinely empty result.<br><b>Not “Return an empty array and mark the call successful”</b> — An empty array marked successful presents the timeout as a valid result, hiding a recoverable failure from the coordinator.<br><b>Not “Silently retry forever without informing the coordinator/caller”</b> — Silent endless retries give the caller no information and may never end, instead of reporting the failure with context."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 2,
+      "scenario": 1,
+      "q": "First-contact resolution sits at 55% against an 80% target; logs show the agent escalates simple, well-evidenced cases while attempting to autonomously resolve cases that actually require policy exceptions. What's the most effective fix?",
+      "options": [
+        "A separately trained ML classifier on historical tickets",
+        "Self-reported confidence-score routing",
+        "Sentiment-based escalation",
+        "Explicit escalation criteria with few-shot examples distinguishing escalate-vs-resolve cases"
+      ],
+      "correct": 3,
+      "explain": "The described failure (escalating easy cases, autonomously resolving cases needing policy exceptions) is a criteria-calibration problem, best fixed with explicit escalate-vs-resolve criteria and few-shot examples; confidence scores and sentiment are both known-unreliable proxies for actual case complexity.<br><b>Not “A separately trained ML classifier on historical tickets”</b> — A separately trained classifier is heavy machinery, and the described failure is about unclear criteria that explicit rules and examples can fix.<br><b>Not “Self-reported confidence-score routing”</b> — Self-reported confidence is poorly calibrated, so it would keep escalating the wrong cases rather than fixing the criteria.<br><b>Not “Sentiment-based escalation”</b> — Sentiment is not a reliable measure of case complexity and would not distinguish easy cases from policy-exception cases."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 2,
+      "scenario": 1,
+      "q": "A 20-turn support conversation is progressively summarized, and a specific dollar amount and order number mentioned early on are lost from the summary by turn 18, causing the agent to ask the customer to repeat themselves. What's the direct fix?",
+      "options": [
+        "Increase the context window size",
+        "Disable summarization for the whole conversation",
+        "Maintain a persistent \"case facts\" block (amount, order ID, dates) that rides along outside the summarized narrative",
+        "Ask the customer to restate key facts every turn as a matter of policy"
+      ],
+      "correct": 2,
+      "explain": "A persistent case-facts block for hard data (amounts, order IDs, dates) that rides outside the summarized narrative directly prevents progressive summarization from dropping numbers the agent needs later. Disabling summarization entirely or expanding the context window don't address the actual mechanism of loss.<br><b>Not “Increase the context window size”</b> — A larger context window does not stop summarization from dropping specific numbers, because the loss comes from the summary itself.<br><b>Not “Disable summarization for the whole conversation”</b> — Turning summarization off for the whole conversation brings back token bloat and does not target the facts that must persist.<br><b>Not “Ask the customer to restate key facts every turn as a matter of policy”</b> — Making customers restate facts every turn shifts the cost onto them, when a case-facts block would keep the data automatically."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 2,
+      "scenario": 1,
+      "q": "A customer explicitly and calmly states, \"Please transfer me to a human,\" at the very start of an otherwise simple, resolvable interaction. What should happen?",
+      "options": [
+        "Attempt to resolve the issue first, since it appears simple, then transfer if the customer insists again",
+        "Offer an incentive to keep the customer with the automated agent",
+        "Escalate immediately, honoring the explicit request without first attempting investigation",
+        "Ask why they want a human before proceeding either way"
+      ],
+      "correct": 2,
+      "explain": "An explicit, calm request for a human should be honored immediately without first attempting resolution, per the escalation-trigger rule that explicit requests bypass investigation regardless of how simple the issue looks.<br><b>Not “Attempt to resolve the issue first, since it appears simple, then t…”</b> — Trying to resolve first ignores a clear, calm request for a human. Explicit requests are honoured immediately, however simple the issue.<br><b>Not “Offer an incentive to keep the customer with the automated agent”</b> — Offering an incentive tries to talk the customer out of what they asked for, instead of honouring the request.<br><b>Not “Ask why they want a human before proceeding either way”</b> — Asking why delays the transfer and treats an explicit request as something to be justified. It should simply be honoured."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 2,
+      "scenario": 1,
+      "q": "Which best describes the risk of using self-reported model confidence scores as the primary escalation trigger?",
+      "options": [
+        "Confidence scores can't be produced without <code>context: fork</code>",
+        "Self-reported confidence is often poorly calibrated — the model can be confidently wrong precisely on the hardest cases",
+        "Confidence scores require the Message Batches API",
+        "Confidence scores are computationally expensive to generate"
+      ],
+      "correct": 1,
+      "explain": "Self-reported confidence is a poorly calibrated signal — models can be confidently wrong precisely on the hardest, most nuanced cases — which is why it's listed as an unreliable escalation trigger. The other options (batches API, <code>context: fork</code>, compute cost) are irrelevant technical distractors.<br><b>Not “Confidence scores can't be produced without <code>context: fork</code>”</b> — Producing a confidence number does not require <code>context: fork</code>. That option isolates skill output, and it has no link to confidence.<br><b>Not “Confidence scores require the Message Batches API”</b> — Confidence scores have no dependence on the Message Batches API, so that is not the risk.<br><b>Not “Confidence scores are computationally expensive to generate”</b> — Generating a confidence number is cheap. The danger is that the number is unreliable, not that it is costly."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 2,
+      "scenario": 1,
+      "q": "A policy document addresses refund exceptions for damaged goods but says nothing about refund exceptions for goods lost in transit. A customer requests exactly this kind of exception. What should the agent do?",
+      "options": [
+        "Apply the damaged-goods policy by analogy without escalating",
+        "Deny the request since it isn't explicitly authorized",
+        "Approve the request since it isn't explicitly denied",
+        "Escalate, since this is a policy gap rather than a straightforward case"
+      ],
+      "correct": 3,
+      "explain": "A policy that is silent on the specific scenario (lost-in-transit) is a genuine policy gap, and the correct trigger for silence/ambiguity is escalation — not extending policy by analogy or unilaterally denying/approving a case the policy never addressed.<br><b>Not “Apply the damaged-goods policy by analogy without escalating”</b> — Applying the damaged-goods policy by analogy extends a policy to a case it does not cover, which means inventing a resolution.<br><b>Not “Deny the request since it isn't explicitly authorized”</b> — Denying because the exception is not authorised assumes silence means no, when the policy gives no answer on lost goods.<br><b>Not “Approve the request since it isn't explicitly denied”</b> — Approving because nothing denies it assumes silence means yes, so the agent would make up a decision the policy never gave."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 6,
+      "q": "An extraction pipeline validates against a JSON schema and a required field, <code>purchase_order_number</code>, fails validation because it's missing. Investigation confirms the source invoice genuinely never included a PO number. What's the correct interpretation?",
+      "options": [
+        "Increase <code>max_tokens</code> and retry",
+        "This retry is unlikely to succeed since the information doesn't exist in the source; the field should be nullable instead of required",
+        "Retry with the same prompt; missing-field errors are always retry-fixable",
+        "The schema needs a stricter type constraint"
+      ],
+      "correct": 1,
+      "explain": "The invoice genuinely never had a PO number, so no amount of retrying manufactures data that isn't in the source; the fix is upstream, making the field nullable. Increasing <code>max_tokens</code> or retrying the same prompt can't invent missing information, and a stricter type constraint doesn't address absence.<br><b>Not “Increase <code>max_tokens</code> and retry”</b> — More <code>max_tokens</code> cannot create a PO number that the invoice never contained.<br><b>Not “Retry with the same prompt; missing-field errors are always retry-f…”</b> — Missing-field errors are only retry-fixable when the data exists in the source. Here it does not, so the same prompt fails again.<br><b>Not “The schema needs a stricter type constraint”</b> — A stricter type constraint does not help when the value is simply absent. Making the field nullable is what fits."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 6,
+      "q": "A validation-retry loop needs to correct a structural JSON error (a nested array flattened incorrectly) on the second attempt. What should the follow-up prompt include?",
+      "options": [
+        "Nothing — <code>tool_use</code> with schemas should never produce structural errors, so no retry should be needed",
+        "The original document, the failed extraction output, and the specific validation error describing the structural mismatch",
+        "A brand-new, unrelated example document",
+        "Only a repeated instruction to \"format correctly this time\""
+      ],
+      "correct": 1,
+      "explain": "A structural error like a flattened array is retry-fixable, but only if the follow-up gives new information to correct against: the original document, the failed output, and the specific validation error. Repeating \"format correctly\" or an unrelated example provides no diagnostic signal, and assuming schema-enforced tools can never produce structural errors is false.<br><b>Not “Nothing — <code>tool_use</code> with schemas should never produce structural e…”</b> — Schema-enforced output still allows structural mistakes such as a flattened nested array, so a retry can well be needed.<br><b>Not “A brand-new, unrelated example document”</b> — An unrelated example document gives no information about this specific failure, so the model cannot correct it.<br><b>Not “Only a repeated instruction to \"format correctly this time\"”</b> — Repeating \"format correctly\" without showing what was wrong gives the model nothing concrete to fix."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 6,
+      "q": "Which statement correctly distinguishes what <code>tool_use</code> with a JSON schema does and does not guarantee?",
+      "options": [
+        "It guarantees semantic correctness but not syntactic validity",
+        "It guarantees syntactic (schema-compliant) validity but not semantic correctness (e.g., values landing in the wrong field or totals not summing)",
+        "It guarantees neither, and offers no benefit over plain-text JSON output",
+        "It guarantees both syntactic validity and semantic correctness of extracted values"
+      ],
+      "correct": 1,
+      "explain": "<code>tool_use</code> with a schema guarantees the output parses and matches the schema's structure (syntactic validity) but cannot verify that values are semantically correct, e.g., a total that doesn't sum or a value in the wrong field. D overclaims that semantic correctness is also guaranteed, which is exactly the gap a <code>calculated_total</code> vs. <code>stated_total</code> check exists to catch.<br><b>Not “It guarantees semantic correctness but not syntactic validity”</b> — This reverses the guarantee. A schema ensures valid structure, but it cannot ensure values are semantically correct.<br><b>Not “It guarantees neither, and offers no benefit over plain-text JSON o…”</b> — It does provide a benefit: output reliably parses and matches the schema, which plain-text JSON does not guarantee.<br><b>Not “It guarantees both syntactic validity and semantic correctness of e…”</b> — It does not guarantee semantic correctness. Values can sit in the wrong field or totals can fail to add up while the JSON stays valid."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 6,
+      "q": "An enum field for expense category needs to remain useful even as new, unanticipated categories appear in documents over time. What schema pattern handles this well?",
+      "options": [
+        "Multiple boolean flags, one per possible category",
+        "A required string field with no enum constraint at all",
+        "A closed enum with no fallback option",
+        "An enum with an <code>\"other\"</code> value paired with a free-text <code>category_detail</code> field"
+      ],
+      "correct": 3,
+      "explain": "Pairing an <code>\"other\"</code> enum value with a free-text <code>category_detail</code> field lets the schema absorb novel categories without breaking validation while still capturing detail. A closed enum breaks on any new category, dropping the enum sacrifices validation entirely, and per-category booleans can't scale to unanticipated categories.<br><b>Not “Multiple boolean flags, one per possible category”</b> — One boolean per category cannot represent categories nobody has anticipated and becomes unwieldy as categories grow.<br><b>Not “A required string field with no enum constraint at all”</b> — An unconstrained string gives up validation, allowing inconsistent spellings and values that are hard to group.<br><b>Not “A closed enum with no fallback option”</b> — A closed enum with no fallback would fail or misclassify whenever a new category appears in a document."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 6,
+      "q": "Which best describes the purpose of a <code>detected_pattern</code> field attached to each automated finding in a review or extraction pipeline?",
+      "options": [
+        "It determines whether <code>tool_choice</code> should be <code>\"auto\"</code> or <code>\"any\"</code>",
+        "It stores the model's self-reported confidence",
+        "It enables systematic downstream analysis of which specific patterns trigger findings, useful for spotting recurring false-positive causes",
+        "It flags whether a finding is retryable"
+      ],
+      "correct": 2,
+      "explain": "Tagging findings with the specific pattern that triggered them turns one-off fixes into an aggregate signal for spotting recurring false-positive causes. It's unrelated to <code>tool_choice</code>, isn't a confidence score, and doesn't indicate retryability.<br><b>Not “It determines whether <code>tool_choice</code> should be <code>\"auto\"</code> or <code>\"any\"</code>”</b> — Choosing between <code>\"auto\"</code> and <code>\"any\"</code> is made per request, and it is not determined by a tag on findings.<br><b>Not “It stores the model's self-reported confidence”</b> — A confidence score is a separate field. <code>detected_pattern</code> records what triggered the finding, not how sure the model was.<br><b>Not “It flags whether a finding is retryable”</b> — Whether a finding can be retried is a different property, and <code>detected_pattern</code> carries no information about retryability."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 6,
+      "q": "Few-shot examples are added to an extraction prompt specifically to handle documents with varied structures — some using inline citations, others using bibliographies, some embedding methodology details inline versus in a separate section. What is the main benefit?",
+      "options": [
+        "They demonstrate correct handling of structural variety, helping the model generalize to formats not explicitly shown",
+        "They guarantee the model will never omit a field",
+        "They eliminate the need for a JSON schema entirely",
+        "Few-shot examples primarily reduce token usage"
+      ],
+      "correct": 0,
+      "explain": "Showing a few examples across genuinely different document structures teaches the underlying judgment (how to locate methodology or citations regardless of layout), letting the model generalize to formats not explicitly shown. Few-shot examples don't guarantee zero omissions, don't replace schema enforcement, and typically add tokens rather than reduce them.<br><b>Not “They guarantee the model will never omit a field”</b> — Few-shot examples improve behaviour but cannot guarantee that a field is never omitted.<br><b>Not “They eliminate the need for a JSON schema entirely”</b> — Examples do not replace schema enforcement. The schema still guarantees structure, while examples guide judgment on varied layouts.<br><b>Not “Few-shot examples primarily reduce token usage”</b> — Examples add tokens to the prompt, so reducing token usage is not their purpose."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 6,
+      "q": "An extraction pipeline is being scaled from a 20-document pilot to a 5,000-document production run using the Message Batches API. What should happen before the full run?",
+      "options": [
+        "Switch to synchronous calls for the full run instead of batch",
+        "Submit all 5,000 immediately to save time",
+        "Refine the prompt against a smaller sample set first to maximize first-pass success and reduce costly iterative resubmission at scale",
+        "Skip validation entirely for the full run since the pilot already passed"
+      ],
+      "correct": 2,
+      "explain": "At 5,000-document scale with batch turnaround up to 24 hours and no latency SLA, discovering a prompt flaw only after the full run is enormously costly, so refining against a smaller sample first maximizes first-pass success. Submitting everything immediately or skipping validation both forfeit the cheap chance to catch systematic errors early, and abandoning batch throws away the reason for using it.<br><b>Not “Switch to synchronous calls for the full run instead of batch”</b> — Switching to synchronous calls gives up the cost savings that motivated batch, when the better step is refining the prompt on a sample first.<br><b>Not “Submit all 5,000 immediately to save time”</b> — Submitting all 5,000 at once risks a systematic prompt flaw only surfacing after a costly full run, with up to a day's turnaround.<br><b>Not “Skip validation entirely for the full run since the pilot already p…”</b> — Skipping validation because a 20-document pilot passed assumes the pilot represents 5,000 varied documents, so systematic errors may go uncaught."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 2,
+      "scenario": 6,
+      "q": "A stakeholder wants to know if a 96% aggregate extraction accuracy is good enough to safely reduce human review across the board. What should be checked first?",
+      "options": [
+        "The average length of the source documents",
+        "Accuracy broken down by document type and by individual field, since aggregate numbers can mask segment-specific failure",
+        "Whether <code>--json-schema</code> was used during extraction",
+        "Nothing further; 96% aggregate is a strong number on its own"
+      ],
+      "correct": 1,
+      "explain": "A 96% aggregate can hide a document type or field performing far worse, so only a by-type, by-field breakdown reveals whether review can safely be reduced broadly or only for specific segments. Document length and whether a schema flag was used don't address the masking risk, and accepting the aggregate at face value is the exact mistake stratified analysis prevents.<br><b>Not “The average length of the source documents”</b> — Average source document length says nothing about whether accuracy holds across every document type and field.<br><b>Not “Whether <code>--json-schema</code> was used during extraction”</b> — Whether <code>--json-schema</code> was used affects output structure, not whether the 96% hides segments performing poorly.<br><b>Not “Nothing further; 96% aggregate is a strong number on its own”</b> — A 96% aggregate can mask a document type or field performing much worse, so it is not enough to justify reducing review."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 2,
+      "scenario": 6,
+      "q": "Field-level confidence scores are used to route low-confidence extractions to human reviewers with limited capacity. What should determine the confidence threshold used for routing?",
+      "options": [
+        "Calibration against a labeled validation set so the threshold maps to actual accuracy",
+        "The number of required fields in the schema",
+        "The size of the review team, independent of accuracy data",
+        "An arbitrary round number chosen for simplicity"
+      ],
+      "correct": 0,
+      "explain": "A threshold is only meaningful if tied to what confidence level actually predicts correctness, which requires calibration against labeled ground truth. Sizing it to schema field count, team headcount, or an arbitrary round number fits the threshold to convenience rather than actual error risk.<br><b>Not “The number of required fields in the schema”</b> — Field count has no connection to how reliable a given confidence score is, so it is not a sound basis for the threshold.<br><b>Not “The size of the review team, independent of accuracy data”</b> — Team size sets capacity, not the point where confidence predicts errors, so a threshold based on it ignores actual accuracy.<br><b>Not “An arbitrary round number chosen for simplicity”</b> — An arbitrary round number has no link to real error rates, so it could send the wrong items to reviewers."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 2,
+      "scenario": 6,
+      "q": "Two extracted values for the same metric conflict because they come from two source documents published a year apart, representing a genuine change over time rather than an error. What structured field, if present, would have prevented this from being misread as a contradiction?",
+      "options": [
+        "Publication or data-collection date fields on each extracted value",
+        "<code>isRetryable</code>",
+        "<code>tool_choice</code>",
+        "<code>errorCategory</code>"
+      ],
+      "correct": 0,
+      "explain": "Attaching a publication or data-collection date to each extracted value lets downstream synthesis recognize a legitimate change over time rather than flag a contradiction. <code>isRetryable</code>, <code>tool_choice</code>, and <code>errorCategory</code> are extraction-mechanics fields that say nothing about when the underlying fact was true.<br><b>Not “<code>isRetryable</code>”</b> — <code>isRetryable</code> describes whether a failed call can be tried again, and says nothing about when a value was measured.<br><b>Not “<code>tool_choice</code>”</b> — <code>tool_choice</code> controls how the model is made to call tools and carries no timing information about the underlying facts.<br><b>Not “<code>errorCategory</code>”</b> — <code>errorCategory</code> classifies failures. Both values were extracted successfully, so it cannot explain an apparent conflict."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 6,
+      "q": "Which best describes when retrying a failed extraction is NOT likely to help?",
+      "options": [
+        "When the required information is genuinely absent from the source document entirely",
+        "When the model swapped two adjacent fields",
+        "When the validation error indicates a structural/format mismatch that's fixable through clearer instructions",
+        "When a nested array was flattened incorrectly"
+      ],
+      "correct": 0,
+      "explain": "Retrying only helps when there's new information or clearer instruction to converge on; if the value was never in the source document, no retry can invent it. Swapped fields, flattened arrays, and structural/format mismatches are exactly the error class a specific validation error message can fix.<br><b>Not “When the model swapped two adjacent fields”</b> — Swapped adjacent fields are a mistake that a specific validation error can point out, so retrying with that feedback is likely to help.<br><b>Not “When the validation error indicates a structural/format mismatch th…”</b> — A format mismatch that clearer instructions can fix is the kind of error a retry with the validation message can correct.<br><b>Not “When a nested array was flattened incorrectly”</b> — A wrongly flattened nested array is a structural error that a retry with the specific error can typically correct."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 6,
+      "q": "An extraction schema requires <code>stated_total</code> and also asks the model to compute <code>calculated_total</code> from the line items. What is the purpose of including both?",
+      "options": [
+        "Enabling downstream detection of semantic mismatches (the two numbers disagree) that schema validation alone wouldn't catch",
+        "Redundancy for its own sake",
+        "To satisfy <code>tool_choice: \"any\"</code> requirements",
+        "To reduce the number of required fields elsewhere"
+      ],
+      "correct": 0,
+      "explain": "Requiring both the stated and a model-computed total creates a downstream check schema validation alone can't perform: if the two disagree, something is semantically wrong even in well-formed JSON. It isn't redundancy for its own sake, unrelated to <code>tool_choice</code>, and doesn't reduce required fields elsewhere.<br><b>Not “Redundancy for its own sake”</b> — Comparing the two totals is not redundancy for its own sake. It lets downstream checks detect a semantic mismatch that the schema cannot.<br><b>Not “To satisfy <code>tool_choice: \"any\"</code> requirements”</b> — <code>tool_choice: \"any\"</code> concerns forcing a tool call and has no link to why both totals are requested.<br><b>Not “To reduce the number of required fields elsewhere”</b> — Asking for both totals adds a field rather than reducing required fields elsewhere, so that is not its purpose."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 2,
+      "scenario": 6,
+      "q": "A synthesis-style extraction task combines financial figures, narrative commentary, and technical specifications from a single source document into one structured output. How should each content type be rendered in the final structured output?",
+      "options": [
+        "Only the financial figures should be kept; other content types should be dropped",
+        "Appropriately to its type — e.g., financial data as tables, narrative as prose, technical specs as structured lists",
+        "Uniformly as plain paragraphs regardless of content type",
+        "Entirely as a single JSON blob with no formatting distinctions"
+      ],
+      "correct": 1,
+      "explain": "Financial figures, narrative, and specs carry different information shapes, and collapsing them into one uniform format throws away structure that's cheap to preserve and useful downstream. Dropping non-financial content discards real information, and forcing everything into plain paragraphs or an undifferentiated JSON blob both erase distinctions the source document actually has.<br><b>Not “Only the financial figures should be kept; other content types shou…”</b> — Dropping the narrative and technical content throws away useful information the task asks to combine.<br><b>Not “Uniformly as plain paragraphs regardless of content type”</b> — Making everything plain paragraphs erases the useful structure of tables and lists, which the source and downstream use rely on.<br><b>Not “Entirely as a single JSON blob with no formatting distinctions”</b> — A single undifferentiated JSON blob loses the distinctions between content types, making the output harder to read and use."
+    }
+  ]
+}

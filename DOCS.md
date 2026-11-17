@@ -273,10 +273,12 @@ questions/
   mock.json        pool config (no questions of its own)
   basic.json       49 questions (Foundations)
   scenario.json    94 questions (Scenario Practice)
-  prep.json        374 questions (Prep Bank Exam) — imported from the CCA
-                   Foundations Prep artifact; mock items are MIT-licensed, see
-                   its `source`/`licence` fields. d: core 1, mocks 1-3 → 2,
-                   mocks 4-6 (labelled hard by the source) → 3
+  core.json        40 questions (Core Concepts Drill)      ┐ "Mock Exam Bank"
+  mock1-6.json     60/58/56/54/51/55 (Mock Exam 1-6)       ┘ section
+                   Imported from the CCA Foundations Prep artifact; mock items
+                   are MIT-licensed, see each file's `source`/`licence`. d: core
+                   1, mocks 1-3 → 2, mocks 4-6 (labelled hard by the source) → 3.
+                   Multi-select and disputed source items were dropped, hence <60.
 api/scores.js      serverless leaderboard endpoint
 package.json       declares the Node runtime for Vercel
 .env.example       template for local Redis credentials
@@ -351,6 +353,20 @@ const SCENARIOS = { 1: …, 6: … };  // the six official exam scenarios
 - `blueprint` — the scenario-mix bar on the level card. Percentages should total
   100.
 - `ready: false` — shows the level as "Soon" and disables it.
+- `section` — `"path"` (default: the gated Exam Path) or `"bank"` (Mock Exam
+  Bank: always unlocked, compact cards without the blueprint bar).
+- `inPool: false` — keep this bank out of pool levels, so Full Mock Exam stays
+  built from the Exam Path banks only. Every bank level sets it.
+
+### Custom quiz builder
+Sits at the top of the Mock Exam Bank section. Pick one or more official domains
+(or all), exam weighting (27/18/20/20/15) or an equal split, and 10/20/30/60
+questions. It draws from every non-pool level in both sections. The older banks
+use loose domain labels; `DOMAIN_OF` in `index.html` maps the clear ones (e.g.
+`MCP` → Tool Design, `CI/CD` → Claude Code), while `Claude API`, `Support Agent`,
+`Code Gen` and `Dev Productivity` are left out of custom quizzes. Picked questions
+are relabelled with the official domain name for the results breakdown. Custom
+quizzes neither unlock levels nor post to the leaderboard.
 
 ### Adding a level
 
