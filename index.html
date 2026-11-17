@@ -274,6 +274,7 @@
   .opt:hover:not(.struck) { border-color: var(--lime); }
   .opt.selected { border-color: var(--lime); background: var(--lime-dim); }
   .opt.struck { opacity: 0.4; text-decoration: line-through; }
+  .pick-hint { display: inline-block; font-size: 0.78rem; font-weight: 600; color: var(--lime); border: 1px solid var(--lime); border-radius: 999px; padding: 2px 10px; margin: 0 0 10px; }
   .opt.fb-correct { border-color: var(--good); background: #26d07c1f; }
   .opt.fb-wrong { border-color: var(--bad); background: #e0524d1a; }
   .fb-mark { font-weight: 800; font-size: 1rem; align-self: center; }
@@ -378,6 +379,30 @@
     padding-top: 38px; /* clears the fixed account avatar in the top-right corner */
   }
   .prep .section-label { margin-top: 0; }
+  /* Exam-time question palette (lives in .prep) */
+  .pal-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; }
+  .pal-stat { display: flex; justify-content: space-between; font-size: 0.84rem; padding: 4px 0; color: var(--text-dim); }
+  .pal-stat b { color: var(--text); font-family: var(--font-mono); }
+  .pal-pct { font-family: var(--font-display); font-size: 2rem; font-weight: 800; margin-top: 8px; color: var(--text-dim); }
+  .pal-pct.ok { color: var(--good); }
+  .pal-pct.no { color: var(--bad); }
+  .pal-sub { font-size: 0.74rem; color: var(--text-dim); margin-bottom: 8px; }
+  .pal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 6px; }
+  .pal-cell { height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: var(--font-mono); font-size: 0.8rem; font-weight: 600; cursor: pointer; position: relative; }
+  .pal-cell:hover { border-color: var(--lime); }
+  .pal-cell.answered { background: var(--lime-dim); border-color: var(--lime); }
+  .pal-cell.right { background: var(--good); border-color: var(--good); color: #fff; }
+  .pal-cell.wrong { background: var(--bad); border-color: var(--bad); color: #fff; }
+  .pal-cell.current { outline: 2px solid var(--text); outline-offset: 1px; }
+  .pal-cell.flagged::after { content: '★'; position: absolute; top: -6px; right: -4px; font-size: 0.7rem; color: var(--amber); }
+  /* Instant-feedback answer + explanation */
+  .fb-panel { margin-top: 12px; padding: 12px 14px; border-radius: 10px; background: var(--surface-2); border-left: 3px solid var(--good); font-size: 0.86rem; line-height: 1.55; }
+  .fb-panel.no { border-left-color: var(--bad); }
+  .fb-verdict { font-weight: 700; margin-bottom: 6px; }
+  .fb-panel.ok .fb-verdict { color: var(--good); }
+  .fb-panel.no .fb-verdict { color: var(--bad); }
+  .fb-answer { margin-bottom: 8px; }
+  .fb-explain { color: var(--text-dim); }
   @media (max-width: 1340px) {
     .prep {
       position: static; width: 100%; max-height: none; overflow: visible;
@@ -658,7 +683,7 @@ let state = {
   timeLeft: EXAM_DURATION,
   timerId: null,
   reviewFilter: 'all',
-  instantFeedback: false
+  instantFeedback: true
 };
 
 const app = document.getElementById('app');
@@ -950,11 +975,30 @@ function prepQuestions(raw, { keepOrder = false } = {}) {
   // Question order is preserved when the caller has already arranged it (the
   // difficulty ramp), otherwise it's shuffled.
   const list = keepOrder ? raw : shuffle(raw);
+  // Authors write `correct` as one index, or an array of indices for a
+  // multiple-response item. Internally it is always a sorted index array into
+  // the shuffled options, and `multi` records which kind the author wrote.
   return list.map(q => {
-    const correctText = q.options[q.correct];
+    const multi = Array.isArray(q.correct);
+    const correctTexts = (multi ? q.correct : [q.correct]).map(i => q.options[i]);
     const opts = shuffle(q.options);
-    return { ...q, options: opts, correct: opts.indexOf(correctText) };
+    const correct = correctTexts.map(t => opts.indexOf(t)).sort((a, b) => a - b);
+    return { ...q, options: opts, multi, correct };
   });
+}
+
+// An answer is null (untouched) or an array of chosen option indices.
+// A multiple-response item counts as answered only once the stated number of
+// options is chosen, and scores only if every chosen option is correct — no
+// partial credit, matching how the real exam marks these items.
+function isAnswered(q, ans) {
+  return Array.isArray(ans) && ans.length === q.correct.length;
+}
+function isRight(q, ans) {
+  return isAnswered(q, ans) && q.correct.every(i => ans.includes(i));
+}
+function unansweredCount() {
+  return state.questions.filter((q, i) => !isAnswered(q, state.answers[i])).length;
 }
 
 function fmtTime(s) {
@@ -1139,11 +1183,21 @@ function renderResources() {
 
 // The prep panel is the right-hand column of the shell, so it lives outside #app
 // and is synced on every screen transition rather than rendered into the page.
-// Start screen only — during an exam it would compete with the question.
+// Start screen shows prep resources; during an exam it becomes the question palette.
 function syncPrep() {
   const panel = document.getElementById('prep');
   if (!panel) return;
-  const html = state.screen === 'start' ? renderResources() : '';
+  if (!panel.dataset.wired) {
+    panel.dataset.wired = '1';
+    panel.addEventListener('click', (e) => {
+      const cell = e.target.closest('[data-jump]');
+      if (!cell || state.screen !== 'exam') return;
+      state.current = parseInt(cell.dataset.jump);
+      renderExam();
+    });
+  }
+  const html = state.screen === 'start' ? renderResources()
+    : (state.screen === 'exam' || state.screen === 'paused') ? renderPalette() : '';
   panel.innerHTML = html;
   panel.toggleAttribute('hidden', !html);
 }
@@ -1204,17 +1258,17 @@ function renderStart() {
         <span class="chip">Pass: <b>720/1000</b></span>
       </div>
     </div>
-    <div class="section-label">Choose your level</div>
-    <div class="levels">${levelCards}</div>
     <button class="fb-toggle" id="fbToggle">
       <span>
         <span class="fb-t">Instant feedback</span>
         <span class="fb-d">${state.instantFeedback
-          ? 'On — each pick is marked right or wrong straight away. The correct option stays hidden, and your first pick is final.'
+          ? 'On — each answer is marked right or wrong straight away, with the correct answer and the explanation. Your first pick is final.'
           : 'Off — real exam conditions. You only find out how you did at the end.'}</span>
       </span>
       <span class="switch ${state.instantFeedback ? 'on' : ''}"></span>
     </button>
+    <div class="section-label">Choose your level</div>
+    <div class="levels">${levelCards}</div>
     <p style="color:var(--text-dim);font-size:0.82rem;text-align:center;margin-top:24px;line-height:1.6">
       Every level runs at the real exam's pace — 2 minutes per question. The timer supports <b style="color:var(--text)">pause / resume</b>, so the clock stops while you're away.
       <br><br>Taking this as <b style="color:var(--text)">${escapeHtml(user.name || '—')}</b> · <a href="#" id="changeName" style="color:var(--lime);text-decoration:none;font-weight:600">change name</a>
@@ -1257,8 +1311,11 @@ function renderExam() {
   const q = state.questions[state.current];
   const ans = state.answers[state.current];
   const struckSet = state.struck[state.current];
-  const answeredCount = state.answers.filter(a => a !== null).length;
+  const answeredCount = state.questions.length - unansweredCount();
   const progress = (answeredCount / state.questions.length) * 100;
+  const chosen = ans || [];
+  // Instant feedback locks the item once it is fully answered.
+  const locked = state.instantFeedback && isAnswered(q, ans);
   const letters = ['A','B','C','D','E'];
 
   app.innerHTML = `
@@ -1280,16 +1337,20 @@ function renderExam() {
     <div class="card">
       ${scenarioHeader(q, state.current)}
       <div class="qtext">${formatQuestion(q.q)}</div>
+      ${q.multi ? `<div class="pick-hint">Select ${q.correct.length} · ${chosen.length} of ${q.correct.length} chosen</div>` : ''}
       ${q.options.map((opt, i) => {
-        const sel = ans === i ? ' selected' : '';
+        const sel = chosen.includes(i) ? ' selected' : '';
         const st = struckSet.has(i) ? ' struck' : '';
-        // Instant feedback marks only the option you chose. The correct answer is
-        // never highlighted, so a wrong pick doesn't give the answer away.
+        // Instant feedback marks your picks right/wrong and, once locked, also
+        // reveals any correct option you missed.
         let fb = '', mark = '';
-        if (state.instantFeedback && ans !== null && i === ans) {
-          const right = ans === q.correct;
+        if (locked && chosen.includes(i)) {
+          const right = q.correct.includes(i);
           fb = right ? ' fb-correct' : ' fb-wrong';
           mark = `<span class="fb-mark">${right ? '✓' : '✗'}</span>`;
+        } else if (locked && q.correct.includes(i)) {
+          fb = ' fb-correct';
+          mark = `<span class="fb-mark">✓</span>`;
         }
         return `
           <div class="opt${sel}${st}${fb}" data-idx="${i}">
@@ -1299,11 +1360,15 @@ function renderExam() {
             <button class="strike-btn" data-strike="${i}" title="Strike out">✕</button>
           </div>`;
       }).join('')}
-      ${state.instantFeedback && ans !== null
-        ? `<div style="font-size:0.78rem;margin-top:8px;color:${ans === q.correct ? 'var(--good)' : 'var(--bad)'};font-weight:600">
-             ${ans === q.correct ? 'Correct.' : 'Not correct — the right answer stays hidden until your review.'}
-           </div>`
-        : ''}
+      ${locked ? (() => {
+        const right = isRight(q, ans);
+        const answerText = q.correct.map(i => `<b>${letters[i]}.</b> ${q.options[i]}`).join('<br>');
+        return `<div class="fb-panel ${right ? 'ok' : 'no'}">
+             <div class="fb-verdict">${right ? '✓ Correct' : '✗ Incorrect'}</div>
+             ${right ? '' : `<div class="fb-answer">Correct answer${q.correct.length > 1 ? 's' : ''}:<br>${answerText}</div>`}
+             ${q.explain ? `<div class="fb-explain">${q.explain}</div>` : ''}
+           </div>`;
+      })() : ''}
       <div style="font-size:0.76rem;color:var(--text-dim);margin-top:6px">Tip: right-click (or tap ✕ on) an option to cross it out as "definitely not this" — it stays crossed for review.</div>
     </div>
 
@@ -1322,11 +1387,20 @@ function renderExam() {
   app.querySelectorAll('.opt').forEach(el => {
     el.addEventListener('click', (e) => {
       if (e.target.dataset.strike !== undefined) return;
-      // In instant-feedback mode the first pick is final — otherwise seeing "wrong"
-      // and switching would make the score meaningless.
-      if (state.instantFeedback && state.answers[state.current] !== null) return;
+      // In instant-feedback mode a fully answered item is final — otherwise seeing
+      // "wrong" and switching would make the score meaningless.
+      if (locked) return;
       const idx = parseInt(el.dataset.idx);
-      state.answers[state.current] = idx;
+      if (!q.multi) {
+        state.answers[state.current] = [idx];
+      } else if (chosen.includes(idx)) {
+        const rest = chosen.filter(x => x !== idx);
+        state.answers[state.current] = rest.length ? rest : null;
+      } else if (chosen.length < q.correct.length) {
+        state.answers[state.current] = [...chosen, idx];
+      } else {
+        return; // already at the stated count; deselect one first
+      }
       renderExam();
     });
     // right-click to strike through (mark as "definitely not this")
@@ -1336,8 +1410,9 @@ function renderExam() {
       if (struckSet.has(idx)) struckSet.delete(idx); else struckSet.add(idx);
       // if you strike your currently-selected answer, clear the selection
       // (unless instant feedback has already locked it in)
-      if (struckSet.has(idx) && state.answers[state.current] === idx && !state.instantFeedback) {
-        state.answers[state.current] = null;
+      if (struckSet.has(idx) && chosen.includes(idx) && !locked) {
+        const rest = chosen.filter(x => x !== idx);
+        state.answers[state.current] = rest.length ? rest : null;
       }
       renderExam();
     });
@@ -1359,14 +1434,50 @@ function renderExam() {
   document.getElementById('exitBtn')?.addEventListener('click', () => {
     resetToMenu();
   });
+  syncPrep();
   updateTimerDisplay();
+}
+
+// Right-hand panel during an exam: live score and a numbered grid to jump
+// between questions. Right/wrong colours only show with instant feedback on;
+// otherwise a cell is just "answered", so real-exam mode gives nothing away.
+function renderPalette() {
+  const qs = state.questions;
+  const fbOn = state.instantFeedback;
+  let correct = 0, wrong = 0;
+  const cells = qs.map((q, i) => {
+    const a = state.answers[i];
+    let cls = '';
+    if (isAnswered(q, a)) {
+      if (!fbOn) cls = ' answered';
+      else if (isRight(q, a)) { cls = ' right'; correct++; }
+      else { cls = ' wrong'; wrong++; }
+    }
+    if (i === state.current) cls += ' current';
+    if (state.flagged[i]) cls += ' flagged';
+    return `<button class="pal-cell${cls}" data-jump="${i}">${i + 1}</button>`;
+  }).join('');
+  const answered = qs.length - unansweredCount();
+  let stats = `<div class="pal-stat"><span>Answered</span><b>${answered} / ${qs.length}</b></div>`;
+  if (fbOn) {
+    const acc = answered ? Math.round(correct / answered * 100) : 0;
+    const onTrack = acc >= 72; // 720/1000 pass mark
+    stats += `
+      <div class="pal-pct ${answered ? (onTrack ? 'ok' : 'no') : ''}">${answered ? acc + '%' : '—'}</div>
+      <div class="pal-sub">${answered ? (onTrack ? 'On track to pass (72% needed)' : 'Below the 72% pass mark') : 'Live pass percentage'}</div>
+      <div class="pal-stat"><span style="color:var(--good)">Correct</span><b>${correct}</b></div>
+      <div class="pal-stat"><span style="color:var(--bad)">Incorrect</span><b>${wrong}</b></div>`;
+  }
+  return `<div class="section-label">Progress</div>
+    <div class="pal-card">${stats}</div>
+    <div class="pal-grid">${cells}</div>`;
 }
 
 function pauseExam() {
   stopTimer();
   state.screen = 'paused';
   syncUserMenu();
-  const unanswered = state.answers.filter(a => a === null).length;
+  const unanswered = unansweredCount();
   const overlay = document.createElement('div');
   overlay.className = 'overlay';
   overlay.id = 'pauseOverlay';
@@ -1387,7 +1498,7 @@ function pauseExam() {
 }
 
 function confirmSubmit() {
-  const unanswered = state.answers.filter(a => a === null).length;
+  const unanswered = unansweredCount();
   stopTimer();
   showConfirm({
     title: unanswered > 0 ? `${unanswered} question${unanswered!==1?'s':''} still unanswered` : 'Submit your exam?',
@@ -1412,7 +1523,7 @@ function renderResults() {
   qs.forEach((q, i) => {
     if (!domainStats[q.domain]) domainStats[q.domain] = { correct: 0, total: 0 };
     domainStats[q.domain].total++;
-    if (state.answers[i] === q.correct) { correct++; domainStats[q.domain].correct++; }
+    if (isRight(q, state.answers[i])) { correct++; domainStats[q.domain].correct++; }
   });
   const scaled = Math.round((correct / qs.length) * 1000);
   const passed = scaled >= PASS_SCORE;
@@ -1432,8 +1543,8 @@ function renderResults() {
     }).then(refreshBoard);
   }
   const timeUsed = (state.totalTime || EXAM_DURATION) - state.timeLeft;
-  const incorrect = qs.length - correct - state.answers.filter(a => a === null).length;
-  const skipped = state.answers.filter(a => a === null).length;
+  const skipped = unansweredCount();
+  const incorrect = qs.length - correct - skipped;
 
   const domainRows = Object.entries(domainStats).map(([d, s]) => {
     const pct = Math.round((s.correct / s.total) * 100);
@@ -1504,8 +1615,9 @@ function renderReviewList() {
   const list = document.getElementById('reviewList');
   const items = qs.map((q, i) => {
     const your = state.answers[i];
-    const isCorrect = your === q.correct;
-    const isSkipped = your === null;
+    const chosen = your || [];
+    const isCorrect = isRight(q, your);
+    const isSkipped = !isAnswered(q, your);
     let statusClass = isSkipped ? 'skipped' : isCorrect ? 'correct' : 'incorrect';
     if (state.reviewFilter === 'incorrect' && (isCorrect || isSkipped)) return '';
     if (state.reviewFilter === 'skipped' && !isSkipped) return '';
@@ -1517,12 +1629,13 @@ function renderReviewList() {
 
     const opts = q.options.map((opt, oi) => {
       let cls = 'review-opt neutral';
-      if (oi === q.correct) cls = 'review-opt right-answer';
-      if (oi === your && your === q.correct) cls = 'review-opt your-correct';
-      if (oi === your && your !== q.correct) cls = 'review-opt your-wrong';
+      const isKey = q.correct.includes(oi);
+      if (isKey) cls = 'review-opt right-answer';
+      if (chosen.includes(oi) && isKey) cls = 'review-opt your-correct';
+      if (chosen.includes(oi) && !isKey) cls = 'review-opt your-wrong';
       const wasStruck = state.struck[i] && state.struck[i].has(oi);
       if (wasStruck) cls += ' struck-review';
-      const mark = oi === q.correct ? ' ✓' : (oi === your && your !== q.correct ? ' ✗ (your answer)' : '');
+      const mark = isKey ? ' ✓' : (chosen.includes(oi) ? ' ✗ (your answer)' : '');
       const struckTag = wasStruck ? ' <span style="font-size:0.7rem;color:var(--text-dim)">(you crossed out)</span>' : '';
       return `<div class="${cls}">${letters[oi]}. ${opt}${mark}${struckTag}</div>`;
     }).join('');
@@ -1533,7 +1646,7 @@ function renderReviewList() {
           <span class="domain-tag">${q.domain}</span>
           <span>${tag} ${state.flagged[i] ? '<span class="tag-mini" style="background:#e8b04b22;color:var(--amber)">★ Flagged</span>' : ''}</span>
         </div>
-        <div class="review-q">Q${i+1}.${SCENARIOS[q.scenario] ? ` <span class="review-scenario">${SCENARIOS[q.scenario].name}</span>` : ''} ${formatQuestion(q.q)}</div>
+        <div class="review-q">Q${i+1}.${SCENARIOS[q.scenario] ? ` <span class="review-scenario">${SCENARIOS[q.scenario].name}</span>` : ''} ${formatQuestion(q.q)}${q.multi ? ` <span class="review-scenario">Select ${q.correct.length}</span>` : ''}</div>
         ${opts}
         <div class="review-explain"><b style="color:var(--lime)">Why:</b> ${q.explain}</div>
       </div>`;
