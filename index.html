@@ -425,7 +425,7 @@
   .domain-bar-fill { height: 100%; border-radius: 4px; }
   .domain-score { min-width: 70px; text-align: right; font-family: var(--font-mono); font-size: 0.85rem; }
 
-  .review-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 12px; }
+  .review-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 12px; scroll-margin-top: 90px; }
   .review-item.correct { border-left: 3px solid var(--good); }
   .review-item.incorrect { border-left: 3px solid var(--bad); }
   .review-item.skipped { border-left: 3px solid var(--text-dim); }
@@ -470,7 +470,12 @@
   .pal-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; padding: 3px; }
   .pal-cell { height: 34px; min-width: 0; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: var(--font-mono); font-size: 0.8rem; font-weight: 600; cursor: pointer; position: relative; }
   .pal-cell:hover { border-color: var(--lime); }
-  .pal-cell.answered { background: var(--lime-dim); border-color: var(--lime); }
+  /* Feedback off: "answered" is neutral grey so it can't be read as "correct". */
+  .pal-cell.answered { background: var(--border); border-color: var(--text-dim); }
+  .pal-cell.skipped { color: var(--text-dim); border-style: dashed; }
+  .results-grid { grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); margin-bottom: 8px; }
+  .results-legend { font-size: 0.76rem; color: var(--text-dim); margin-bottom: 18px; }
+  .review-item.flash { box-shadow: 0 0 0 2px var(--lime); }
   .pal-cell.right { background: var(--good); border-color: var(--good); color: #fff; }
   .pal-cell.wrong { background: var(--bad); border-color: var(--bad); color: #fff; }
   .pal-cell.current { outline: 2px solid var(--text); outline-offset: 1px; }
@@ -1869,6 +1874,12 @@ function renderResults() {
     </div>
 
     <div class="section-label">Question review</div>
+    <div class="pal-grid results-grid">${qs.map((q, i) => {
+      const a = state.answers[i];
+      const cls = !isAnswered(q, a) ? 'skipped' : isRight(q, a) ? 'right' : 'wrong';
+      return `<button class="pal-cell ${cls}${state.flagged[i] ? ' flagged' : ''}" data-rv="${i}" title="Question ${i + 1}">${i + 1}</button>`;
+    }).join('')}</div>
+    <div class="results-legend">Green correct · red wrong · dashed skipped. Click a number to jump to it below.</div>
     <div class="filter-row">
       <button class="filter-btn active" data-filter="all">All</button>
       <button class="filter-btn" data-filter="incorrect">Wrong only</button>
@@ -1884,6 +1895,19 @@ function renderResults() {
     b.classList.add('active');
     state.reviewFilter = b.dataset.filter;
     renderReviewList();
+  }));
+  // Results grid: jump to a question's review item, clearing a filter that hides it.
+  app.querySelectorAll('[data-rv]').forEach(b => b.addEventListener('click', () => {
+    let el = document.getElementById('rv-' + b.dataset.rv);
+    if (!el) {
+      state.reviewFilter = 'all';
+      app.querySelectorAll('.filter-btn').forEach(x => x.classList.toggle('active', x.dataset.filter === 'all'));
+      renderReviewList();
+      el = document.getElementById('rv-' + b.dataset.rv);
+    }
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    el.classList.add('flash');
+    setTimeout(() => el.classList.remove('flash'), 1200);
   }));
   renderReviewList();
   window.scrollTo(0, 0);
@@ -1921,7 +1945,7 @@ function renderReviewList() {
     }).join('');
 
     return `
-      <div class="review-item ${statusClass}">
+      <div class="review-item ${statusClass}" id="rv-${i}">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <span class="domain-tag">${q.domain}</span>
           <span>${tag} ${state.flagged[i] ? '<span class="tag-mini" style="background:#e8b04b22;color:var(--amber)">★ Flagged</span>' : ''}</span>
