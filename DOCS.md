@@ -171,6 +171,13 @@ answered, against the 72% pass mark) is shown. With feedback off, cells only mar
 
 Turn it off for real exam conditions.
 
+**Moving between questions.** Besides Prev/Next under the card, round ‹ › arrows
+sit on either side of the question card, pinned at mid-screen (sticky inside a
+full-height rail), so a long explanation never pushes navigation out of reach;
+on the last question the right arrow becomes ✓ Submit. ←/→ on the keyboard do the
+same, except while typing or when a pause/confirm overlay is open. Every move
+scrolls back to the top. The side arrows hide below 760px wide.
+
 ### Results
 - Score out of 1000, with pass/fail against 720
 - Correct / wrong / skipped counts and time used

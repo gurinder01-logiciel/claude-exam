@@ -397,6 +397,17 @@
     padding-right: 12px; /* keeps cards off the window edge */
   }
   .prep .section-label { margin-top: 0; }
+  /* Side arrows: each rail spans the card's height and the button inside is
+     sticky at mid-viewport, so Prev/Next stay in reach however long the card is. */
+  .q-stage { position: relative; }
+  .side-rail { position: absolute; top: 0; bottom: 0; width: 44px; pointer-events: none; z-index: 2; }
+  .side-rail.left { left: -22px; }
+  .side-rail.right { right: -22px; }
+  .side-btn { pointer-events: auto; position: sticky; top: calc(50vh - 22px); width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 1.6rem; line-height: 1; cursor: pointer; box-shadow: 0 4px 14px rgba(46,46,46,0.12); display: flex; align-items: center; justify-content: center; padding: 0 0 3px; }
+  .side-btn:hover:not(:disabled) { border-color: var(--lime); color: var(--lime); }
+  .side-btn:disabled { opacity: 0.35; cursor: default; }
+  .side-btn.submit { background: var(--lime); border-color: var(--lime); color: #fff; font-size: 1.2rem; }
+  @media (max-width: 760px) { .side-rail { display: none; } }
   /* Exam-time question palette (lives in .prep) */
   .pal-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; }
   .pal-stat { display: flex; justify-content: space-between; font-size: 0.84rem; padding: 4px 0; color: var(--text-dim); }
@@ -805,6 +816,13 @@ document.addEventListener('click', (e) => {
 });
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeUserMenu();
+  // ←/→ move between questions during an exam — not while typing, and not
+  // while a pause/confirm overlay is up.
+  if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && state.screen === 'exam'
+      && !e.target.closest('input, textarea, select') && !document.querySelector('.overlay')) {
+    e.preventDefault();
+    goToQuestion(state.current + (e.key === 'ArrowRight' ? 1 : -1));
+  }
 });
 
 // ---- Level progression -------------------------------------------------
@@ -1484,6 +1502,10 @@ function renderExam() {
     </div>
     <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
 
+    <div class="q-stage">
+    <div class="side-rail left">
+      <button class="side-btn" id="sidePrev" title="Previous question (←)" aria-label="Previous question" ${state.current === 0 ? 'disabled' : ''}>‹</button>
+    </div>
     <div class="card">
       ${scenarioHeader(q, state.current)}
       <div class="qtext">${formatQuestion(q.q)}</div>
@@ -1520,6 +1542,12 @@ function renderExam() {
            </div>`;
       })() : ''}
       <div style="font-size:0.76rem;color:var(--text-dim);margin-top:6px">Tip: right-click (or tap ✕ on) an option to cross it out as "definitely not this" — it stays crossed for review.</div>
+    </div>
+    <div class="side-rail right">
+      ${state.current === state.questions.length - 1
+        ? `<button class="side-btn submit" id="sideSubmit" title="Submit exam" aria-label="Submit exam">✓</button>`
+        : `<button class="side-btn" id="sideNext" title="Next question (→)" aria-label="Next question">›</button>`}
+    </div>
     </div>
 
     <div class="nav-row">
@@ -1576,8 +1604,11 @@ function renderExam() {
       renderExam();
     });
   });
-  document.getElementById('prevBtn')?.addEventListener('click', () => { state.current--; renderExam(); });
-  document.getElementById('nextBtn')?.addEventListener('click', () => { state.current++; renderExam(); });
+  document.getElementById('prevBtn')?.addEventListener('click', () => goToQuestion(state.current - 1));
+  document.getElementById('nextBtn')?.addEventListener('click', () => goToQuestion(state.current + 1));
+  document.getElementById('sidePrev')?.addEventListener('click', () => goToQuestion(state.current - 1));
+  document.getElementById('sideNext')?.addEventListener('click', () => goToQuestion(state.current + 1));
+  document.getElementById('sideSubmit')?.addEventListener('click', confirmSubmit);
   document.getElementById('flagBtn')?.addEventListener('click', () => { state.flagged[state.current] = !state.flagged[state.current]; renderExam(); });
   document.getElementById('submitBtn')?.addEventListener('click', confirmSubmit);
   document.getElementById('pauseBtn')?.addEventListener('click', pauseExam);
@@ -1623,6 +1654,15 @@ function renderPalette() {
   return `<div class="section-label">Progress</div>
     <div class="pal-card">${stats}</div>
     <div class="pal-grid">${cells}</div>`;
+}
+
+// Move to question `i` and bring its top into view: after a long explanation
+// the next question would otherwise open scrolled halfway down.
+function goToQuestion(i) {
+  if (i < 0 || i >= state.questions.length) return;
+  state.current = i;
+  renderExam();
+  window.scrollTo({ top: 0 });
 }
 
 function pauseExam() {
