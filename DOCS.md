@@ -154,15 +154,22 @@ this". Crossed options stay crossed and are labelled *"you crossed out"* in the
 review, so you don't re-read options you already eliminated. This mirrors a
 feature of the real exam.
 
-### Instant feedback (optional, off by default)
-Marks each pick ✓ or ✗ immediately **without revealing the correct answer** — a
-wrong pick tells you it's wrong, nothing more. The correct answer and explanation
-appear in the review after submitting.
+### Instant feedback (on by default)
+The toggle sits at the top of the start screen. Once an item is answered it is
+marked ✓ or ✗, the correct option(s) are highlighted, and the explanation is shown
+— on a wrong pick the correct answer is spelled out too.
 
 In this mode **your first pick is final**. Without that lock, seeing "wrong" and
 switching would make the score meaningless.
 
-Off by default because the real exam gives no feedback.
+During an exam the right-hand panel (`#prep`, which shows prep resources on the
+start screen) becomes a numbered question grid: click a number to jump to it.
+With feedback on, cells turn green/red and a live pass percentage (correct ÷
+answered, against the 72% pass mark) is shown. With feedback off, cells only mark
+"answered", so real-exam mode gives nothing away. `renderExam()` calls
+`syncPrep()` to keep it current.
+
+Turn it off for real exam conditions.
 
 ### Results
 - Score out of 1000, with pass/fail against 720
@@ -266,6 +273,10 @@ questions/
   mock.json        pool config (no questions of its own)
   basic.json       49 questions (Foundations)
   scenario.json    94 questions (Scenario Practice)
+  prep.json        374 questions (Prep Bank Exam) — imported from the CCA
+                   Foundations Prep artifact; mock items are MIT-licensed, see
+                   its `source`/`licence` fields. d: core 1, mocks 1-3 → 2,
+                   mocks 4-6 (labelled hard by the source) → 3
 api/scores.js      serverless leaderboard endpoint
 package.json       declares the Node runtime for Vercel
 .env.example       template for local Redis credentials
@@ -400,8 +411,9 @@ Worth knowing before you change things:
   and your practice scores would flatter you.
 - **Instant feedback locks the first pick.** Otherwise you could switch after
   seeing "wrong" and the score would be fiction.
-- **Instant feedback defaults to off.** The real exam gives no feedback; the
-  default should be the realistic condition.
+- **Instant feedback defaults to on.** Most sittings are study sessions, where
+  seeing the answer and explanation straight away is the point. Turn it off for
+  a realistic run.
 - **Leaderboard failure never blocks the exam.** A study tool that refuses to run
   because a database is down is worse than one with a stale leaderboard.
 - **Native `confirm()` is not used.** It's blocked in sandboxed iframes and

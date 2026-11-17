@@ -10,8 +10,9 @@ exam: 60 scenario questions in 120 minutes, with a shared team leaderboard.
 - **120-minute pausable timer** at the real exam's pace of 2 min/question
 - **Right-click to cross out** an option as "definitely not this" — it stays
   crossed through the review
-- **Instant feedback** (optional): marks each pick right or wrong *without*
-  revealing the correct answer
+- **Instant feedback** (on by default): marks each answer right or wrong and
+  shows the correct answer with its explanation; a numbered question grid on the
+  right turns green/red and shows a live pass percentage
 - **Score out of 1000** with a domain breakdown and per-question explanations
 - **Team leaderboard** ranking each person's latest score, plus a **My profile**
   view with their full attempt history
@@ -38,7 +39,8 @@ This matters — a flattened folder is the most common cause of a broken deploy:
 │   ├── index.json
 │   ├── mock.json
 │   ├── basic.json
-│   └── scenario.json
+│   ├── scenario.json
+│   └── prep.json
 ├── api/
 │   └── scores.js
 ├── package.json
@@ -165,6 +167,6 @@ full schema.
 | 404 on `questions/index.json` | Files were flattened — `mkdir -p questions && mv basic.json index.json mock.json scenario.json questions/` |
 | `/api/scores` 404s on Vercel | `mkdir -p api && mv scores.js api/scores.js`, commit, redeploy |
 | Leaderboard "offline" on Vercel | Attach the Upstash integration, then **redeploy** |
-| Can't change an answer | Instant feedback is on — first pick is final by design |
+| Can't change an answer | Instant feedback is on (the default) — first pick is final by design |
 
 More in [DOCS.md](DOCS.md) §9.
