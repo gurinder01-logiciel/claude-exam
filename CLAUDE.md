@@ -59,14 +59,25 @@ into the `LEVELS` map keyed by `lv.key`. A level file is metadata plus its own
   `questions` array by design.
 - `requires: "<key>"` gates the level behind completing another one.
 
+- `scenarioPick: N` (+ optional `scenarioWeights: {"<id>": weight}`) ⇒
+  `buildScenarioPaper()` draws N scenarios (weighted), splits `count` across them,
+  and emits each as a consecutive block, blocks ordered by mean difficulty.
+  Questions are grouped by their numeric `scenario` field; items without one are
+  excluded from scenario papers. Scenario names/blurbs live in the `SCENARIOS`
+  map in `index.html`, not in the JSON.
+
 `buildRampedPaper()` orders every paper as a difficulty ramp using
 `RAMP = [{d:1,n:15},{d:2,n:20},{d:3,n:25}]`, scaled to the paper length, then
 backfills any tier shortfall from the nearest tier. So a bank whose `d` tags are
 inflated silently distorts every paper drawn from it — tag `d` honestly.
 
 Options are shuffled at runtime by `prepQuestions()`, which remaps `correct` to
-the shuffled index. Authors always write `correct` as the index into `options` as
-written.
+the shuffled indices. Authors write `correct` as the index into `options` as
+written — or an array of indices for a multiple-response item. Internally
+`correct` is *always* a sorted index array and `q.multi` records which form the
+author used; answers are `null` or an index array. `isAnswered()` requires
+exactly `correct.length` picks and `isRight()` gives no partial credit — use
+those helpers rather than comparing answers directly.
 
 ### Client state
 
@@ -78,8 +89,14 @@ mutating `state`, call the matching render.
 The leaderboard (`#board`, left) and the How-to-prepare panel (`#prep`, right)
 are siblings of `#app`, so `render*()` never touches them. They're kept in step
 by `syncUserMenu()` — which also calls `syncPrep()` — invoked at the end of every
-render. Adding chrome outside `#app` means wiring it in there too. See DOCS.md
+render. `#prep` is context-dependent: outside an exam it shows prep links from
+`resources.json` (loaded by `loadResources()`, hidden silently on failure);
+during `exam`/`paused` it shows `renderPalette()`, the numbered question grid.
+Adding chrome outside `#app` means wiring it in there too. See DOCS.md
 § Page layout.
+
+`instantFeedback` defaults to `true`: once a question is answered it locks and
+shows the verdict, correct option and `explain`.
 
 Timing is always 2 min/question (`SECONDS_PER_QUESTION`), derived per level from
 `count`, so it holds on shorter levels too. Scoring in `renderResults()` is
@@ -99,10 +116,16 @@ length and a 0–1000 score range, nothing more.
 
 ## Adding questions or a level
 
-Edit `questions/*.json` only — no code change is needed. Per-question fields:
-`domain` (free text, drives the results breakdown), `d` (1/2/3), `q` (prefix
-`SCENARIO — <name>.` to render a context banner), `options`, `correct`,
-`explain`. Explanations should say why the tempting distractor fails, not just
+Edit `questions/*.json` only — no code change is needed (unless you add a new
+scenario id, which needs a `SCENARIOS` entry). Per-question fields: `domain`
+(free text, drives the results breakdown), `d` (1/2/3), `q` (prefix
+`SCENARIO — <name>.` to render a context banner — legacy; prefer `scenario`),
+`scenario` (`1`–`6` official scenario, `0` for a standalone concept check), `options`, `correct` (index or index array),
+`explain`.
+
+Scope authority for what belongs in the bank is `BLUEPRINT.md` (official exam
+guide task statements); `SCOPE.md` records per-question scope verdicts and
+`AUDIT.md` the last bank audit. Check a new question against them. Explanations should say why the tempting distractor fails, not just
 why the answer is right.
 
 A new level = create `questions/<name>.json` in the level shape (see DOCS.md §7)

@@ -151,7 +151,9 @@ Each level is its own JSON file, so you never touch `index.html`:
 
 - `d` is difficulty: `1` easy, `2` medium, `3` hard — it drives the ramp, so tag
   honestly
-- `correct` is the index into `options` as written; options are shuffled at runtime
+- `correct` is the index into `options` as written; options are shuffled at runtime.
+  Use an array of indices (e.g. `[0, 2]`) for a multiple-response "Select N" item —
+  all-or-nothing scoring
 
 To add a whole level: create `questions/my-level.json` and add `"my-level"` to
 the `levels` array in `questions/index.json`. See [DOCS.md](DOCS.md) §7 for the

@@ -320,7 +320,7 @@ const SCENARIOS = { 1: …, 6: … };  // the six official exam scenarios
 | `scenario` | Which of the six official exam scenarios this belongs to, `1`–`6`. Use `0` for a standalone concept check with no narrative. Drives scenario grouping and the context banner |
 | `q` | Question text. The legacy `SCENARIO — <name>.` prefix still renders a banner, but prefer the `scenario` field |
 | `options` | Four options recommended. Order as written; shuffled at runtime |
-| `correct` | Index into `options` **as written**. No need to vary the position by hand |
+| `correct` | Index into `options` **as written**. No need to vary the position by hand. An array of indices (e.g. `[0, 2]`) makes it a **multiple-response** item: the candidate is told to "Select N", it counts as answered only once N options are chosen, and it scores only if every pick is correct — no partial credit, as on the real exam |
 | `explain` | Shown in the review. Explain why distractors fail, not just why the answer is right — that's where the exam's difficulty lives |
 
 ### Level file schema
