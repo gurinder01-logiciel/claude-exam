@@ -39,15 +39,15 @@
     {
       "domain": "Claude API",
       "d": 1,
-      "q": "You need Claude to always return valid JSON matching a specific schema. Which combination is most reliable?",
+      "q": "You need Claude to always return valid JSON matching a specific schema, for a pipeline on a current Claude model. Which approach is most reliable?",
       "options": [
-        "A stop_sequences list of closing braces so output is truncated to valid JSON only",
-        "A schema in the system prompt plus assistant prefill, with a validate-and-retry loop",
-        "Extended thinking enabled so Claude self-checks the JSON shape before emitting it",
-        "A schema in the system prompt with temperature raised so Claude explores valid variants"
+        "A stop_sequences list of closing braces so the output is cut off at the end of the JSON object and nothing after it",
+        "Schema-backed structured output (a JSON schema via tool use or structured outputs), validating fields in code afterwards",
+        "A schema in the system prompt plus a prefilled assistant turn starting with '{', with a validate-and-retry loop on failure",
+        "A schema in the system prompt with extended thinking enabled, so Claude self-checks the JSON shape before emitting it"
       ],
       "correct": 1,
-      "explain": "Reliability comes from combining a clear schema, prefilling the assistant turn to anchor the format, and programmatically retrying on validation failure. The extended-thinking option is the strong near-miss: internal reasoning can improve quality but provides no guarantee of schema conformance, so you still need external validation.",
+      "explain": "Pick the method by required strictness: when output must always match a schema, schema-backed output (tool use with a JSON schema, or structured outputs) eliminates syntax errors by construction; you still validate semantics in code. Prefill plus retry is the near-miss: it was a common pattern, but it only nudges the format, and starting with Claude 4.6 models a prefilled final assistant turn is rejected with a 400 error.",
       "scenario": 6
     },
     {
@@ -154,12 +154,12 @@
       "q": "You're designing an MCP tool that can permanently delete production records. What must the design include?",
       "options": [
         "A dry_run parameter defaulting to true, with the description warning about data loss",
-        "An explicit confirmation step that must be satisfied before the irreversible call runs",
+        "A confirmation step enforced outside the model — a human approval or server-issued token — before the irreversible call runs",
         "Rate limiting on the endpoint so no more than a few records can be removed per minute",
         "A read-only companion tool listing affected records that Claude is instructed to call first"
       ],
       "correct": 1,
-      "explain": "Destructive, irreversible operations need a real confirmation gate enforced at the tool boundary, not left to model judgment. The dry_run default is the strongest near-miss: it reduces accidents but the model can still set dry_run to false in the same turn, so nothing actually blocks the deletion.",
+      "explain": "Destructive, irreversible operations need a confirmation gate enforced at the tool boundary — for example the server requires a confirmation token, or the host asks the human — not left to model judgment. The dry_run default is the strongest near-miss: it reduces accidents, but the same model that chose to delete can also set dry_run to false in the same turn, so nothing outside the model blocks the deletion.",
       "scenario": 1
     },
     {
