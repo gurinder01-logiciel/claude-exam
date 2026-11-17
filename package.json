@@ -5,9 +5,9 @@
   "description": "CCAR-F (Claude Certified Architect - Foundations) exam simulator with a team leaderboard",
   "type": "module",
   "engines": {
-    "node": ">=24"
+    "node": "26.x"
   },
   "dependencies": {
-    "@upstash/redis": "^1.38.1"
+    "@upstash/redis": "^1.41.0"
   }
 }
