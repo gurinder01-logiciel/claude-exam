@@ -233,15 +233,12 @@
   .bq-title { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; }
   .bq-sub, .bq-foot { font-size: 0.78rem; color: var(--text-dim); margin-top: 2px; }
   .bq-row { display: grid; grid-template-columns: 90px 1fr; gap: 10px; align-items: start; }
-  /* Mock Exam Bank: exam tiles on the left, quiz builder on the right. The builder
-     column is narrow, so its labels sit above their chips. */
-  .bank-split { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 14px; align-items: start; }
-  .bank-split .levels.bank { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); margin-bottom: 0; }
-  .bank-split .builder { margin-bottom: 0; position: sticky; top: 16px; }
-  .bank-split .bq-row { grid-template-columns: 1fr; gap: 6px; }
-  .bank-split .bq-label { padding-top: 0; }
-  .bank-split .bq-go { justify-self: stretch; }
-  @media (max-width: 900px) { .bank-split { grid-template-columns: 1fr; } .bank-split .builder { position: static; } }
+  /* Mock Exam Bank: a 50/50 centre split — exam tiles (2 per row) on the left,
+     the quiz builder on the right; both halves stretch to the same height. */
+  .bank-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: stretch; }
+  .bank-split .levels.bank { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 0; align-content: start; }
+  .bank-split .builder { margin-bottom: 0; align-content: start; }
+  @media (max-width: 900px) { .bank-split { grid-template-columns: 1fr; } }
   .bq-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); padding-top: 8px; }
   .bq-chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .bq-chip { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); border-radius: 999px; padding: 6px 13px; font: 600 0.8rem/1.2 inherit; font-family: inherit; cursor: pointer; }
