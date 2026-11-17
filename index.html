@@ -77,6 +77,7 @@
     border-bottom: 1px solid var(--border); font-size: 0.85rem;
   }
   .lb-row:last-child { border-bottom: none; }
+  .lb-code { color: var(--lime); font-weight: 700; font-family: var(--font-mono); font-size: 0.82em; }
   .lb-row.me { background: var(--lime-dim); margin: 0 -10px; padding: 9px 10px; border-radius: 8px; border-bottom-color: transparent; }
   .lb-rank {
     font-family: var(--font-mono); font-weight: 700; color: var(--text-dim);
@@ -969,26 +970,46 @@ async function submitScore(entry) {
   }
 }
 
+// Short exam code for leaderboard labels: initials of the level name, digits
+// kept whole, anything after " · " dropped — "Scenario Practice" → "SP",
+// "Mock Exam 4 · Hard" → "ME4". A one-word name keeps the whole word
+// ("Foundations"), since a lone initial reads badly next to a name.
+function examCode(levelName) {
+  const base = String(levelName || '').split(' · ')[0].trim();
+  const words = base.split(/\s+/).filter(Boolean);
+  if (words.length === 1) return words[0];
+  return words.map(w => /^\d+$/.test(w) ? w : w[0].toUpperCase()).join('');
+}
+
 function renderBoard(scores, live) {
-  // Latest attempt per person, ranked by that score. `at` is stamped server-side
-  // on POST; entries without it (older local-fallback ones) sort as oldest.
-  const latest = {};
+  // One row per person *per exam*: their best score on that exam, with the
+  // attempt count. A newer, lower attempt never hides an earlier best, and a
+  // Foundations run no longer overwrites a Mock Exam run.
+  const best = {};
   scores.forEach(s => {
     if (!s || !s.name) return;
-    if (!latest[s.name] || (s.at || 0) > (latest[s.name].at || 0)) latest[s.name] = s;
+    const key = s.name + '\u0000' + (s.level || '');
+    const cur = best[key];
+    if (!cur) best[key] = { ...s, attempts: 1 };
+    else {
+      cur.attempts++;
+      if (s.score > cur.score || (s.score === cur.score && (s.at || 0) > (cur.at || 0)))
+        best[key] = { ...s, attempts: cur.attempts };
+    }
   });
-  const ranked = Object.values(latest).sort((a, b) => b.score - a.score);
+  const ranked = Object.values(best).sort((a, b) => b.score - a.score || (b.at || 0) - (a.at || 0));
 
   const rows = ranked.length ? ranked.map((s, i) => {
-    // Attempt counts live on the profile screen, not here.
+    const code = examCode(s.level);
     const meta = [
       s.level && escapeHtml(s.level),
-      s.total ? Math.round(s.score * s.total / 1000) + '/' + s.total + ' right' : ''
+      s.total ? Math.round(s.score * s.total / 1000) + '/' + s.total + ' right' : '',
+      s.attempts > 1 ? `best of ${s.attempts}` : ''
     ].filter(Boolean).join(' · ');
     return `
     <div class="lb-row ${s.name === user.name ? 'me' : ''}">
       <span class="lb-rank ${i < 3 ? 'top' : ''}">${i + 1}</span>
-      <span class="lb-name">${escapeHtml(s.name)}
+      <span class="lb-name" title="${escapeHtml(s.name)}${s.level ? ' — ' + escapeHtml(s.level) : ''}">${escapeHtml(s.name)}${code ? `<span class="lb-code">-${escapeHtml(code)}</span>` : ''}
         <span class="lb-meta">${meta}</span>
       </span>
       <span class="lb-score" style="color:${s.passed ? 'var(--good)' : 'var(--text-dim)'}">${s.score}<span style='font-size:0.66rem;color:var(--text-dim);font-weight:400'>/1000</span></span>
@@ -998,7 +1019,7 @@ function renderBoard(scores, live) {
 
   boardEl.innerHTML = `
     <h3>🏆 Team leaderboard</h3>
-    <div class="lb-sub">Score out of 1000 · latest per person · pass ${PASS_SCORE}${live ? '' : ' · offline (this browser only)'}</div>
+    <div class="lb-sub">Score out of 1000 · best per person per exam · pass ${PASS_SCORE}${live ? '' : ' · offline (this browser only)'}</div>
     ${rows}
   `;
 }
@@ -1817,7 +1838,7 @@ function renderResults() {
   const isLevel = Boolean(LEVELS[state.level]);
   if (isLevel) markCompleted(state.level);
   // Publish this attempt to the team leaderboard (the board ranks each
-  // person's most recent attempt; every attempt is kept for the profile view).
+  // person's best score per exam; every attempt is kept for the profile view).
   if (user.name && !state.submitted && isLevel) {
     state.submitted = true;
     submitScore({

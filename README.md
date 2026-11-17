@@ -14,12 +14,12 @@ exam: 60 scenario questions in 120 minutes, with a shared team leaderboard.
   shows the correct answer with its explanation; a numbered question grid on the
   right turns green/red and shows a live pass percentage
 - **Score out of 1000** with a domain breakdown and per-question explanations
-- **Team leaderboard** ranking each person's latest score, plus a **My profile**
+- **Team leaderboard** with each person's best score per exam (e.g. `gurinder-SP`), plus a **My profile**
   view with their full attempt history
 - **Scenario blocks like the real exam** — the Full Mock draws 4 of the 6
   official scenarios, each framing a run of consecutive questions under a shared
   context banner
-- **Levels unlock in order** — Foundations first, then Scenario Practice, then
+- **Levels unlock in order** — Claude Code Foundations first, then Scenario Practice, then
   the Full Mock Exam, so nobody skips the fundamentals
 
 Full reference: **[DOCS.md](DOCS.md)**
@@ -100,7 +100,7 @@ it should return `{"scores":[]}` rather than an error.
 ### 5. Share with the team
 
 Send the deployment URL. Each person types their name once (remembered in their
-browser), picks a level, and their latest score appears on the leaderboard.
+browser), picks a level, and their best score for that exam appears on the leaderboard.
 
 Names must be unique: the name gate rejects a name already on the leaderboard
 (compared ignoring case and extra spaces). The account menu at the top-right

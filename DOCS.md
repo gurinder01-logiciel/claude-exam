@@ -104,7 +104,7 @@ It's configured in the level JSON, not in code:
 - **Full Mock Exam** pools every other level's questions and presents them as
   **4 scenarios drawn from the official 6**, weighted toward the agentic-heavy
   scenarios. 60 questions. This is the one to use for realistic practice.
-- **Foundations** is an ungrouped warm-up across all five domains. Its bank is
+- **Claude Code Foundations** is an ungrouped warm-up across all five domains. Its bank is
   49, so every question appears every time.
 - **Scenario Practice** draws 40 questions as **3 scenario blocks**, weighted
   toward Claude Code for CI/CD — the cluster candidates most often report.
@@ -212,9 +212,11 @@ exam frames them.
 ## 5. Leaderboard
 
 Each person enters a name once (remembered in their browser). Finished exams post
-to `/api/scores`, and the sidebar shows the **latest score per person**, ranked
-by that score, with the level they took and an attempt count once they have more
-than one. Your own row is highlighted.
+to `/api/scores`, and the leaderboard (bottom of the start screen) shows **one row
+per person per exam** — their best score on that exam, labelled `name-CODE` where
+CODE is the exam's initials (`examCode()`: Claude Code Foundations → CCF, Scenario Practice → SP, a one-word name kept whole,
+Full Mock Exam → FME, Mock Exam 4 · Hard → ME4) — ranked by score, with
+"best of N" once they have sat it more than once. Your own rows are highlighted.
 
 Every attempt is retained in Redis, so **My history** — in the account menu at
 the top-right — opens a read-only view for the signed-in name: attempts, best
@@ -292,7 +294,7 @@ index.html         app shell, all logic, no build step (~1030 lines)
 questions/
   index.json       load order — the manifest
   mock.json        pool config (no questions of its own)
-  basic.json       49 questions (Foundations)
+  basic.json       49 questions (Claude Code Foundations)
   scenario.json    94 questions (Scenario Practice)
   core.json        40 questions (Core Concepts Drill)      ┐ "Mock Exam Bank"
   mock1-6.json     60/58/56/54/51/55 (Mock Exam 1-6)       ┘ section
