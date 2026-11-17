@@ -118,6 +118,18 @@ rather than surfacing an error.
 The endpoint is unauthenticated by design (team practice tool); it validates name
 length and a 0–1000 score range, nothing more.
 
+## Claude Code setup (`.claude/`)
+
+- **Hooks** (`.claude/settings.json`): after any Edit/Write to `questions/*.json`,
+  `.claude/hooks/check-bank.mjs` validates the bank and blocks (exit 2) on bad
+  `correct` indices, `d`, `scenario`, empty `explain` or duplicate options. Edits to
+  `CCAF_Exam_Simulator.html` are blocked outright. Run the validator by hand with
+  `node .claude/hooks/check-bank.mjs [file …]`.
+- **Skills**: `/add-question` (scope → write → validate → independent review) and
+  `/bank-audit` (length bias, answer positions, d mix, duplicates vs `AUDIT.md`).
+- **Subagent**: `question-reviewer` — read-only PASS / FIX / CUT review of questions
+  against `BLUEPRINT.md` and `SCOPE.md`.
+
 ## Adding questions or a level
 
 Edit `questions/*.json` only — no code change is needed (unless you add a new
