@@ -1347,6 +1347,306 @@
       "correct": 0,
       "explain": "Truncation is an output-length problem, and scoping each call to a slice of the diff keeps every response comfortably inside the limit while the merge reconstructs the full finding set. The near-miss is raising the token ceiling: it may buy headroom for this diff but the failure returns on the next larger one, and it does nothing about quality loss over a very long single response.",
       "scenario": 5
+    },
+    {
+      "domain": "Claude Code",
+      "d": 2,
+      "q": "Claude Code keeps formatting your date-parsing helper's output slightly wrong, and three rounds of 'make the output match our format more closely' haven't fixed it. What is the most effective next instruction?",
+      "options": [
+        "Give two or three concrete input → expected-output pairs, including the edge case it keeps getting wrong, and ask it to make them pass",
+        "Restate the format requirement in stronger terms, marking it IMPORTANT and asking Claude to be precise about every character this time",
+        "Switch to plan mode so Claude writes a full plan for the formatter before touching any code, then approve the plan and let it execute",
+        "Ask Claude to rewrite the helper from scratch with a different parsing library, since the current approach has evidently hit its limit"
+      ],
+      "correct": 0,
+      "explain": "Vague corrections ('more closely') give Claude nothing to converge on; concrete input/output examples define done precisely, and including the failing edge case targets the actual defect. Restating the rule more forcefully is the near-miss: emphasis changes tone, not information, so Claude still has to guess what 'correct' looks like.",
+      "scenario": 2
+    },
+    {
+      "domain": "Claude Code",
+      "d": 3,
+      "q": "A review of Claude's refactor lists five problems. Three of them interact — they all stem from how a shared config object is now passed between modules — and two are independent typos. How should you feed this back?",
+      "options": [
+        "Describe the three interacting issues together in one message so they are fixed as a unit, then send the two independent typos separately",
+        "Send all five issues one at a time in order of severity, so each fix is verified in isolation before the next issue is introduced",
+        "Send all five in one message, since batching every finding into a single round always minimises the total number of iterations",
+        "Revert the refactor and restart with a prompt that lists all five problems as constraints, so the next attempt avoids them up front"
+      ],
+      "correct": 0,
+      "explain": "Issues that interact should be batched, because fixing one in isolation can break or mask the others; independent issues can go separately (or together) without that risk. Strictly sequential feedback is the near-miss: it is right for independent problems but, for coupled ones, each isolated fix is made without the context the others supply.",
+      "scenario": 2
+    },
+    {
+      "domain": "Claude Code",
+      "d": 2,
+      "q": "You are about to ask Claude Code to build a CSV import feature whose requirements are still fuzzy in your own head — edge cases around encodings, duplicate rows and partial failures haven't been decided. What approach is recommended?",
+      "options": [
+        "Ask Claude to interview you first — have it ask questions about the edge cases and decisions — then write the spec it implements from",
+        "Ask Claude to implement the most common interpretation immediately, then correct whatever it guessed wrong once you see the code",
+        "Write a long prompt listing every edge case you can think of yourself, and forbid Claude from asking questions so it stays on task",
+        "Run the request with --print so Claude produces a complete answer in one shot without any back-and-forth that could drift scope"
+      ],
+      "correct": 0,
+      "explain": "When requirements are underspecified, the interview pattern has Claude surface the decisions you haven't made yet, producing a spec before any code. Implementing a guess and correcting afterwards is the near-miss: it works for small changes, but on a fuzzy feature it bakes wrong assumptions into code you then have to unpick.",
+      "scenario": 2
+    },
+    {
+      "domain": "Claude Code",
+      "d": 3,
+      "q": "You want Claude Code to converge reliably on a correct implementation of a pricing-rules function. Which TWO practices most improve iterative refinement? (Select 2.)",
+      "options": [
+        "Write the tests first and have Claude iterate until they pass, so each round is judged against an objective, executable target",
+        "Tell Claude after each round that the output is still wrong, without specifics, so it re-examines its own reasoning from scratch",
+        "Give targeted feedback naming the exact input, the output it produced, and the output you expected, rather than general dissatisfaction",
+        "Increase the number of rounds allowed and let Claude self-assess when it is finished, so it is never cut off before converging",
+        "Ask Claude to produce several alternative implementations each round and pick whichever one looks closest to what you wanted"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explain": "Test-driven iteration gives an objective pass/fail target, and targeted feedback (input, actual, expected) tells Claude exactly what to change — both turn refinement into convergence. Letting Claude self-assess completion is the near-miss: more rounds help only if there's an external definition of done; self-assessment is the unreliable signal you're trying to replace.",
+      "scenario": 2
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 3,
+      "q": "In production logs, the support agent occasionally calls process_refund before get_customer has verified the account owner, despite a system-prompt rule saying 'always verify identity first'. What is the right fix?",
+      "options": [
+        "Enforce the order programmatically: block process_refund in code until a verified-identity flag is set by a successful get_customer call",
+        "Move the verification rule to the top of the system prompt in capitals and add a few-shot example showing verification happening first",
+        "Lower the temperature so the agent follows the system-prompt instructions more deterministically and stops skipping the verification",
+        "Add a line to the process_refund tool description reminding the model that identity must already have been verified before it is used"
+      ],
+      "correct": 0,
+      "explain": "When a step must happen before another for compliance or money reasons, prompt guidance is probabilistic; a programmatic gate makes the ordering a guarantee. Strengthening the prompt with emphasis and examples is the near-miss: it lowers the failure rate but cannot drive it to zero, and a refund to an unverified caller only has to happen once.",
+      "scenario": 1
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 2,
+      "q": "The support agent must hand a complex billing dispute to a human agent who has no access to the conversation transcript. What should the handoff contain?",
+      "options": [
+        "A structured summary: customer ID, verified status, the issue, what was already tried and its results, and the specific decision needed",
+        "The full raw conversation transcript pasted into the ticket, so the human has every detail and nothing the agent said is filtered out",
+        "A one-line note saying the customer needs billing help, so the human starts fresh without being biased by the agent's earlier reasoning",
+        "The agent's own confidence score and sentiment reading of the customer, so the human can prioritise the queue by urgency and mood"
+      ],
+      "correct": 0,
+      "explain": "A structured handoff gives the human exactly what they need to act without re-asking the customer: identity, issue, attempted steps, and the open decision. The raw transcript is the near-miss: it contains everything but forces the human to re-derive the state, which is slow and error-prone at queue volume.",
+      "scenario": 1
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 2,
+      "q": "Your CI pipeline always performs the same steps on every PR: summarise the diff, check it against the style guide, then draft review comments. Which decomposition fits best?",
+      "options": [
+        "Fixed sequential prompt chaining, where each step's output feeds the next, because the steps are known and identical for every PR",
+        "A dynamic coordinator that decides at run time which subagents to spawn, so the pipeline can adapt its plan to each individual PR",
+        "A single long prompt that asks for all three outputs in one call, because splitting the work always loses context between the steps",
+        "Parallel subagents for all three steps at once, so the comments are drafted at the same moment the summary and style check finish"
+      ],
+      "correct": 0,
+      "explain": "When the steps are predictable and the same every time, a fixed prompt chain is simpler, cheaper and easier to debug than adaptive orchestration. The dynamic coordinator is the near-miss: it suits open-ended work where the next step depends on findings, but here it adds cost and non-determinism for no benefit.",
+      "scenario": 5
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 3,
+      "q": "The research system is asked an open-ended question where which sources matter, and how deep to go, only becomes clear after the first round of searching. How should the work be decomposed?",
+      "options": [
+        "Dynamic adaptive decomposition: the coordinator plans an initial round, reviews findings, and spawns further subtasks based on what it learned",
+        "A fixed chain of search, analyse, synthesise and report steps defined up front, so every question follows the same audited pipeline",
+        "Split the question into a fixed number of equal subtopics at the start and run one subagent on each, merging whatever comes back",
+        "Run a single agent with every tool and a high turn limit, so it can pursue whatever it finds without the overhead of coordination"
+      ],
+      "correct": 0,
+      "explain": "When the shape of the work depends on intermediate results, adaptive decomposition lets the coordinator re-plan after each round. A fixed upfront split into subtopics is the near-miss: it parallelises well, but it commits to a partition before anyone knows which areas matter, so coverage gaps and wasted branches are baked in.",
+      "scenario": 3
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 3,
+      "q": "Yesterday a Claude Code session analysed a module and recorded findings. Overnight, teammates merged changes to several of those files. You want to continue the analysis today. What is the best approach?",
+      "options": [
+        "Resume the named session and tell the agent which files changed, so it re-reads those rather than trusting its earlier analysis of them",
+        "Resume the session as-is, because its context already contains the complete analysis and re-reading files would waste tokens",
+        "Always start from a blank session with no summary, since any earlier context is stale once a single file in the module has changed",
+        "Fork the session so the original stays intact, and let the fork continue from yesterday's findings without mentioning the merges"
+      ],
+      "correct": 0,
+      "explain": "Resuming keeps valuable context, but the agent can't know files changed underneath it; telling it which ones lets it re-read just those instead of reasoning from stale tool results. (If most of the context is stale, a fresh session seeded with a summary is better.) Resuming silently is the near-miss: it is cheapest, but the agent will confidently build on analysis of code that no longer exists.",
+      "scenario": 4
+    },
+    {
+      "domain": "Agentic Arch",
+      "d": 2,
+      "q": "A teammate's Agent SDK loop for the support agent has several termination checks. Which TWO are anti-patterns? (Select 2.)",
+      "options": [
+        "Continuing the loop while stop_reason is 'tool_use', executing the requested tools and appending their results to the message history",
+        "Stopping when the assistant's text contains phrases like 'I have completed' or 'task done', detected with a string match",
+        "Ending the loop when stop_reason is 'end_turn', because the model has finished responding and is not requesting any more tools",
+        "Hard-stopping after exactly three iterations regardless of state, because most tickets in testing needed three tool calls or fewer",
+        "Returning the tool's error to the model as a tool result so it can decide whether to retry, try another tool, or escalate"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explain": "Parsing natural language for completion and arbitrary iteration caps are both termination anti-patterns: the first is brittle to phrasing, the second cuts off legitimate work. The loop should be driven by stop_reason — continue on 'tool_use', stop on 'end_turn'. Feeding tool errors back as results is the tempting distractor because it looks like it could loop forever, but it is the correct way to let the model recover.",
+      "scenario": 1
+    },
+    {
+      "domain": "Dev Productivity",
+      "d": 1,
+      "q": "An engineer asks the agent to find every place the codebase calls the deprecated function legacyAuth(). Which built-in tool fits this best?",
+      "options": [
+        "Grep, because it searches file contents for a pattern and returns the matching files and lines where legacyAuth( is called",
+        "Glob, because it matches file paths against a pattern and returns every file whose name relates to the legacyAuth function",
+        "Read on every file in the repository, so the agent sees full context around each call before deciding which ones count",
+        "Bash running find on the repository root, because find lists files by name and is faster than any dedicated search tool"
+      ],
+      "correct": 0,
+      "explain": "Grep searches file contents, which is what finding call sites needs. Glob is the near-miss: it matches file paths (e.g. **/*.test.ts), not what is inside files, so it can't find where a function is called. Reading every file wastes context, and find also matches names, not contents.",
+      "scenario": 4
+    },
+    {
+      "domain": "Dev Productivity",
+      "d": 2,
+      "q": "The agent tries to use Edit to change one line of config, but the line it anchors on appears several times in the file, so the edit is rejected as ambiguous. What is the correct fallback?",
+      "options": [
+        "Widen the anchor with enough surrounding lines to make it unique, or Read the whole file and Write it back with the change applied",
+        "Retry the same Edit call several times, since an ambiguous match usually resolves itself once the file has been re-indexed",
+        "Use Bash with sed to replace every occurrence of the line at once, since all copies of the line should probably change anyway",
+        "Use Glob to locate the right copy of the file, because an ambiguous edit means the agent is looking in the wrong file path"
+      ],
+      "correct": 0,
+      "explain": "Edit needs a unique anchor. Adding context makes it unique; if that isn't practical, Read the file and Write the full corrected content. A global sed replace is the near-miss: it does get past the ambiguity, but it silently changes every occurrence, including the ones that were meant to stay.",
+      "scenario": 4
+    },
+    {
+      "domain": "Dev Productivity",
+      "d": 3,
+      "q": "An engineer asks the agent to explain how request authentication works in a large, unfamiliar monorepo. Which TWO approaches reflect good use of built-in tools for incremental understanding? (Select 2.)",
+      "options": [
+        "Use Glob to find likely entry points (e.g. **/middleware/**, **/auth*) before opening anything, so reading is targeted",
+        "Read every file under src/ up front so the agent has the whole system in context before it starts answering any question",
+        "Run Bash with cat on the largest files first, because the most important logic in a codebase usually lives in its biggest files",
+        "Grep for the auth symbols found so far, then Read only the matched files, following imports outward one step at a time",
+        "Ask the engineer to paste the relevant files into the chat, since the agent's own tools cannot be trusted to locate the right code"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explain": "Good exploration is incremental: Glob to find candidate files by path, Grep to trace symbols by content, then Read only what matters and follow the trail outward. Reading everything up front is the near-miss — it feels thorough, but it floods the context window and degrades the answers it was meant to improve.",
+      "scenario": 4
+    },
+    {
+      "domain": "Context Mgmt",
+      "d": 2,
+      "q": "A customer asks for a refund on 'my last order', and get_customer returns two accounts with that customer's name, each with a recent order. What should the agent do?",
+      "options": [
+        "Ask the customer a clarifying question, such as an order number or email, to identify the right account before taking any action",
+        "Pick the account with the most recent order, since 'my last order' most likely refers to whichever order was placed latest",
+        "Escalate to a human immediately, because any ambiguity in customer identity is outside what an automated agent should handle",
+        "Process the refund on both orders and flag them for review, so the customer is not kept waiting while the ambiguity is resolved"
+      ],
+      "correct": 0,
+      "explain": "When several records match, the agent should ask for an identifier rather than guess with a heuristic — a wrong guess means a refund on someone else's account. Picking the most recent order is the near-miss: it is often right, which is exactly why it's dangerous; a plausible heuristic hides the cases where it's wrong. Escalating is unnecessary when one question resolves it.",
+      "scenario": 1
+    },
+    {
+      "domain": "Context Mgmt",
+      "d": 3,
+      "q": "To decide when to escalate, a teammate proposes having the agent rate its own confidence from 1 to 10 and escalate below 6, plus escalate whenever the customer's message reads as angry. What is the problem?",
+      "options": [
+        "Self-reported confidence and sentiment are unreliable escalation signals; escalate on explicit request, a policy gap, or lack of progress",
+        "The threshold is set too low; models are well calibrated, so raising the cut-off to 8 would catch nearly all of the hard cases",
+        "Sentiment is a strong signal but confidence is not, so the rule should escalate on anger alone and drop the self-rating entirely",
+        "Nothing is wrong with the signals, but the agent should log the scores without acting on them until a week of data is collected"
+      ],
+      "correct": 0,
+      "explain": "Models are often confidently wrong, and an angry customer may have a simple issue the agent can solve, while a calm one may need a human. Reliable triggers are concrete: the customer asks for a human, policy doesn't cover the case, or the agent is making no progress. Keeping sentiment but dropping confidence is the near-miss: it removes one bad signal but keeps the other.",
+      "scenario": 1
+    },
+    {
+      "domain": "Context Mgmt",
+      "d": 2,
+      "q": "Which TWO situations are valid triggers for the support agent to escalate to a human? (Select 2.)",
+      "options": [
+        "The customer explicitly asks to speak to a person, even though the agent believes it could resolve the issue itself",
+        "The customer uses capital letters and exclamation marks, suggesting frustration with how the conversation is going",
+        "The request falls outside documented policy, such as a refund type the policy neither allows nor forbids",
+        "The agent's own self-assessed confidence in its answer drops below a threshold set in the system prompt",
+        "The conversation has run past five turns, so the agent should hand over before the customer gets impatient"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explain": "Explicit requests for a human and genuine policy gaps are reliable escalation triggers. Frustration signals and self-rated confidence are unreliable, and a turn count is an arbitrary cap — the related valid trigger is lack of progress, not conversation length. The capitals option is the tempting one, because frustration feels like it should matter, but tone does not tell you whether the agent can solve the problem.",
+      "scenario": 1
+    },
+    {
+      "domain": "Multi-Agent",
+      "d": 3,
+      "q": "The coordinator passes the search subagent's results to the synthesis subagent. The final reports keep losing citations. What should the hand-off to the synthesis subagent include?",
+      "options": [
+        "The findings as structured data, each claim carrying its source URL, title and date, so attribution survives into the synthesis",
+        "A prose summary of the findings written by the coordinator, kept short so the synthesis subagent's context stays focused",
+        "Only the list of source URLs, letting the synthesis subagent fetch and re-read each source itself to rebuild the findings",
+        "The search subagent's full conversation history, so the synthesis subagent can reconstruct where each finding came from"
+      ],
+      "correct": 0,
+      "explain": "Subagents only know what is in their prompt; for citations to survive, each finding must travel with its source metadata as structured data. A short prose summary is the near-miss: it keeps context focused, but summarisation is exactly where claim-to-source attribution gets lost.",
+      "scenario": 3
+    },
+    {
+      "domain": "Structured Output",
+      "d": 2,
+      "q": "Your invoice extraction prompt is accurate on clean invoices but invents a due date when the document says 'payable on receipt'. Which change best fixes this?",
+      "options": [
+        "Add two or three few-shot examples covering ambiguous cases, including 'payable on receipt' mapped to null with a note, not a date",
+        "Add a sentence to the system prompt telling Claude to be careful and accurate when it extracts the due date from an invoice",
+        "Lower the temperature to zero so Claude stops inventing values, since fabricated fields come from randomness in sampling",
+        "Make due_date a required string field in the schema, so Claude has to find an actual date somewhere in the document text"
+      ],
+      "correct": 0,
+      "explain": "Targeted few-shot examples of the ambiguous case show Claude what to do when the value isn't a clean date — map it to null (with a nullable field) rather than invent one. Making the field required is the near-miss and actually backfires: forcing a value is what pushes the model to fabricate. Temperature doesn't remove fabrication either.",
+      "scenario": 6
+    },
+    {
+      "domain": "Structured Output",
+      "d": 3,
+      "q": "Extracting every line item from a 400-page catalogue in one call keeps returning truncated JSON with stop_reason 'max_tokens', even at the model's maximum output limit. What is the right fix?",
+      "options": [
+        "Split the work into smaller calls, such as a page range per request, and merge the validated results, so each output fits the limit",
+        "Retry the same request with a validate-and-retry loop, feeding the parse error back until Claude returns complete, valid JSON",
+        "Ask Claude to compress the JSON by removing whitespace and shortening field names, so the same items fit into fewer tokens",
+        "Switch the request to the Message Batches API, which allows a much larger output budget than a synchronous request does"
+      ],
+      "correct": 0,
+      "explain": "If the required output exceeds the maximum output limit, no prompt or retry can fit it; split the input so each call's output fits, then merge. Retrying with error feedback is the near-miss: it fixes malformed output, but here the output is simply too long, so every retry truncates in the same way. Batches lower cost, not the per-request output cap.",
+      "scenario": 6
+    },
+    {
+      "domain": "CI/CD",
+      "d": 2,
+      "q": "Developers have started ignoring the CI review bot because it keeps flagging the same deliberate patterns as problems. Which TWO changes reduce these false positives durably? (Select 2.)",
+      "options": [
+        "Tell the review prompt to be more conservative and only report issues it is highly confident about, to cut the noise",
+        "Document the team's accepted patterns and conventions in the project CLAUDE.md that the CI review run loads",
+        "Lower the model temperature for the review job so it reports fewer borderline findings from one run to the next",
+        "Have the bot rate each finding's confidence and show only those it scores above 8, hiding the rest from developers",
+        "Give the review explicit exclusions, such as generated files, vendored code and named intentional patterns, to skip"
+      ],
+      "correct": [
+        1,
+        4
+      ],
+      "explain": "Persistent conventions in CLAUDE.md and explicit exclusions tell the reviewer what is intentional, so the same false positive doesn't come back on every PR. 'Be more conservative' is the near-miss: it sounds like it cuts noise, but vague caution suppresses true positives as well and doesn't tell the model which patterns are acceptable. Self-rated confidence filtering is unreliable for the same reason.",
+      "scenario": 5
     }
   ],
   "scenarioPick": 3,
