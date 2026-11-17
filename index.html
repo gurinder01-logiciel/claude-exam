@@ -292,6 +292,10 @@
   .opt.selected { border-color: var(--lime); background: var(--lime-dim); }
   .opt.struck { opacity: 0.4; text-decoration: line-through; }
   .pick-hint { display: inline-block; font-size: 0.78rem; font-weight: 600; color: var(--lime); border: 1px solid var(--lime); border-radius: 999px; padding: 2px 10px; margin: 0 0 10px; }
+  /* A locked (answered, instant-feedback) question can't be changed, so its
+     options drop the pointer and the green hover that suggests they're clickable. */
+  .card.locked .opt { cursor: default; }
+  .card.locked .opt:not(.fb-correct):not(.fb-wrong):hover { border-color: var(--border); }
   .opt.fb-correct { border-color: var(--good); background: #26d07c1f; }
   .opt.fb-wrong { border-color: var(--bad); background: #e0524d1a; }
   .fb-mark { font-weight: 800; font-size: 1rem; align-self: center; }
@@ -1506,7 +1510,7 @@ function renderExam() {
     <div class="side-rail left">
       <button class="side-btn" id="sidePrev" title="Previous question (←)" aria-label="Previous question" ${state.current === 0 ? 'disabled' : ''}>‹</button>
     </div>
-    <div class="card">
+    <div class="card${locked ? ' locked' : ''}">
       ${scenarioHeader(q, state.current)}
       <div class="qtext">${formatQuestion(q.q)}</div>
       ${q.multi ? `<div class="pick-hint">Select ${q.correct.length} · ${chosen.length} of ${q.correct.length} chosen</div>` : ''}
