@@ -72,7 +72,8 @@ for the rewrite and verification history.
 |---|---|---|---|---|---|
 | 1 | **Basic** | 60 | 60 | 31 / 18 / 11 | — (always open) |
 | 2 | **Scenario Practice** | 78 | 60 | 9 / 51 / 18 | finishing Basic |
-| 3 | **Full Mock Exam** | 138 (all banks) | 60 | 15 / 20 / 25 | finishing Scenario Practice |
+| 3 | **Architect Scenarios** | 100 | 60 | 15 / 20 / 25 | — (always open) |
+| 4 | **Full Mock Exam** | 138 (all banks) | 60 | 15 / 20 / 25 | finishing Scenario Practice |
 
 ### Progression
 
@@ -108,6 +109,10 @@ It's configured in the level JSON, not in code:
   49, so every question appears every time.
 - **Scenario Practice** draws 40 questions as **3 scenario blocks**, weighted
   toward Claude Code for CI/CD — the cluster candidates most often report.
+- **Architect Scenarios** draws a fresh, ungrouped 60 from its own 100-question
+  bank each sitting (90 framed in the six official scenarios, 10 standalone,
+  8 multiple-response), domain-weighted 27/18/20/20/15. No `requires`, so it is
+  always open.
 
 ### Scenario blocks
 
@@ -296,6 +301,7 @@ questions/
   mock.json        pool config (no questions of its own)
   basic.json       49 questions (Claude Code Foundations)
   scenario.json    94 questions (Scenario Practice)
+  architect.json   100 questions (Architect Scenarios; 60 drawn per sitting)
   core.json        40 questions (Core Concepts Drill)      ┐ "Mock Exam Bank"
   mock1-6.json     60/58/56/54/51/55 (Mock Exam 1-6)       ┘ section
                    Imported from the CCA Foundations Prep artifact; mock items
