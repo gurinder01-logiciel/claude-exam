@@ -303,11 +303,15 @@ questions/
   scenario.json    94 questions (Scenario Practice)
   architect.json   100 questions (Architect Scenarios; 60 drawn per sitting)
   core.json        40 questions (Core Concepts Drill)      ┐ "Mock Exam Bank"
-  mock1-6.json     60/58/56/54/51/55 (Mock Exam 1-6)       ┘ section
+  mock1-6.json     60/58/56/54/51/55 (Mock Exam 1-6)       │ section
                    Imported from the CCA Foundations Prep artifact; mock items
                    are MIT-licensed, see each file's `source`/`licence`. d: core
                    1, mocks 1-3 → 2, mocks 4-6 (labelled hard by the source) → 3.
                    Multi-select and disputed source items were dropped, hence <60.
+  foundations-es.json  79 questions (Foundations Bank      ┘
+                   (translated); 60 drawn per sitting, incl. multi-response).
+                   CC BY 4.0, adapted from a Spanish community set; see the
+                   file's `source`/`licence`.
 api/scores.js      serverless leaderboard endpoint
 package.json       declares the Node runtime for Vercel
 .env.example       template for local Redis credentials

@@ -1,0 +1,1245 @@
+{
+  "key": "foundationsEs",
+  "name": "Foundations Bank (translated)",
+  "desc": "79 Foundations practice items from a Spanish community prep set, adapted to English — single- and multiple-response concept checks across all five domains. 60 drawn per sitting.",
+  "section": "bank",
+  "inPool": false,
+  "ready": true,
+  "count": 60,
+  "blueprint": [
+    {
+      "label": "Agentic Architecture & Orchestration",
+      "pct": 27
+    },
+    {
+      "label": "Claude Code Config & Workflows",
+      "pct": 20
+    },
+    {
+      "label": "Prompt Engineering & Structured Output",
+      "pct": 20
+    },
+    {
+      "label": "Tool Design & MCP Integration",
+      "pct": 18
+    },
+    {
+      "label": "Context Management & Reliability",
+      "pct": 15
+    }
+  ],
+  "source": "Questions and rationales: https://github.com/juanmartincoma-collab/claude-certified-architect-es by Juan Martín Cordero (\"Claude Certified Architect — preparación en español\", v1.0.0, commit 02e8b16), Foundations (CCAR-F) items from the simulator bank. Rationales translated from Spanish to English and adapted to this format: option order shuffled, \"Select N\" added to multiple-response stems, distractor reasons rewritten to name options instead of letters. 20 items out of scope for this bank or with disputed answers, and all 11 matching-grid items, were omitted.",
+  "licence": "\"Claude Certified Architect — preparación en español\" by Juan Martín Cordero, https://github.com/juanmartincoma-collab/claude-certified-architect-es, is licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes made: Foundations items selected; explanations translated from Spanish to English and reworded to reference option text; option order shuffled; difficulty, domain and scenario tags reassigned; matching-grid, out-of-scope and disputed items removed. This adaptation is not endorsed by the original author. The original work is unofficial and not affiliated with or endorsed by Anthropic PBC; \"Claude\" and \"Claude Certified Architect\" are trademarks of Anthropic PBC.",
+  "questions": [
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 0,
+      "q": "A fixed workflow for supplier onboarding now fails on roughly a fifth of cases, where staff step in manually to finish the job. Which TWO signals would justify moving this stage to an autonomous agent? (Select 2)",
+      "options": [
+        "The manual interventions follow no repeatable pattern the team can list",
+        "The steps differ per supplier and only become clear part-way through",
+        "The number of onboarding requests per week has roughly doubled since launch",
+        "Leadership wants the solution to look more advanced to the board",
+        "The cost per request has risen along with the added volume"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explain": "Autonomy is justified when the path cannot be listed in advance. Interventions that follow no listable pattern, and steps that only appear part-way through, are exactly that condition. Doubled volume and rising cost are scale and cost problems that any pattern can absorb; wanting the solution to look advanced to the board is prestige, not an architectural driver."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 0,
+      "q": "A supervisor coordinates four specialist agents in a regulated claims process. Which TWO responsibilities belong to the supervisor rather than to the specialists? (Select 2)",
+      "options": [
+        "Formatting each specialist's own output for its internal use",
+        "Applying the rules that determine whether a claim is fraudulent",
+        "Recording the ordered outcome of every step for the audit trail",
+        "Deciding the order the specialists run in and when to stop the chain",
+        "Choosing which model version each specialist should call at runtime"
+      ],
+      "correct": [
+        2,
+        3
+      ],
+      "explain": "The supervisor supplies sequencing and a single point where the order of decisions is recorded — exactly what a peer-to-peer arrangement cannot guarantee. Applying the fraud rules is the specialist's job; formatting a specialist's own output is internal to that agent; choosing model versions is configuration fixed in advance, not runtime orchestration."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 0,
+      "q": "An architect is splitting a long analysis task into sequenced subtasks. Which TWO practices make the decomposition real rather than cosmetic? (Select 2)",
+      "options": [
+        "Merging the steps back into one call once quality has improved",
+        "Running each of the steps on the largest model in the family",
+        "Passing structured output between steps so each one can be checked",
+        "Giving every step only the context that step actually needs",
+        "Keeping the original prompt intact and appending the steps"
+      ],
+      "correct": [
+        2,
+        3
+      ],
+      "explain": "Decomposition pays off for two reasons: each step gets focused attention, and each intermediate output can be checked. Without structured output between steps the chain is a black box again. Running every step on the largest model confuses capability with structure; keeping the original prompt intact and appending steps leaves the giant prompt in place; merging the steps back into one call undoes the decomposition."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 0,
+      "q": "Which TWO conditions indicate that a single augmented model call is enough, with no workflow or agent around it? (Select 2)",
+      "options": [
+        "Each step has to be recorded separately for an external auditor",
+        "Several specialists must contribute before the output is complete",
+        "Any reference material needed fits alongside the request itself",
+        "The next step depends entirely on what the previous step happened to return",
+        "The task is one transformation whose context can be supplied up front"
+      ],
+      "correct": [
+        2,
+        4
+      ],
+      "explain": "A single augmented call is enough when there is one transformation and the context it needs fits alongside the request. It is the lowest rung of the ladder and is chosen whenever it suffices. Several contributing specialists call for multi-agent; a next step that depends entirely on what the previous one returned calls for a workflow or an agent; separately recorded steps for an auditor call for a workflow with discrete steps."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 0,
+      "q": "Which TWO practices make the guardrails written into a system prompt more likely to hold? (Select 2)",
+      "options": [
+        "Pasting the full guardrail list, unchanged, into every section of the prompt",
+        "Writing the guardrails in a noticeably more emphatic and commanding tone",
+        "Placing the guardrails at the start or end, apart from reference material",
+        "Assuming the guardrail also covers the cases it does not mention",
+        "Stating explicitly what takes precedence when two instructions conflict"
+      ],
+      "correct": [
+        2,
+        4
+      ],
+      "explain": "Two real levers: an explicit statement of which instruction wins when two conflict, and placing the guardrails away from the middle of the context, structurally separate from reference material. A more emphatic tone is superstition, not a mechanism; pasting the whole list into every section inflates and dilutes the prompt; assuming a guardrail covers cases it does not mention is an assumption, not a practice."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 2,
+      "scenario": 0,
+      "q": "A support agent has a tool that can delete customer records. Which TWO changes reduce the blast radius without removing the capability from the platform? (Select 2)",
+      "options": [
+        "Require an explicit approval step before any delete call executes",
+        "Rename the tool so the model is less likely to select it by mistake",
+        "Scope the tool's credentials so it can only reach the support dataset",
+        "Add the word 'careful' to the tool description so that the model hesitates",
+        "Log every delete after the fact so the team can review them weekly"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explain": "Least privilege plus a gate before the irreversible action: scoped credentials limit what the tool can reach, and the approval step requires a human before it executes. Adding 'careful' to the description or renaming the tool are text nudges, not controls; logging deletes for a weekly review is detection after the record is already gone."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 2,
+      "scenario": 0,
+      "q": "An architect is choosing between MCP and direct API integration for a new internal system. Which TWO facts about the situation point to MCP? (Select 2)",
+      "options": [
+        "Only the data engineering team will ever query this system directly",
+        "The system is only ever queried by one service the team owns",
+        "The team owning the system will keep adding and retiring endpoints",
+        "Three separate AI applications will need the same access to this system",
+        "The integration is a single deterministic call inside a nightly job"
+      ],
+      "correct": [
+        2,
+        3
+      ],
+      "explain": "MCP pays off when there are several consumers and the catalogue changes often: the owning team maintains its server once and every client reuses it, picking up new tools when it connects. A single deterministic call in a nightly job, one owned service, or a single querying team all describe one stable consumer — the case where a direct integration is simpler."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 2,
+      "scenario": 0,
+      "q": "A team wants to expose forty internal endpoints to an agent. Tool-selection accuracy in testing drops sharply past roughly a dozen tools. What is the sound design response?",
+      "options": [
+        "Group the endpoints into task-oriented tools and load them on demand",
+        "Expose one generic tool that accepts the endpoint name as a parameter",
+        "Register all forty and instruct the model to think before selecting one",
+        "Register all forty tools and rely on a more capable model to choose"
+      ],
+      "correct": 0,
+      "explain": "Tools are designed around tasks, not as a mirror of the internal API, and only the ones relevant to a request are presented. The complexity stays on the system side, where it is deterministic. A more capable model buys capability without reducing the confusion; telling the model to think first adds latency to every call without shrinking the choice; one generic tool taking the endpoint name throws away typed interfaces and makes errors harder to catch."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 1,
+      "scenario": 0,
+      "q": "A platform team is enabling AI-assisted development across twelve squads. Which TWO measures scale the practice without scaling the risk? (Select 2)",
+      "options": [
+        "Let each squad publish its own standards independently",
+        "Define which commands automated tooling may run and on which branches",
+        "Grant the tooling broad credentials so squads are never blocked",
+        "Keep shared configuration and prompt standards under version control",
+        "Adopt every new assistant tool in the week it becomes available"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explain": "Accelerator and brake at once: proven practice that every squad inherits through version control, and explicit limits on what automation may execute. Broad credentials maximise the blast radius; letting each squad publish its own standards recreates fragmentation; adopting every new tool in its first week adds churn without evaluation."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 5,
+      "q": "Reviews of AI-authored pull requests almost never raise findings, yet defects keep reaching production. What is the most likely cause?",
+      "options": [
+        "The reviewer shares the context and assumptions that produced the code",
+        "The model used for the review is smaller than the one used for authoring",
+        "The review prompt is too short to describe what quality means here",
+        "The team merges before the automated review has finished running"
+      ],
+      "correct": 0,
+      "explain": "A reviewer anchored to the reasoning that produced the code inherits its blind spots, so review should come from a fresh context separate from the authoring session. A longer review prompt or a different model size are configuration tweaks that leave the anchoring untouched; merging before the review finishes would be a process problem visible in the timings, not a reason for reviews that run and find nothing."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 1,
+      "scenario": 2,
+      "q": "A team wants every session in a repository to follow the same commit-message convention. Which mechanism is the right home for that rule?",
+      "options": [
+        "An entry in <code>settings.json</code> under the permissions block",
+        "A CLAUDE.md file committed at the root of the repository",
+        "A <code>PreToolUse</code> hook that inspects and rejects the commit message",
+        "A slash command each developer runs before committing"
+      ],
+      "correct": 1,
+      "explain": "A style convention is a reasonable request, not a hard guarantee: it belongs in CLAUDE.md, which the model reads and generally follows, committed so the whole team inherits it. A <code>PreToolUse</code> hook is a hard mechanism for something that does not need one and is costly to maintain; <code>settings.json</code> permissions do not configure behaviour; a slash command depends on someone remembering to run it."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 1,
+      "scenario": 0,
+      "q": "A rule must hold without exception: no command may ever touch the production database. Which mechanism enforces it?",
+      "options": [
+        "A <code>PreToolUse</code> hook that inspects the command and exits with code 2",
+        "A comment in the codebase next to the connection string",
+        "A prominent warning placed at the top of the project's CLAUDE.md file",
+        "A slash command that wraps the safe version of the query"
+      ],
+      "correct": 0,
+      "explain": "'Without exception' demands a hard mechanism. The hook runs before the tool, is deterministic code, and exiting with code 2 blocks the call and returns the reason to the model. A CLAUDE.md warning, a wrapping slash command and a code comment are all text: followed almost always, which is not the same as always."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 1,
+      "scenario": 0,
+      "q": "Of these hook events, which can stop a tool call before it runs?",
+      "options": [
+        "<code>SessionStart</code>",
+        "<code>PreCompact</code>",
+        "<code>PreToolUse</code>",
+        "<code>PostToolUse</code>"
+      ],
+      "correct": 2,
+      "explain": "Only <code>PreToolUse</code> fires before the tool runs and can block it (exit code 2 or a deny decision). <code>PostToolUse</code> runs after the call has completed, so it can format or record the result but not prevent it; <code>SessionStart</code> loads state when a session opens and <code>PreCompact</code> preserves context before compaction, and neither is tied to a tool call."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 1,
+      "scenario": 0,
+      "q": "A <code>PreToolUse</code> hook exits with code 2 after a blocked command. Which TWO things happen next? (Select 2)",
+      "options": [
+        "What the hook wrote to stderr goes back to the model",
+        "The tool call never executes",
+        "The session ends and has to be restarted by the user",
+        "The model retries the same command automatically",
+        "<code>PostToolUse</code> still runs so the block can be recorded"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explain": "The block is not a silent lock: it prevents execution and feeds the explanation (stderr) back to the model, which can change course in the same turn. Ending the session is far too drastic and does not happen; <code>PostToolUse</code> does not run because no tool ran; the model is not made to retry automatically — it decides what to do with the explanation it received."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 1,
+      "scenario": 0,
+      "q": "A developer writes a personal preference into <code>settings.local.json</code> while the team's version sits in <code>settings.json</code>. Which one applies to that developer?",
+      "options": [
+        "Neither, until the developer restarts the whole session",
+        "The versioned file, because the team's setting is shared",
+        "The local file, because the more specific layer wins",
+        "Both merge, with conflicting keys raising an error"
+      ],
+      "correct": 2,
+      "explain": "Settings resolve in layers and the more specific one wins, so the developer's <code>settings.local.json</code> overrides the shared <code>settings.json</code>. The exception is permissions, where the most restrictive rule wins: a deny stays a deny even if another layer allows it. 'The shared file wins' inverts the precedence; conflicting keys do not raise an error; a restart has nothing to do with how layers resolve."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 1,
+      "scenario": 0,
+      "q": "An API key is needed by a project's MCP server. Where does it belong?",
+      "options": [
+        "An environment variable referenced by the configuration",
+        "The versioned <code>.mcp.json</code> file, so the whole team shares it",
+        "The project CLAUDE.md, so the model knows to use it",
+        "A slash command that pastes it when it is needed"
+      ],
+      "correct": 0,
+      "explain": "A secret never goes in a version-controlled file or anywhere the model reads. It lives in an environment variable that the configuration references. Putting it in the committed <code>.mcp.json</code> publishes it in the repository; putting it in CLAUDE.md puts it in the context window; a slash command that pastes it exposes it on every invocation."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 1,
+      "scenario": 0,
+      "q": "What exactly does a project's <code>.mcp.json</code> do?",
+      "options": [
+        "Stores the instructions the model should follow per server",
+        "Records which servers each developer prefers to enable",
+        "Declares which MCP servers exist and how to connect to them",
+        "Grants the permissions that those MCP servers are allowed to use"
+      ],
+      "correct": 2,
+      "explain": "It does one thing: declare which MCP servers exist and how to connect to them. It does not grant permissions (that is <code>settings.json</code>), hold instructions for the model (that would be CLAUDE.md), store secrets, or record per-developer preferences (that is user scope, not project scope)."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 2,
+      "q": "A monorepo holds twelve applications, each with its own conventions. Which TWO practices keep context usage sane? (Select 2)",
+      "options": [
+        "Concatenate every app's conventions into the single root file for clarity",
+        "Put app-specific conventions in a CLAUDE.md inside each app folder",
+        "Ask developers to paste the relevant conventions at session start",
+        "Keep only shared, repo-wide conventions in the root CLAUDE.md",
+        "Move all conventions into <code>settings.json</code> so they load on demand"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explain": "A CLAUDE.md in a subfolder loads on demand, only when files in that folder are touched, which avoids dragging twelve applications' conventions into every session; the root file keeps only what is shared. Concatenating everything into the root file is exactly the waste to avoid; <code>settings.json</code> holds configuration, not instructions; asking developers to paste conventions depends on human memory."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 5,
+      "q": "A pull-request review runs headless in CI. Which setting keeps the run reproducible across builds?",
+      "options": [
+        "An interactive approval step for any command outside the allowlist",
+        "A fresh session for every job, with permissions declared up front",
+        "An unbounded turn limit so the review is never cut short midway",
+        "A long-lived session reused across jobs to keep context"
+      ],
+      "correct": 1,
+      "explain": "In CI nobody is watching: every decision a human would have made on the fly must be made before the run starts, and a fresh session per job stops two identical inputs from producing different results. A long-lived session makes each result depend on history; an interactive approval step hangs the pipeline; an unbounded turn limit leaves both the run and the bill without a ceiling."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 5,
+      "q": "An automated review should block a merge when it finds a critical issue. Where does the blocking decision belong?",
+      "options": [
+        "In the model, which decides whether the issue warrants a block",
+        "In pipeline code applying a rule to the model's structured findings",
+        "In a <code>PostToolUse</code> hook that inspects the review output right afterwards",
+        "In the reviewer's judgement after reading the model's summary"
+      ],
+      "correct": 1,
+      "explain": "Automated review informs a decision rather than replacing it: the model returns structured findings with severities and pipeline code applies a deterministic rule. Letting the model decide puts a gate decision in non-deterministic hands; a <code>PostToolUse</code> hook runs after the fact and does not block a merge; a human reading a summary is valid but is neither automated nor deterministic."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 0,
+      "q": "Which TWO statements about hook security are accurate? (Select 2)",
+      "options": [
+        "A hook runs locally with the user's own permissions, without asking",
+        "Hooks require explicit confirmation from the user on every trigger",
+        "Hooks can only execute commands that appear in the allow list",
+        "A hook from an untrusted repository is arbitrary code execution",
+        "Hooks run inside a sandbox that isolates them from the whole file system"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explain": "A hook runs on the local machine, with the user's own permissions and automatically when its event fires, so accepting an untrusted repository's hook configuration amounts to running someone else's code. Sandboxing, per-trigger confirmation and allow-list-only execution describe protections hooks do not have — which is why hook configuration must be reviewed before it is accepted."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 1,
+      "scenario": 0,
+      "q": "A team wants a procedure the model invokes on its own when the situation calls for it, without anyone typing a command. Which mechanism fits?",
+      "options": [
+        "A skill, selected by the model from its description",
+        "A slash command the developer types when needed",
+        "An entry appended to the end of the project CLAUDE.md file",
+        "A hook bound to the tool the procedure relates to"
+      ],
+      "correct": 0,
+      "explain": "Skills, slash commands and hooks are all saved procedures; they differ in who decides to use them. The model chooses a skill by reading its description, which is why the description is the most important part of a skill. A slash command is invoked by a person; a hook is fired by the system on a tool event; a CLAUDE.md entry is a standing instruction, not an invocable procedure."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 1,
+      "scenario": 0,
+      "q": "A long research task keeps filling the main session with raw output that is only needed once. Which mechanism protects the context?",
+      "options": [
+        "Add a <code>PreCompact</code> hook that trims the output before compaction",
+        "Load a skill that explains how to do the research more efficiently",
+        "Delegate the work to a subagent that returns only the conclusion",
+        "Raise the turn limit so the session can absorb more material"
+      ],
+      "correct": 2,
+      "explain": "A subagent has its own context window: it takes the mess into its own context and returns only the conclusion. A skill, by contrast, feeds instructions into the main model's own context and isolates nothing. A <code>PreCompact</code> hook acts only once the context has already filled; raising the turn limit makes the problem bigger instead of avoiding it."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 0,
+      "q": "Which TWO facts about permissions in <code>settings.json</code> are correct? (Select 2)",
+      "options": [
+        "Allow lists are advisory and the model may override them if needed",
+        "A deny rule beats an allow rule from any other configuration layer",
+        "Permissions are inherited only when the project has no local file",
+        "Rules are written per tool and can use patterns to narrow scope",
+        "The model reads the permission list and explains its choices from it"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explain": "Permissions are a hard mechanism: rules are declared per tool, with patterns to narrow them, and a deny always wins. Rules are enforced by the harness, not by the model reading a list: a denied call is simply refused when attempted. So 'the model reads the list and explains from it' is false, 'allow lists are advisory' contradicts the mechanism, and 'inherited only when there is no local file' misdescribes the layering."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 3,
+      "q": "A report needs four independent sections researched and then written as one document. How should the work be split across agents?",
+      "options": [
+        "Four subagents each research and write their own section",
+        "A single agent researches and then writes everything in one long pass",
+        "Four subagents research in parallel, one agent writes the document",
+        "Four subagents write, and a fifth merges their four drafts"
+      ],
+      "correct": 2,
+      "explain": "Parallelise the fieldwork, not the writing. Voice, narrative thread and avoiding repetition are properties of the whole document, and no individual subagent can see them. Four subagents each writing their own section, or four drafts merged by a fifth, both produce four voices and overlaps; a single agent doing everything wastes the available parallelism."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 1,
+      "scenario": 0,
+      "q": "An orchestrator dispatches subagents whose number is only known once the problem is read. Which pattern is this?",
+      "options": [
+        "Routing across a fixed menu",
+        "Parallelization over fixed sections",
+        "Orchestrator–workers",
+        "Prompt chaining in a fixed sequence"
+      ],
+      "correct": 2,
+      "explain": "In orchestrator–workers, the subtasks are created on reading the problem and the orchestrator's main job is the final synthesis. Routing chooses one path from options that already exist; parallelisation splits sections defined in advance; prompt chaining is a fixed sequential chain. None of those fits a number of workers that is only known at runtime."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 0,
+      "q": "A subagent receives its assignment from an orchestrator. Which TWO parts of that assignment should a person define in advance, not the orchestrator at runtime? (Select 2)",
+      "options": [
+        "The specific question this subagent must answer",
+        "The portion of the problem it has been given",
+        "The hard limits and the tools it may use",
+        "The order in which it should consult its sources",
+        "The output format every subagent must return"
+      ],
+      "correct": [
+        2,
+        4
+      ],
+      "explain": "The person fixes the contract; the model fills in the content. Without a common output format the results cannot be combined, and hard limits and permitted tools are safety decisions, not content decisions. The specific question, the slice of the problem and the order of sources all depend on the concrete problem and can only be decided at runtime."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 0,
+      "q": "One of five subagents fails and returns nothing. What should the orchestrator do?",
+      "options": [
+        "Abort the whole run and return an error to the user",
+        "Deliver the four results and state which part is missing",
+        "Deliver the four results as though the whole set were complete",
+        "Retry the failed subagent until it eventually succeeds"
+      ],
+      "correct": 1,
+      "explain": "Honest degradation: deliver what you have and state what is missing. Presenting four results as if they were five is lying by omission; aborting the whole run discards four valid results; retrying until success may never terminate."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 0,
+      "q": "A team is deciding whether a multi-agent design is worth its overhead. Which TWO conditions make it pay off? (Select 2)",
+      "options": [
+        "The team wants the architecture to look more capable to the client",
+        "Several subtasks must run in a strict order, each using the last result",
+        "The subtasks are independent and do not need to talk to each other",
+        "Two agents need to read and update the same shared state as they go",
+        "Each subtask produces bulk material that is better summarised apart"
+      ],
+      "correct": [
+        2,
+        4
+      ],
+      "explain": "Multi-agent systems use on the order of fifteen times more tokens than a normal chat, so the design pays only with genuinely independent subtasks and subtasks that generate bulk material worth summarising separately. Strict sequential dependency and shared mutable state are precisely where multi-agent designs fail; wanting the architecture to look capable is not an architectural criterion."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 1,
+      "scenario": 0,
+      "q": "An agent can send emails to customers on its own. Where does the checkpoint belong?",
+      "options": [
+        "Before the send, as a confirmation the agent cannot bypass",
+        "After the send, with a notification to the account owner",
+        "Inside the prompt, as an instruction to confirm before sending",
+        "Nowhere: the agent already drafts within approved templates"
+      ],
+      "correct": 0,
+      "explain": "Sending is irreversible and leaves the organisation, so it needs a confirmation or verifiable rule the agent cannot bypass — never the model's own judgement inside the prompt. A prompt instruction to confirm leaves the guarantee to an instruction; a notification after the send warns only after the damage; approved templates control the wording, not whether the send should happen."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 0,
+      "q": "Results from parallel subagents come back in incompatible shapes and cannot be combined. Which TWO fixes address the cause? (Select 2)",
+      "options": [
+        "Increase each subagent's context so it can see all the others' work",
+        "Define one output contract that every subagent must fill in",
+        "Validate each subagent's return against that contract before use",
+        "Ask the orchestrator to reformat whatever each subagent sent",
+        "Run the subagents sequentially so later ones copy the first"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explain": "Mismatched shapes mean the human-written output contract is missing. Define it once and validate each return against it before trying to combine anything. Having the orchestrator reformat whatever arrives patches the symptom downstream; letting each subagent see the others' work breaks the isolation that justifies subagents; running them sequentially sacrifices the parallelism."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 1,
+      "scenario": 6,
+      "q": "A downstream service parses the model's output as JSON and crashes when a field is missing. What is the correct fix?",
+      "options": [
+        "Enforce the shape with a schema instead of asking for it in the prompt",
+        "Post-process the text with a regular expression to patch the gaps",
+        "Add a sentence to the prompt insisting the JSON must be complete",
+        "Wrap the parser in a try block and skip records that fail"
+      ],
+      "correct": 0,
+      "explain": "If a program consumes the output, its structure is enforced with a schema, not requested in the prompt. Asking works almost always, and almost always is not enough when a parser sits on the other end. A firmer sentence in the prompt is still a request; wrapping the parser and skipping failures turns the error into a silent loss of records; regex patching treats symptoms and accumulates debt."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 1,
+      "scenario": 0,
+      "q": "A prompt mixes instructions, a reference document and a user question, and the model keeps confusing them. What is the most direct improvement?",
+      "options": [
+        "Delimit each part with explicit tags so the boundaries are unambiguous",
+        "Shorten the reference document until the confusion disappears",
+        "Raise the temperature so that the model interprets the layout more loosely",
+        "Repeat the instructions again after the reference document ends"
+      ],
+      "correct": 0,
+      "explain": "When the model mixes the parts up, the problem is that there is no explicit boundary. Delimiting with tags separates instruction, data and question without changing the content. Repeating the instructions inflates the prompt without marking the boundaries; shortening the document discards material the task needs; a higher temperature only increases variability."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 6,
+      "q": "An extraction step returns valid JSON that occasionally contains a wrong value. Which TWO responses fit? (Select 2)",
+      "options": [
+        "Validate the values against business rules, not just against the shape",
+        "Log the discrepancy and pass the record downstream unchanged",
+        "Fall back to an empty object whenever the validation step does not pass it",
+        "Return the failure explicitly so the caller can decide what to do",
+        "Retry the same call repeatedly until a valid value comes back"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explain": "Well-formed JSON can still be wrong in content: validate it against business rules and, if it fails, make the failure visible to the caller. A silent failure contaminates data and is discovered late. Falling back to an empty object and logging-then-passing-through are both silent failures in different clothes; retrying the identical call repeatedly changes nothing that would fix the value."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 1,
+      "scenario": 0,
+      "q": "An output will be read by a person, not parsed by a program. What follows for its format?",
+      "options": [
+        "A schema should still be enforced for consistency across responses",
+        "Prose is fine; a strict schema adds cost without buying anything",
+        "The output should be JSON so it can be reused programmatically later",
+        "The format should change per request to suit the reader's preference"
+      ],
+      "correct": 1,
+      "explain": "The question that organises this domain is who consumes the output. For a person, a format slip breaks nothing, and putting a hard mechanism where a soft one suffices costs maintenance and buys nothing. Enforcing a schema anyway, or emitting JSON for hypothetical reuse, over-corrects; changing the format per request makes the behaviour unpredictable."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 0,
+      "q": "Few-shot examples were added to a classification prompt and accuracy on one rare category got worse. What is the likely cause?",
+      "options": [
+        "The temperature is too low for the examples to have any influence",
+        "The examples are too short for the model to learn the whole pattern from",
+        "Few-shot prompting does not work for classification tasks at all",
+        "The examples over-represent the common categories and skew the model"
+      ],
+      "correct": 3,
+      "explain": "Examples are the implicit specification of the task. If their distribution does not reflect the real categories, the model learns that imbalance and the rare category suffers. Blaming example length or temperature attributes the failure to parameters rather than to what the examples teach; few-shot prompting does work for classification, so 'it never works' is false."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 2,
+      "scenario": 0,
+      "q": "A tool wraps an internal API with eleven optional parameters. The agent fills them inconsistently. What is the better design?",
+      "options": [
+        "Add validation that rejects calls with unusual parameter combinations",
+        "Let the agent send free-form text and parse the parameters out of it",
+        "Document all eleven parameters more thoroughly in the description",
+        "Expose a task-oriented tool that takes only what the task needs"
+      ],
+      "correct": 3,
+      "explain": "Tools are designed around the task, not as a mirror of the internal API; the complexity stays on the system side, where it is deterministic and testable. Documenting all eleven parameters more thoroughly moves the burden into the context; validation that rejects odd combinations catches the symptom; free-form text parsed afterwards throws away the typed interface."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 1,
+      "scenario": 0,
+      "q": "A tool returns an empty list when the underlying service times out. What is wrong with that?",
+      "options": [
+        "Timeouts should always be retried inside the tool without informing anyone",
+        "Empty lists are valid only when the query itself was malformed",
+        "The empty list uses more tokens than an explicit error would use",
+        "The model reads it as 'no results' and answers confidently from nothing"
+      ],
+      "correct": 3,
+      "explain": "This is the cardinal anti-pattern: returning empty on an error is a silent failure. The model concludes there are no results and builds a confident answer on a false premise. The token count is irrelevant; retrying silently inside the tool hides the problem one layer lower; an empty list on a malformed query does not describe the defect here, which is an access failure dressed up as a valid empty result."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 1,
+      "scenario": 0,
+      "q": "Which TWO properties make a tool description effective? (Select 2)",
+      "options": [
+        "It uses the same wording as the other tools for consistency",
+        "It states plainly when the tool should and should not be used",
+        "It names the boundary with the tools closest to it in purpose",
+        "It lists every error code that the underlying service can return",
+        "It documents the internal implementation the tool wraps"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explain": "The description is the whole interface: it is the only thing the model has to decide with. Saying when to use the tool and how it differs from its nearest neighbours is exactly what prevents wrong selections. Documenting the internal implementation or every error code fills context with detail that does not change the decision; copying the neighbours' wording is cosmetic and can increase confusion."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 2,
+      "scenario": 0,
+      "q": "A long agent session degrades as it goes: earlier facts get dropped and answers drift. What is the sound response?",
+      "options": [
+        "Start over from scratch each time the drift becomes noticeable",
+        "Re-inject the facts that must survive, instead of trusting the history",
+        "Ask the model to summarise the conversation and continue",
+        "Increase the temperature so the model explores the history more"
+      ],
+      "correct": 1,
+      "explain": "The organising question is whether a piece of information must survive no matter what. If so, it cannot live only in the conversation: it is re-injected. Asking the model to summarise and carry on loses detail and still depends on the history; temperature has nothing to do with it; starting over discards useful work."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 1,
+      "scenario": 0,
+      "q": "An agent loop needs to know when the task is actually finished. Which signal is the reliable one?",
+      "options": [
+        "A <code>stop_reason</code> of <code>end_turn</code> on the model's response",
+        "A <code>stop_reason</code> of <code>max_tokens</code> once the budget is spent",
+        "An assistant message that contains no text blocks",
+        "A <code>stop_reason</code> of <code>tool_use</code> with no tools left to run"
+      ],
+      "correct": 0,
+      "explain": "<code>end_turn</code> is the only reliable signal that the task is finished. The loop is: send, inspect <code>stop_reason</code>, run tools if it says <code>tool_use</code>, append the results, repeat. <code>tool_use</code> means the model asked for a tool, so the loop must continue; a message with no text blocks is not a protocol signal; <code>max_tokens</code> means the response was cut off, not that it finished."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 1,
+      "scenario": 0,
+      "q": "A tool has finished executing. How does its result get back to the model?",
+      "options": [
+        "Injected into the system prompt for the following request",
+        "Stored server-side and referenced later by the tool call identifier",
+        "Returned as a new assistant message the model then reads",
+        "Appended as a user-role message containing <code>tool_result</code> blocks"
+      ],
+      "correct": 3,
+      "explain": "Results go back as a user-role message containing <code>tool_result</code> blocks, and every request resends the full history — there is no server-side state. Injecting results into the system prompt or returning them as an assistant message puts them in the wrong role; storing them server-side assumes persistence the API does not provide."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 1,
+      "scenario": 0,
+      "q": "A coordinator issues several Task calls inside a single response. What happens?",
+      "options": [
+        "The call fails as ambiguous",
+        "They queue and run one after another",
+        "They execute in parallel",
+        "Only the first one is executed"
+      ],
+      "correct": 2,
+      "explain": "Several Task calls in one response run in parallel; that is the lever for spreading independent fieldwork. Queuing them one after another, running only the first, or failing as ambiguous do not happen — parallelism is precisely why you group the calls into one response."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 0,
+      "q": "Which TWO situations call for starting a fresh session rather than continuing the current one? (Select 2)",
+      "options": [
+        "A long stretch of unrelated work has degraded the working context",
+        "You want to try an alternative approach from the same point in the task",
+        "The next task needs the same repository and the same conventions",
+        "The tool results in context are stale and no longer reflect reality",
+        "The conversation is long but every earlier fact is still accurate"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explain": "Start a fresh session when the context is no longer trustworthy: stale tool results, or degradation after unrelated work. Needing the same repository and conventions is no reason to cut; trying an alternative approach from the same point in the task is what forking a session is for, not starting from scratch; a long conversation whose facts are all still accurate is a healthy context."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 1,
+      "scenario": 1,
+      "q": "A refund above a fixed threshold must never be issued without approval. Where does that rule belong?",
+      "options": [
+        "In the tool description, so the model knows the limit",
+        "In a <code>PreToolUse</code> hook that blocks the call deterministically",
+        "In the system prompt, written as a clearly worded operating rule",
+        "In the escalation guidance the agent reads before acting"
+      ],
+      "correct": 1,
+      "explain": "Financial and compliance rules are guaranteed with a deterministic mechanism. A text instruction is probabilistic — it works almost always, and almost always is not enough when money is involved. The system prompt, the tool description and the escalation guidance are all variations of the same text: they ask, they do not prevent."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 5,
+      "q": "A review process must analyse each file locally and then check consistency across files. Which decomposition fits?",
+      "options": [
+        "A fixed pipeline that reviews files in alphabetical order once",
+        "A single pass that loads every file and reasons over all of them at once",
+        "A multi-pass design: one pass per file, then an integration pass",
+        "One subagent per file, each also judging cross-file consistency"
+      ],
+      "correct": 2,
+      "explain": "A single pass over many files dilutes attention and applies the criteria unevenly. A per-file pass handles local issues and an integration pass handles what is only visible across files. One pass over everything is the anti-pattern; one subagent per file judging cross-file consistency asks each subagent for something it cannot see; an alphabetical fixed pipeline does not separate the two levels of analysis."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 1,
+      "scenario": 2,
+      "q": "New team members keep missing the project's coding standards, which live in the lead's own CLAUDE.md. What is the fix?",
+      "options": [
+        "Ask each new member to copy the lead's file into their home directory",
+        "Move them to a project-level CLAUDE.md committed to the repository",
+        "Paste the standards into the first message of every new session",
+        "Move them into <code>settings.json</code> so the tooling enforces them directly"
+      ],
+      "correct": 1,
+      "explain": "This is the classic misconfiguration: team instructions stored at user level. What the whole team must see goes in the project file, committed to the repository. Copying the lead's file into each home directory does not scale and drifts out of sync; pasting standards into each session depends on memory; <code>settings.json</code> holds configuration, not instructions the model reads."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 0,
+      "q": "A CLAUDE.md pulls in other files with the <code>@path</code> import syntax. Which TWO statements are correct? (Select 2)",
+      "options": [
+        "Imports accept a space between the @ and the path for readability",
+        "Only Markdown files can be imported, never configuration files",
+        "Relative paths resolve against the file doing the importing",
+        "Imported files load only when the model explicitly asks for them",
+        "Imports can nest, but only up to a maximum depth of five"
+      ],
+      "correct": [
+        2,
+        4
+      ],
+      "explain": "Relative paths resolve against the importing file, and nesting is capped at five levels; imports are for splitting long conventions into maintainable pieces. Imports load with the CLAUDE.md that references them, not only when the model asks; there is no space between the @ and the path; and non-Markdown files such as a README or package.json can be imported."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 1,
+      "scenario": 2,
+      "q": "A team moves its conventions from one long CLAUDE.md into <code>.claude/rules/</code> files with paths frontmatter. Which TWO gains does that produce? (Select 2)",
+      "options": [
+        "Each rule loads only when files matching its patterns are touched",
+        "All conventions load at session start, which speeds up responses",
+        "Rules become enforceable, so the model can no longer ignore any of them",
+        "Context and tokens are spent only on the conventions in play",
+        "The rules apply to every repository the developer works in"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explain": "paths frontmatter activates each rule only when matching files are touched — progressive disclosure applied to conventions, so context is spent only on the conventions in play. Rules are still text, so they do not become enforceable; they do not all load at session start (that is the opposite of what happens); applying to every repository describes user scope, not project rules."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 1,
+      "scenario": 0,
+      "q": "A skill produces very verbose output that pollutes the main session. Which frontmatter setting addresses it?",
+      "options": [
+        "<code>allowed-tools</code>, so the skill touches fewer files overall",
+        "<code>context: fork</code>, so the skill runs in an isolated subagent",
+        "A shorter description, so it is invoked less often",
+        "<code>argument-hint</code>, so the skill asks for narrower input"
+      ],
+      "correct": 1,
+      "explain": "<code>context: fork</code> runs the skill in an isolated subagent: the noise stays in its own window and the main context stays clean. <code>allowed-tools</code> pre-approves the tools the skill may use, it does not change how much output lands in the main session; <code>argument-hint</code> improves usability; a shorter description reduces invocations instead of fixing the problem."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 2,
+      "scenario": 2,
+      "q": "A library migration will touch roughly 45 files across an unfamiliar codebase. How should the work start?",
+      "options": [
+        "In planning mode, exploring safely and producing a plan to approve",
+        "By running the migration on a branch and reviewing the whole diff after",
+        "In direct execution, fixing files one at a time as they come up",
+        "By delegating the whole migration to a single autonomous subagent"
+      ],
+      "correct": 0,
+      "explain": "Large changes with several viable approaches in unfamiliar code are the plan-mode case: it explores without side effects and produces a plan a person approves before anything is touched. Direct execution is for single-file fixes with a clear cause; running it on a branch and reviewing the diff afterwards discovers the problems after making them; handing the whole migration to one subagent delegates the architectural decision."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 2,
+      "scenario": 0,
+      "q": "Which TWO statements about the built-in <code>/compact</code> and <code>/memory</code> commands are correct? (Select 2)",
+      "options": [
+        "Compacting can lose numeric values and dates in the summary",
+        "Compacting is required before any session can exceed its window",
+        "Memory entries apply only to the session where they were written",
+        "Facts recorded in memory files (edited via <code>/memory</code>) load automatically in later sessions",
+        "Compacting keeps every message verbatim in the model's context and only hides it from the display"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explain": "Compaction frees the window by compressing history, and concrete details — figures, dates, names — can be lost in that compression. What is saved as memory lives in CLAUDE.md files and loads automatically at the start of later sessions. Compaction replaces the history in context with a summary, so the original text is no longer available to the model; memory is not limited to one session (that would defeat its purpose); compaction is not a prerequisite for anything."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 1,
+      "scenario": 6,
+      "q": "An extraction step must return a consistent output shape. Prose instructions describing the format keep producing variations. What works better?",
+      "options": [
+        "Two to four worked input and output examples in the prompt",
+        "A longer written description of the format",
+        "A reminder at the end of the prompt to respect the format",
+        "A lower temperature so the output varies less between runs"
+      ],
+      "correct": 0,
+      "explain": "Two to four worked input/output examples beat any written description for format consistency, and the model generalises the pattern to new cases rather than copying the examples. A longer description and a closing reminder both keep describing instead of showing; a lower temperature reduces variation but does not teach the expected shape."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 1,
+      "scenario": 5,
+      "q": "A review prompt says 'be conservative and report only high-confidence findings'. Results are inconsistent between runs. What is the defect?",
+      "options": [
+        "The model needs a larger context to be consistent about it",
+        "Confidence cannot really be expressed in a prompt in any useful way",
+        "The criterion is vague, so each run interprets it differently",
+        "The prompt is too short for the model to apply judgement"
+      ],
+      "correct": 2,
+      "explain": "'Conservative' and 'high confidence' are not criteria. Define exactly what to flag, what not to flag and what each severity level means, with an example per level. Blaming prompt length or context size mistakes ambiguity for size; confidence can be expressed in a prompt — through explicit criteria — so 'it cannot be expressed' is false."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 0,
+      "q": "Which TWO uses of the <code>tool_choice</code> parameter are correct? (Select 2)",
+      "options": [
+        "Setting it to any when the model should be free to answer in text",
+        "Setting it to any when a structured result must always come back",
+        "Setting it to auto when the output must always be structured",
+        "Forcing a specific tool to stop the model from hallucinating facts",
+        "Forcing a specific tool when execution order has to be enforced"
+      ],
+      "correct": [
+        1,
+        4
+      ],
+      "explain": "any forces the model to call some tool, which guarantees a structured result; forcing a specific tool enforces execution order. auto is the opposite of a guarantee — it lets the model answer in text, which is also why 'any when the model should be free to answer in text' describes auto, not any; forcing a tool controls which tool is called, not whether the facts are hallucinated."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 1,
+      "scenario": 6,
+      "q": "An extraction schema marks every field as required. Documents that lack a field come back with invented values. What is the fix?",
+      "options": [
+        "Split the schema so each field is extracted in its own call",
+        "Reject any extraction where a required field looks implausible",
+        "Make fields that may be absent optional or explicitly nullable",
+        "Add an instruction telling the model never to invent values"
+      ],
+      "correct": 2,
+      "explain": "A required field forces the model to put something there. Mark as required only what is always available; everything else is optional or nullable. An instruction never to invent values asks in text for the opposite of what the schema demands; rejecting implausible values detects the problem late and by hand; one call per field multiplies calls without fixing the cause."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 1,
+      "scenario": 6,
+      "q": "A classification enum keeps forcing borderline documents into the closest available category. What design change helps?",
+      "options": [
+        "Instruct the model to pick the category it considers most likely",
+        "Raise the temperature so the classification is less rigid",
+        "Add an unclear value, plus an other option with a detail field",
+        "Add more categories until every observed document fits one"
+      ],
+      "correct": 2,
+      "explain": "An 'unclear' value is better than a wrong category, and an 'other' with a detail field keeps the schema extensible without inventing categories. Adding categories chases an infinite tail; telling the model to pick the most likely category is exactly what it is already doing wrong; temperature has nothing to do with the enum design."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 1,
+      "scenario": 6,
+      "q": "Invoice totals occasionally disagree with the sum of their line items, and nothing downstream notices. Which extraction design surfaces it?",
+      "options": [
+        "Extract only the stated total, since it is what the document says",
+        "Round both values so small differences stop being reported",
+        "Extract only the calculated total, since it is the trustworthy one",
+        "Extract the stated total and the calculated total, and flag conflicts"
+      ],
+      "correct": 3,
+      "explain": "Extracting both the stated and the calculated total and flagging the conflict turns a silent discrepancy into data someone can resolve. Keeping only the calculated total, or only the stated one, picks a side and loses the signal; rounding both hides the problem."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 1,
+      "scenario": 0,
+      "q": "Which TWO statements about the Message Batches API are correct? (Select 2)",
+      "options": [
+        "It costs around half of the equivalent synchronous calls",
+        "It guarantees a response within a fixed low-latency window",
+        "It supports multi-turn tool calling inside a single batch entry",
+        "The whole batch must be resubmitted if any single entry fails",
+        "Requests are correlated to their responses by a custom identifier"
+      ],
+      "correct": [
+        0,
+        4
+      ],
+      "explain": "Batches save about 50% and use your own <code>custom_id</code> to pair each request with its response. The processing window is up to 24 hours with no latency guarantee, so a low-latency guarantee is wrong. Multi-turn tool calling inside one batch entry is not supported; and only the failed entries are resubmitted (in a new batch), not the whole batch."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 1,
+      "scenario": 0,
+      "q": "Two tools share the description 'Retrieves information' and the agent keeps picking the wrong one. What fixes it?",
+      "options": [
+        "Remove one of the two tools from the agent's catalogue",
+        "Merge both tools into one that takes a mode parameter",
+        "Rename each tool and state the concrete data each one returns",
+        "Add an instruction telling the model to think before choosing"
+      ],
+      "correct": 2,
+      "explain": "The description is the selection mechanism. A specific name plus the concrete data each tool returns removes the ambiguity at its root. Telling the model to think first adds latency without removing the ambiguity; merging into one tool with a mode parameter hides the decision inside a parameter; removing a tool sacrifices a capability that is in use."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 1,
+      "scenario": 0,
+      "q": "An MCP tool fails. Which TWO elements should its error response carry so the coordinator can recover intelligently? (Select 2)",
+      "options": [
+        "The full stack trace of the underlying service failure",
+        "The total number of times this tool has failed this week",
+        "A flag stating whether retrying the call could succeed",
+        "A generic message saying the operation could not be completed",
+        "A category such as transient, validation, permission or business"
+      ],
+      "correct": [
+        2,
+        4
+      ],
+      "explain": "The coordinator needs to know what kind of failure occurred and whether retrying could help; with that it decides between backoff, fixing the input, proposing an alternative or escalating. A full stack trace is noise to the model; a generic 'could not complete' message is the anti-pattern that prevents recovery; a weekly failure count is an operations metric, not information about this call."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 1,
+      "scenario": 4,
+      "q": "A project's MCP server needs an API token, and the configuration file is committed to the repository. How is that handled?",
+      "options": [
+        "Reference an environment variable from the configuration file",
+        "Keep the whole configuration out of version control instead",
+        "Commit the token and rotate it whenever someone leaves",
+        "Store the token in the project CLAUDE.md so it is documented"
+      ],
+      "correct": 0,
+      "explain": "Project configuration is committed with environment-variable expansion: the file travels to the repository, the token does not. Committing the token and rotating it publishes the secret; keeping the whole configuration out of version control loses the benefit of sharing it; putting the token in CLAUDE.md also puts it in the context window."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 1,
+      "scenario": 4,
+      "q": "A developer wants to try an MCP server on their own, without affecting teammates. Where does that configuration go?",
+      "options": [
+        "In the project configuration, disabled by default",
+        "In a branch of the repository that is never merged",
+        "In the project configuration, with a comment explaining it",
+        "In the user-level configuration in their home directory"
+      ],
+      "correct": 3,
+      "explain": "User-level configuration lives in the developer's home directory, is not shared through version control, and is the place to experiment without affecting the team. Adding it to the project configuration — disabled, or with a comment — still pollutes the shared configuration; a never-merged branch is something to keep alive for no reason."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 1,
+      "scenario": 0,
+      "q": "An agent burns several tool calls each session just discovering what data is available. What reduces that?",
+      "options": [
+        "Increase the agent's context so it can remember prior sessions",
+        "Add a tool that lists every other tool and what it does",
+        "Expose a resource that maps the available data up front",
+        "Instruct the agent to guess the structure before querying"
+      ],
+      "correct": 2,
+      "explain": "A resource that provides the catalogue or schema gives the agent the map up front and saves the exploratory calls spent discovering what could have been declared. A bigger context does not persist between sessions; a tool that lists the other tools describes tools, not data; telling the agent to guess invites invention."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 1,
+      "scenario": 1,
+      "q": "In a long support conversation, the order number and the amount keep getting lost after the history is summarised. What fixes it?",
+      "options": [
+        "Keep a case-facts block outside the history and resend it every turn",
+        "Summarise less aggressively so more of the history survives",
+        "Ask the model to repeat the key facts at the end of each reply",
+        "Raise the context window so summarisation happens later"
+      ],
+      "correct": 0,
+      "explain": "If a fact must survive no matter what, it cannot live only in the conversation. A case-facts block is kept separately, updated, and re-injected with every request. Summarising less aggressively and enlarging the window only postpone the problem; asking the model to repeat the facts leaves persistence in the model's own hands."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 1,
+      "scenario": 0,
+      "q": "A long input is processed reliably at the beginning and the end, but details in the middle are missed. What is the mitigation?",
+      "options": [
+        "Place the decisive information near the start or the end",
+        "Increase the temperature so more of the input is considered",
+        "Split the input into random chunks and process them apart",
+        "Repeat the whole input twice so the middle appears elsewhere"
+      ],
+      "correct": 0,
+      "explain": "The lost-in-the-middle effect is well known and is mitigated by position: what decides the answer goes near the start or the end. Repeating the whole input doubles the cost; temperature has nothing to do with it; random chunks destroy the document's order."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 1,
+      "scenario": 1,
+      "q": "Which TWO are reliable triggers for escalating to a human? (Select 2)",
+      "options": [
+        "The sentiment analysis scores the message as angry",
+        "The customer explicitly asks to speak with a person",
+        "The conversation has exceeded a fixed number of turns",
+        "The model reports low confidence in its own answer",
+        "The request falls into a gap the policy does not cover"
+      ],
+      "correct": [
+        1,
+        4
+      ],
+      "explain": "An explicit request and a policy gap are unambiguous signals. The rest are unreliable proxies: sentiment is not the same as complexity, and the model can be confidently wrong. An angry sentiment score confuses emotion with difficulty; self-reported low confidence is uncalibrated self-assessment; a fixed turn count is an arbitrary threshold."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 1,
+      "scenario": 0,
+      "q": "A long investigation will span several sessions. How are the findings preserved?",
+      "options": [
+        "Keep the session open indefinitely so nothing is ever lost",
+        "Rely on compaction to retain the important parts of the history",
+        "Write key findings to a file and reference it in the next session",
+        "Repeat the discovery steps at the start of each new session"
+      ],
+      "correct": 2,
+      "explain": "A notes file survives context degradation and the end of a session, and avoids repeating discovery from scratch. Keeping a session open indefinitely is not sustainable; compaction loses exactly the concrete details; repeating the discovery steps each session wastes time and tokens."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 2,
+      "scenario": 3,
+      "q": "A subagent partly fails. Which TWO elements should its structured response include so the synthesis stays honest? (Select 2)",
+      "options": [
+        "The number of retries it performed before giving up entirely",
+        "An empty result set so the coordinator can move on quickly",
+        "A note on what coverage was lost because of the failure",
+        "The partial results it did manage to gather before failing",
+        "A recommendation that the whole workflow be aborted"
+      ],
+      "correct": [
+        2,
+        3
+      ],
+      "explain": "Deliver what you have and declare the gap: partial results plus a coverage annotation let the synthesis proceed without pretending the material is complete. Recommending that the whole workflow abort throws away valid work; an empty result set is a silent failure; the retry count is an operational detail that does not change the synthesis."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 2,
+      "scenario": 6,
+      "q": "An extraction pipeline routes high-confidence results straight through. How do you know the confidence scores can be trusted?",
+      "options": [
+        "Audit a stratified sample of them and measure accuracy by field",
+        "Ask the model to re-rate the confidence of its own extractions",
+        "Raise the threshold until the volume of errors becomes acceptable",
+        "Review every low-confidence case and assume the rest are fine"
+      ],
+      "correct": 0,
+      "explain": "Confidence is calibrated against reality: a stratified sample, with accuracy measured by document type and by field, not just in aggregate. Asking the model to re-rate its confidence is self-assessment again; raising the threshold moves it without evidence; reviewing only the low-confidence cases assumes exactly what had to be verified about the high-confidence ones."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 1,
+      "scenario": 0,
+      "q": "A tool returns forty fields but the task only ever uses five. What reduces the noise it adds to context?",
+      "options": [
+        "Trim the result to the needed fields before it enters the context",
+        "Call the tool less often so the noise accumulates slower",
+        "Increase the context window to absorb the extra fields",
+        "Ask the model to ignore the fields that are not relevant"
+      ],
+      "correct": 0,
+      "explain": "Trimming the result before it enters the context cuts noise and tokens at once — deterministic work that belongs to the system, not the model. Asking the model to ignore fields still pays for them in context; a bigger window just moves the problem; calling the tool less often reduces its usefulness."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 1,
+      "scenario": 0,
+      "q": "An assistant handles two kinds of request: simple status lookups that arrive constantly, and complex disputes that need deep analysis. Which design serves both?",
+      "options": [
+        "A router that classifies the request and sends it down the fitting path",
+        "Two separate products, each with its own interface and its own login",
+        "One agent with every tool available, deciding what to do per request",
+        "A single prompt long enough to cover lookups and disputes together"
+      ],
+      "correct": 0,
+      "explain": "When inputs fall into clearly distinct categories, classifying first and routing lets simple requests be served cheaply and quickly while reserving deep analysis for what needs it. One agent with every tool pays the complex case's cost on every trivial lookup; a single long prompt mixes two tasks; two separate products split the user experience for no reason."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 1,
+      "scenario": 6,
+      "q": "A pipeline extracts data, transforms it and writes it to a system of record. Where does validation belong?",
+      "options": [
+        "After each step, so a bad result never reaches the following one",
+        "At the very end, right before the write to the system of record",
+        "Only at the start, validating the input document that arrived",
+        "Nowhere: the model is instructed to check its own work as it goes"
+      ],
+      "correct": 0,
+      "explain": "Validating between steps is what makes a chain debuggable: an error is caught where it originates and does not contaminate what follows. It is the main reason to decompose. Validating only at the end catches errors after they have propagated; validating only the input misses what the process itself generates; trusting the model to check itself leaves the guarantee to an instruction."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 0,
+      "q": "In a four-stage chain, the third stage fails on about one request in twenty. What belongs in the design?",
+      "options": [
+        "A fifth stage that reviews the output and repairs whatever looks wrong",
+        "A larger model in stage three so the failures become less frequent",
+        "A defined behaviour for that failure: retry, fall back, or stop and report",
+        "A rule telling the model to skip stage three when it cannot complete"
+      ],
+      "correct": 2,
+      "explain": "A production chain needs defined behaviour on failure, not just a happy path. Retry, fallback or an explicit stop are design decisions made beforehand, not during the incident. A repair stage patches downstream without knowing what failed; a larger model lowers the frequency but still does not define what happens when it fails; silently skipping stage three drops a needed step."
+    },
+    {
+      "domain": "Prompt Engineering & Structured Output",
+      "d": 2,
+      "scenario": 0,
+      "q": "A classification task has eight well-defined categories and clear written definitions for each. Accuracy is already high without examples. What follows?",
+      "options": [
+        "Add few-shot examples anyway, since they always improve accuracy",
+        "Add one example per category as a precaution, without any measured need",
+        "Move to a larger model to protect the accuracy already achieved",
+        "Keep it zero-shot and add examples only if measured errors appear"
+      ],
+      "correct": 3,
+      "explain": "Examples cost tokens on every request. If the definitions already suffice and accuracy is high, adding examples pays a cost and buys nothing, so keeping it zero-shot, and adding examples only where errors are measured, is the right call; each technique is applied according to measured benefit. 'Examples always improve accuracy' is an absolute rule that does not hold; one example per category inflates the prompt without evidence of need; a larger model spends capability where there is no problem."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 1,
+      "scenario": 1,
+      "q": "A support conversation runs long and the earliest messages start falling out of the window. What preserves quality?",
+      "options": [
+        "Summarise the older turns and keep the decisive facts verbatim",
+        "Move to the model with the largest window and keep everything",
+        "Let the oldest turns drop, since recent context matters more",
+        "Start a new conversation whenever the window gets close to full"
+      ],
+      "correct": 0,
+      "explain": "Summarising the older turns while keeping the decisive facts — identifiers, amounts, commitments — verbatim does both jobs: it fits the window and keeps the data whose absence would break the answer. Letting the oldest turns drop discards information without judgement; a bigger window only defers the problem a few turns; starting a new conversation loses the thread."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 1,
+      "scenario": 0,
+      "q": "An internal API exposes forty endpoints. The team is deciding how to expose it to the agent. What should drive the tool boundaries?",
+      "options": [
+        "One tool per endpoint, so the whole surface stays available to it",
+        "A single tool that receives the endpoint name and its parameters",
+        "The endpoints the backend team considers most stable over time",
+        "The tasks the agent needs to accomplish, not the endpoints that exist"
+      ],
+      "correct": 3,
+      "explain": "Tools are designed per task. Mirroring the internal API pushes its complexity onto the model, which handles it worst; grouped by task, the complexity stays on the deterministic side. One tool per endpoint gives the agent too many capabilities to choose from; a single generic tool throws away typed interfaces; backend stability is a backend criterion applied to an agent-design decision."
+    },
+    {
+      "domain": "Claude Code Config & Workflows",
+      "d": 1,
+      "scenario": 0,
+      "q": "A developer joins a team that works with AI assistance daily. What gets them productive fastest?",
+      "options": [
+        "The shared project configuration and standards the team already uses",
+        "A training session covering prompt techniques and their trade-offs",
+        "Read-only access for the first weeks, until they know the codebase",
+        "Their own configuration, so they can work the way they prefer"
+      ],
+      "correct": 0,
+      "explain": "Shared, version-controlled project configuration is the onboarding mechanism: the new developer inherits proven practice on day one without depending on someone explaining it. A prompt-technique course teaches technique without the team's context; weeks of read-only access postpone productivity; their own private configuration recreates fragmentation."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 1,
+      "scenario": 0,
+      "q": "An AI coding assistant needs access to a service that requires an API key. How is that handled?",
+      "options": [
+        "A configuration file kept out of the repository through the ignore list",
+        "A note in the project documentation explaining where to find the key",
+        "A key with a short expiry, pasted into the session when it is needed",
+        "An environment variable the tooling reads, never a file under version control"
+      ],
+      "correct": 3,
+      "explain": "Secrets live in environment variables that the configuration references. Everything else eventually ends up inside a repository or a context window. A git-ignored config file depends on nobody ever slipping once; a documentation note just records where the secret is; pasting a short-lived key into the session puts it in the model's context."
+    }
+  ]
+}

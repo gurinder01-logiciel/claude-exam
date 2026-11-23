@@ -43,7 +43,8 @@ This matters — a flattened folder is the most common cause of a broken deploy:
 │   ├── basic.json
 │   ├── scenario.json
 │   ├── core.json
-│   └── mock1.json … mock6.json
+│   ├── mock1.json … mock6.json
+│   └── foundations-es.json
 ├── api/
 │   └── scores.js
 ├── package.json
