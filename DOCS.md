@@ -73,6 +73,7 @@ for the rewrite and verification history.
 | 1 | **Basic** | 60 | 60 | 31 / 18 / 11 | — (always open) |
 | 2 | **Scenario Practice** | 78 | 60 | 9 / 51 / 18 | finishing Basic |
 | 3 | **Architect Scenarios** | 100 | 60 | 15 / 20 / 25 | — (always open) |
+| 3b | **Architect Professional** (CCAR-P) | 100 | 60 | 15 / 20 / 25 | — (always open) |
 | 4 | **Full Mock Exam** | 138 (all banks) | 60 | 15 / 20 / 25 | finishing Scenario Practice |
 
 ### Progression
@@ -113,6 +114,12 @@ It's configured in the level JSON, not in code:
   bank each sitting (90 framed in the six official scenarios, 10 standalone,
   8 multiple-response), domain-weighted 27/18/20/20/15. No `requires`, so it is
   always open.
+- **Architect Professional** is the CCAR-P (Professional) level: a fresh,
+  ungrouped 60 from its own 100-question bank (90 framed in six Professional
+  practice scenarios, ids 11–16, plus 10 standalone; 10 multiple-response),
+  weighted to the seven CCAR-P domains 17/13/19/16/14/14/7. The real CCAR-P has
+  63 items and publishes no scenario bank, so the scenarios are our own — see
+  `BLUEPRINT-PRO.md`. `inPool: false`, so the Full Mock Exam is unchanged.
 
 ### Scenario blocks
 
@@ -302,6 +309,7 @@ questions/
   basic.json       49 questions (Claude Code Foundations)
   scenario.json    94 questions (Scenario Practice)
   architect.json   100 questions (Architect Scenarios; 60 drawn per sitting)
+  architect-pro.json  100 questions (Architect Professional, CCAR-P; 60 drawn)
   core.json        40 questions (Core Concepts Drill)      ┐ "Mock Exam Bank"
   mock1-6.json     60/58/56/54/51/55 (Mock Exam 1-6)       │ section
                    Imported from the CCA Foundations Prep artifact; mock items
@@ -352,7 +360,7 @@ const SCENARIOS = { 1: …, 6: … };  // the six official exam scenarios
 |---|---|
 | `domain` | Free text; drives the results breakdown and the tag shown on each question |
 | `d` | Difficulty: `1` easy, `2` medium, `3` hard. Drives the ramp — **tag honestly**, inflating it just makes your practice scores misleading |
-| `scenario` | Which of the six official exam scenarios this belongs to, `1`–`6`. Use `0` for a standalone concept check with no narrative. Drives scenario grouping and the context banner |
+| `scenario` | Which exam scenario this belongs to: `1`–`6` for the six official Foundations scenarios, `11`–`16` for the Professional practice scenarios (`BLUEPRINT-PRO.md`). Use `0` for a standalone concept check with no narrative. Drives scenario grouping and the context banner |
 | `q` | Question text. The legacy `SCENARIO — <name>.` prefix still renders a banner, but prefer the `scenario` field |
 | `options` | Four options recommended. Order as written; shuffled at runtime |
 | `correct` | Index into `options` **as written**. No need to vary the position by hand. An array of indices (e.g. `[0, 2]`) makes it a **multiple-response** item: the candidate is told to "Select N", it counts as answered only once N options are chosen, and it scores only if every pick is correct — no partial credit, as on the real exam |

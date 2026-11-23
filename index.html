@@ -679,7 +679,22 @@ const SCENARIOS = {
   5: { name: 'Claude Code for Continuous Integration',
        blurb: 'You are integrating Claude Code into your CI/CD pipeline. It runs automated code reviews, generates test cases, and comments on pull requests. Your prompts need to give actionable feedback while minimising false positives.' },
   6: { name: 'Structured Data Extraction',
-       blurb: 'You are building a structured data extraction system with Claude. It pulls information out of unstructured documents, validates against JSON schemas, and must stay accurate, handle edge cases gracefully, and feed downstream systems.' }
+       blurb: 'You are building a structured data extraction system with Claude. It pulls information out of unstructured documents, validates against JSON schemas, and must stay accurate, handle edge cases gracefully, and feed downstream systems.' },
+  // Professional (CCAR-P) practice scenarios. The CCAR-P exam guide publishes no
+  // scenario bank, so these are our own (see BLUEPRINT-PRO.md); ids 11+ keep them
+  // apart from the Foundations ids above.
+  11: { name: 'Clinical Documentation Assistant',
+        blurb: 'A regional hospital network wants Claude to draft visit notes from recorded consultations and triage patient-portal messages. Data is PHI under HIPAA, clinicians sign off on anything clinical, the assistant integrates with the EHR, and a budget-conscious CIO and a compliance officer must approve the design.' },
+  12: { name: 'Enterprise Knowledge Assistant',
+        blurb: 'A global professional-services firm with 40,000 staff in the EU and US wants a cited Claude assistant over SharePoint, its wiki and CRM. Documents carry per-user permissions, GDPR applies, and leadership wants measurable answer quality before wider rollout.' },
+  13: { name: 'Insurance Claims Automation',
+        blurb: 'A property insurer wants Claude to triage first-notice-of-loss claims, extract facts from forms, photos and adjuster notes, and recommend payouts. Payouts above $5,000 need adjuster approval, regulators require each denial to be explained, and storms bring sudden surges of claims.' },
+  14: { name: 'Public-Sector Benefits Assistant',
+        blurb: 'A US federal agency wants a citizen-facing assistant, in English and Spanish, that explains benefits eligibility and helps people start applications. It must run inside the agency\'s FedRAMP-authorised cloud boundary, stand up to fairness scrutiny, and hand off to caseworkers, who make every eligibility decision.' },
+  15: { name: 'E-commerce Support at Scale',
+        blurb: 'An online retailer handles about 2 million support conversations a month (orders, returns, delivery). It has a tight model-spend target per conversation, a 3-second p95 first-response SLA, four-times traffic at peak season, and wants A/B-tested evidence that the assistant beats a $4 human contact.' },
+  16: { name: 'Claude Code Enterprise Rollout',
+        blurb: 'A 600-engineer software company is rolling Claude Code out across 40 teams. The platform team must set shared configuration and security policy, connect internal MCP servers, add Claude Code to CI, measure impact for leadership, and hand day-2 operations to its own on-call rotation.' }
 };
 
 // Weighted pick of `k` distinct scenario ids. `weights` biases which scenarios
@@ -1347,7 +1362,7 @@ function syncPrep() {
 function renderStart() {
   stopTimer();
   state.screen = 'start';
-  const scenarioColors = ['#26d07c','#3b9ae1','#f0a828','#a678e2','#e0524d','#20c4b8'];
+  const scenarioColors = ['#26d07c','#3b9ae1','#f0a828','#a678e2','#e0524d','#20c4b8','#d16ba5'];
   // Compact card: everything the picker needs in a few lines, so every exam fits
   // on one screen. The full description sits in the tooltip.
   const levelCard = ([key, lv], i) => {

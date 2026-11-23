@@ -9,12 +9,14 @@
 //
 // The rules mirror what index.html relies on (see CLAUDE.md § Adding questions):
 // options 2-5, `correct` an index or index array into options *as written*,
-// d in 1..3, scenario 0..6 (must exist in SCENARIOS), non-empty domain/explain.
+// d in 1..3, scenario 0, 1..6 or 11..16 (must exist in SCENARIOS), non-empty domain/explain.
 import fs from 'node:fs';
 import path from 'node:path';
 
 const ROOT = process.env.CLAUDE_PROJECT_DIR || path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
 const QDIR = path.join(ROOT, 'questions');
+// 0 = standalone; 1-6 = Foundations scenarios; 11-16 = Professional scenarios (SCENARIOS in index.html).
+const SCENARIO_IDS = new Set([0, 1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16]);
 
 function isBank(file) {
   const abs = path.resolve(ROOT, file);
@@ -29,8 +31,8 @@ function checkQuestion(q, i) {
   if (typeof q.q !== 'string' || !q.q.trim()) bad('`q` must be non-empty text');
   if (typeof q.domain !== 'string' || !q.domain.trim()) bad('`domain` must be non-empty text');
   if (![1, 2, 3].includes(q.d)) bad(`\`d\` must be 1, 2 or 3 (got ${JSON.stringify(q.d)})`);
-  if (q.scenario !== undefined && !(Number.isInteger(q.scenario) && q.scenario >= 0 && q.scenario <= 6))
-    bad(`\`scenario\` must be an integer 0-6 (got ${JSON.stringify(q.scenario)})`);
+  if (q.scenario !== undefined && !SCENARIO_IDS.has(q.scenario))
+    bad(`\`scenario\` must be 0, 1-6 (Foundations) or 11-16 (Professional) (got ${JSON.stringify(q.scenario)})`);
   if (typeof q.explain !== 'string' || !q.explain.trim()) bad('`explain` must be non-empty text');
   const opts = q.options;
   if (!Array.isArray(opts) || opts.length < 2 || opts.length > 5) { bad('`options` must be an array of 2-5 items'); return errs; }

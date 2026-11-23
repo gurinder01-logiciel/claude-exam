@@ -23,6 +23,10 @@ exam: 60 scenario questions in 120 minutes, with a shared team leaderboard.
   the Full Mock Exam, so nobody skips the fundamentals
 - **Architect Scenarios** — always open: a random 60 from a 100-question bank of
   scenario-based items covering all 30 task statements
+- **Architect Professional** — always open: a random 60 from a 100-question bank
+  for the **CCAR-P** (Professional) exam — architecture trade-offs, integration,
+  evals, governance and stakeholder decisions across six Professional practice
+  scenarios, weighted to its seven-domain blueprint ([BLUEPRINT-PRO.md](BLUEPRINT-PRO.md))
 
 Full reference: **[DOCS.md](DOCS.md)**
 

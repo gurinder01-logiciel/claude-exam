@@ -136,7 +136,7 @@ Edit `questions/*.json` only — no code change is needed (unless you add a new
 scenario id, which needs a `SCENARIOS` entry). Per-question fields: `domain`
 (free text, drives the results breakdown), `d` (1/2/3), `q` (prefix
 `SCENARIO — <name>.` to render a context banner — legacy; prefer `scenario`),
-`scenario` (`1`–`6` official scenario, `0` for a standalone concept check), `options`, `correct` (index or index array),
+`scenario` (`1`–`6` official Foundations scenario, `11`–`16` Professional practice scenario, `0` for a standalone concept check), `options`, `correct` (index or index array),
 `explain`.
 
 Scope authority for what belongs in the bank is `BLUEPRINT.md` (official exam
