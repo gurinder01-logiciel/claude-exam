@@ -145,7 +145,7 @@
         "Missing tool_choice configuration; force a specific tool on every turn to remove doubt"
       ],
       "correct": 1,
-      "explain": "Large sets of overlapping tools make selection ambiguous, so the fix is consolidating and narrowing tool surface area. Tightening parameter schemas is the tempting near-miss: better schemas help argument accuracy but do nothing to disambiguate which of 40 similar tools to call.",
+      "explain": "Large sets of overlapping tools make selection ambiguous, so the fix is consolidating and narrowing tool surface area. Tightening parameter schemas is the tempting near-miss: better schemas help argument accuracy but do nothing to disambiguate which of 40 similar tools to call. Current docs: Claude Code defers MCP tool definitions by default (tool search), so the problem here is ambiguous selection, not context size.",
       "scenario": 4
     },
     {
@@ -196,12 +196,12 @@
       "q": "You've typed the same multi-step procedure more than once, and it includes long reference material and a helper script. How should you package it?",
       "options": [
         "Register it as an organization-level managed policy so the procedure is applied automatically",
-        "Package it as a skill with a lean skill.md, pushing depth into reference.md and helper scripts",
+        "Package it as a skill with a lean SKILL.md, pushing depth into reference.md and helper scripts",
         "Paste the whole procedure plus reference material into project CLAUDE.md for the team to share",
-        "Package it as a skill with every step and the full reference material written inline in skill.md"
+        "Package it as a skill with every step and the full reference material written inline in SKILL.md"
       ],
       "correct": 1,
-      "explain": "Skills use progressive disclosure: a short skill.md that Claude always sees, with bulky reference files and scripts loaded only when needed. Writing everything inline in skill.md is the near-miss: it is still a skill, but it defeats progressive disclosure and consumes context on every invocation.",
+      "explain": "Skills use progressive disclosure: a short SKILL.md that Claude always sees, with bulky reference files and scripts loaded only when needed. Writing everything inline in SKILL.md is the near-miss: it is still a skill, but it defeats progressive disclosure and consumes context on every invocation.",
       "scenario": 2
     },
     {
@@ -279,13 +279,13 @@
       "d": 1,
       "q": "You delegate a task to a sub-agent. Does it automatically have access to your main conversation's skills?",
       "options": [
-        "Sub-agents start fresh; only custom sub-agents can use skills, and only when listed in their config",
+        "Sub-agents start fresh and do not inherit the parent's loaded skills; a custom sub-agent preloads skills only if you list them in its skills field",
         "Sub-agents inherit the parent conversation's loaded skills along with its accumulated context",
         "Built-in sub-agents such as Explore receive skills, while custom sub-agents must request them",
         "Skills become available to a sub-agent only once it has read the project's CLAUDE.md file"
       ],
       "correct": 0,
-      "explain": "Sub-agents begin with fresh context, and skills are available only to custom sub-agents that explicitly list them. The inheritance option is the strong near-miss: sub-agents do receive their task prompt from the parent, but not its loaded skills or context.",
+      "explain": "Sub-agents begin with fresh context and do not inherit the parent's loaded skills; a custom sub-agent preloads skills only if they are listed in its skills field. The inheritance option is the strong near-miss: sub-agents do receive their task prompt from the parent, but not its loaded skills or context.",
       "scenario": 3
     },
     {
@@ -551,7 +551,7 @@
         "Have the review report any network access it made, so the pipeline can fail the job afterwards when such a call appears"
       ],
       "correct": 2,
-      "explain": "A hard prohibition belongs in settings permissions as a deny rule, which the tool layer enforces regardless of what the model decides. The near-miss is restating the instruction closer to the model: it raises compliance odds but is still guidance, and guidance has already failed twice here.",
+      "explain": "A hard prohibition belongs in settings permissions as a deny rule, which the tool layer enforces regardless of what the model decides; it is the deterministic layer, and for a true no-network guarantee you would pair it with sandbox network restrictions, because a Bash deny rule only covers the usual invocation form. The near-miss is restating the instruction closer to the model: it raises compliance odds but is still guidance, and guidance has already failed twice here.",
       "scenario": 5
     },
     {
@@ -615,13 +615,13 @@
       "d": 1,
       "q": "The same MCP server name is defined at local, project, and user scope with different configs. Which one loads?",
       "options": [
-        "Local scope wins — precedence runs local, then project, then user, and it shadows the others silently",
+        "Local scope wins — precedence runs local, then project, then user, and only that one entry loads",
         "Project scope wins — the committed .mcp.json entry is authoritative so every teammate resolves it identically",
         "User scope wins — it is the global definition and therefore sits at the top of the MCP resolution chain",
         "The configs are merged field by field, with narrower scopes overriding only the keys they actually define"
       ],
       "correct": 0,
-      "explain": "MCP scope precedence is local over project over user, and a local definition shadows a same-named server at a wider scope without any warning; claude mcp get <name> shows which one resolved. The tempting near-miss is field-by-field merging — plausible given how other settings behave, but same-named servers are shadowed wholesale, not blended.",
+      "explain": "MCP scope precedence is local over project over user, and a local definition shadows a same-named server at a wider scope, and only the highest-precedence entry loads; claude mcp list and /mcp warn when the endpoints differ. The tempting near-miss is field-by-field merging — plausible given how other settings behave, but same-named servers are shadowed wholesale, not blended.",
       "scenario": 4
     },
     {
@@ -697,15 +697,15 @@
     {
       "domain": "Claude API",
       "d": 2,
-      "q": "You're defining a research subagent in the Agent SDK and want it to break its work into further parallel subtasks. What should you know?",
+      "q": "A research subagent in the Agent SDK should stay a leaf worker and not fan out into subagents of its own. How do you keep it from spawning them?",
       "options": [
-        "Only subagents defined programmatically rather than as filesystem definitions are permitted to nest",
-        "Add the Agent/Task tool to the subagent's tool list, which is how a subagent is granted its own fan-out",
-        "Nesting works to arbitrary depth provided max_turns is raised enough to cover the child agents' turns",
-        "Subagents cannot spawn subagents, so leave Agent/Task out of their tools and keep fan-out at the orchestrator"
+        "Define it on the filesystem rather than programmatically, since only programmatically defined subagents are able to spawn their own",
+        "Keep the Agent/Task tool in its tool list but tell it in its prompt never to use it, so the fan-out stays with the orchestrator",
+        "Nothing is needed: nesting is limited only by max_turns, so keep max_turns low enough that child agents never get a turn",
+        "Leave Agent/Task out of its tools (or list it in disallowedTools), so it has no way to spawn and the fan-out stays with the orchestrator"
       ],
       "correct": 3,
-      "explain": "Subagents cannot spawn further subagents, so granting them the Agent/Task tool is a dead end and parallel fan-out has to be organised by the orchestrator. The tempting near-miss is simply adding Agent/Task to the subagent's tools — the syntax is valid and the tool name is real, but the nesting it implies is not supported.",
+      "explain": "A subagent can spawn subagents of its own only when the Agent/Task tool is in its tools (up to a default depth of three layers below the main conversation), so keeping a research subagent a leaf worker means leaving that tool out or listing it in disallowedTools. The tempting near-miss is keeping the tool and telling the subagent in its prompt not to use it: that is guidance, while listing the tool is exactly what lets it spawn. Depth is capped by design, not by max_turns, and filesystem versus programmatic definition does not decide it.",
       "scenario": 3
     }
   ]

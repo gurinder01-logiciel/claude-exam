@@ -197,7 +197,7 @@
         "Set tool_choice to {\"type\": \"tool\", \"name\": \"get_customer\"} on every request in the conversation"
       ],
       "correct": 2,
-      "explain": "Forcing the named tool on the first request guarantees the prerequisite call, and returning to auto lets the conversation continue normally. tool_choice any is the near-miss: it guarantees that some tool is called, but the model can still pick lookup_order. Forcing get_customer on every request would trap the agent calling it repeatedly, and tool order is not a priority setting."
+      "explain": "Forcing the named tool on the first request guarantees the prerequisite call, and returning to auto lets the conversation continue normally. tool_choice any is the near-miss: it guarantees that some tool is called, but the model can still pick lookup_order. Forcing get_customer on every request would trap the agent calling it repeatedly, and tool order is not a priority setting. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs."
     },
     {
       "domain": "Context Management & Reliability",
@@ -270,7 +270,7 @@
         "Run /doctor, which checks the installation and lists any CLAUDE.md files that failed to load or parse"
       ],
       "correct": 1,
-      "explain": "/memory shows which memory files are loaded and opens them for editing, which quickly shows whether the project CLAUDE.md, or the rule file holding the pnpm rule, is actually in play. /config is the near-miss because it is also a configuration view, but it covers settings, not memory files. /init writes a new CLAUDE.md rather than diagnosing the current one, and /doctor checks the installation."
+      "explain": "/memory lists your memory file locations (CLAUDE.md, CLAUDE.local.md and other memory files) and lets you open them, so it quickly shows whether the project CLAUDE.md, or the rule file holding the pnpm rule, is in play; /context all then verifies what actually loaded. /config is the near-miss because it is also a configuration view, but it covers settings, not memory files. /init suggests improvements to an existing CLAUDE.md rather than diagnosing it, and /doctor checks the installation."
     },
     {
       "domain": "Claude Code Config & Workflows",
@@ -298,7 +298,7 @@
         "model, which picks the model for the command and asks for any missing input before it starts"
       ],
       "correct": 0,
-      "explain": "argument-hint shows the expected arguments during autocomplete, so the command tells people it needs a table name. description is the near-miss: it is also shown in the picker, but it summarises what the command does rather than showing an argument placeholder. allowed-tools pre-approves tools and model picks the model; neither asks for input."
+      "explain": "argument-hint shows the expected arguments during autocomplete, so the command tells people it needs a table name. description is the near-miss: it is also shown in the picker, but it summarises what the command does rather than showing an argument placeholder. allowed-tools pre-approves tools and model picks the model; neither asks for input. Current docs: custom commands are merged into skills, and existing .claude/commands/ files keep working."
     },
     {
       "domain": "Claude Code Config & Workflows",
@@ -312,7 +312,7 @@
         "In .claude/settings.json in each repository, registered under a commands key with the prompt inline"
       ],
       "correct": 0,
-      "explain": "User-scoped commands in ~/.claude/commands/ follow the developer into every project without touching shared repos. Project commands are the near-miss: it is the same mechanism, but a committed copy in each repository adds a personal tool to every team's codebase, which is what they wanted to avoid. A CLAUDE.md instruction isn't a command, and settings.json doesn't define commands."
+      "explain": "User-scoped commands in ~/.claude/commands/ follow the developer into every project without touching shared repos. Project commands are the near-miss: it is the same mechanism, but a committed copy in each repository adds a personal tool to every team's codebase, which is what they wanted to avoid. A CLAUDE.md instruction isn't a command, and settings.json doesn't define commands. Current docs: custom commands are merged into skills, and existing .claude/commands/ files keep working."
     },
     {
       "domain": "Claude Code Config & Workflows",
@@ -508,7 +508,7 @@
         "Emit all four Task calls in a single coordinator response, so the four searches run in parallel"
       ],
       "correct": 3,
-      "explain": "Several tool calls in one response run in parallel, so independent subtasks should be spawned together. One subagent covering all four is the near-miss: it removes the turn-by-turn waiting, but the subtopics are still worked through one after another, in one context that fills up. Chaining bypasses the coordinator and stays sequential, and shorter outputs only cut a little time from each sequential step."
+      "explain": "Several tool calls in one response run in parallel, so independent subtasks should be spawned together. One subagent covering all four is the near-miss: it removes the turn-by-turn waiting, but the subtopics are still worked through one after another, in one context that fills up. Chaining bypasses the coordinator and stays sequential, and shorter outputs only cut a little time from each sequential step. Current docs: the Task tool is now named Agent; Task remains an alias."
     },
     {
       "domain": "Agentic Architecture & Orchestration",
@@ -522,7 +522,7 @@
         "Put the search findings, the extracted figures and each source's URL and date directly in the Task prompt"
       ],
       "correct": 3,
-      "explain": "Subagents start with isolated context: they see only what the coordinator puts in the Task prompt, so findings and source metadata must be passed explicitly. Giving it WebSearch is the near-miss: the subagent would get documents, but it repeats the search and may pick different sources from the ones the run already chose. It can't recall what it never saw, and a bigger window doesn't import the coordinator's history."
+      "explain": "Subagents start with isolated context: they see only what the coordinator puts in the Task prompt, so findings and source metadata must be passed explicitly. Giving it WebSearch is the near-miss: the subagent would get documents, but it repeats the search and may pick different sources from the ones the run already chose. It can't recall what it never saw, and a bigger window doesn't import the coordinator's history. Current docs: the Task tool is now named Agent; Task remains an alias."
     },
     {
       "domain": "Agentic Architecture & Orchestration",
@@ -578,7 +578,7 @@
         "Everything every other subagent has produced in this run, since subagents share one research workspace"
       ],
       "correct": 0,
-      "explain": "Subagents run in isolated contexts. They start from their own definition and the Task prompt (plus shared project setup such as CLAUDE.md), not from the coordinator's conversation, which is why everything they need must be written into that prompt. Inheriting the coordinator's system prompt is the near-miss: it sounds like a sensible partial share, but the subagent runs under its own definition's prompt, not the coordinator's. Neither the conversation history nor other subagents' output is passed on automatically."
+      "explain": "Subagents run in isolated contexts. They start from their own definition and the Task prompt (plus shared project setup such as CLAUDE.md), not from the coordinator's conversation, which is why everything they need must be written into that prompt. Inheriting the coordinator's system prompt is the near-miss: it sounds like a sensible partial share, but the subagent runs under its own definition's prompt, not the coordinator's. Neither the conversation history nor other subagents' output is passed on automatically. Current docs: the Task tool is now named Agent; Task remains an alias. A fork is the exception: it inherits the parent conversation."
     },
     {
       "domain": "Agentic Architecture & Orchestration",
@@ -819,7 +819,7 @@
         "A PostToolUse hook that adds the test and route entry each time Claude writes a new handler file to disk"
       ],
       "correct": 2,
-      "explain": "A project-scoped command lives in the repo, so everyone gets it with the code, and $ARGUMENTS passes in the endpoint name. The personal command is the near-miss: it is the same mechanism in the wrong scope, so each copy drifts and new hires don't have it. A CLAUDE.md paragraph adds to every session's context and isn't invoked on demand, and a hook can't generate code in the team's style."
+      "explain": "A project-scoped command lives in the repo, so everyone gets it with the code, and $ARGUMENTS passes in the endpoint name. The personal command is the near-miss: it is the same mechanism in the wrong scope, so each copy drifts and new hires don't have it. A CLAUDE.md paragraph adds to every session's context and isn't invoked on demand, and a hook can't generate code in the team's style. Current docs: custom commands are merged into skills, and existing .claude/commands/ files keep working."
     },
     {
       "domain": "Claude Code Config & Workflows",
@@ -1175,7 +1175,7 @@
         "Tool use with a JSON schema for the dashboard tags; a prefilled opening brace for the ERP invoice records"
       ],
       "correct": 2,
-      "explain": "Pick the method by how strict the output must be. A loose, human-read output can use prompt-based formatting, while a system that rejects anything off-schema needs tool use with a schema and the tool forced. The prefill for the ERP is the near-miss: it makes the reply start as JSON, but nothing makes the rest match the schema (and prefill is not supported on the newest models anyway). Parse-and-retry accepts failures as routine, and the last option puts the strict method on the output that needs it least."
+      "explain": "Pick the method by how strict the output must be. A loose, human-read output can use prompt-based formatting, while a system that rejects anything off-schema needs tool use with a schema and the tool forced. The prefill for the ERP is the near-miss: it makes the reply start as JSON, but nothing makes the rest match the schema (and prefill is not supported on the newest models anyway). Parse-and-retry accepts failures as routine, and the last option puts the strict method on the output that needs it least. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs."
     },
     {
       "domain": "Prompt Engineering & Structured Output",
@@ -1189,7 +1189,7 @@
         "none, followed by a second request asking the model which of the three tools it would use instead"
       ],
       "correct": 2,
-      "explain": "any guarantees a tool call while letting the model pick which one fits the document. auto is the near-miss: the model will usually pick a tool, but auto allows a plain-text reply, which breaks the pipeline's guarantee. Forcing extract_invoice sends receipts and contracts through the wrong schema, and none just adds a round trip."
+      "explain": "any guarantees a tool call while letting the model pick which one fits the document. auto is the near-miss: the model will usually pick a tool, but auto allows a plain-text reply, which breaks the pipeline's guarantee. Forcing extract_invoice sends receipts and contracts through the wrong schema, and none just adds a round trip. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs."
     },
     {
       "domain": "Prompt Engineering & Structured Output",

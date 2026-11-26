@@ -665,7 +665,7 @@
       "domain": "Prompt Engineering & Structured Output",
       "d": 2,
       "scenario": 6,
-      "q": "Which statement correctly distinguishes what <code>tool_use</code> with a JSON schema does and does not guarantee?",
+      "q": "Which statement correctly distinguishes what <code>tool_use</code> with a JSON schema and <code>strict: true</code> does and does not guarantee?",
       "options": [
         "It guarantees semantic correctness but not syntactic validity",
         "It guarantees syntactic (schema-compliant) validity but not semantic correctness (e.g., values landing in the wrong field or totals not summing)",
@@ -673,7 +673,7 @@
         "It guarantees both syntactic validity and semantic correctness of extracted values"
       ],
       "correct": 1,
-      "explain": "<code>tool_use</code> with a schema guarantees the output parses and matches the schema's structure (syntactic validity) but cannot verify that values are semantically correct, e.g., a total that doesn't sum or a value in the wrong field. D overclaims that semantic correctness is also guaranteed, which is exactly the gap a <code>calculated_total</code> vs. <code>stated_total</code> check exists to catch.<br><b>Not “It guarantees semantic correctness but not syntactic validity”</b> — This reverses the guarantee. A schema ensures valid structure, but it cannot ensure values are semantically correct.<br><b>Not “It guarantees neither, and offers no benefit over plain-text JSON o…”</b> — It does provide a benefit: output reliably parses and matches the schema, which plain-text JSON does not guarantee.<br><b>Not “It guarantees both syntactic validity and semantic correctness of e…”</b> — It does not guarantee semantic correctness. Values can sit in the wrong field or totals can fail to add up while the JSON stays valid."
+      "explain": "<code>tool_use</code> with <code>strict: true</code> and a schema guarantees the output parses and matches the schema's structure (syntactic validity; without strict mode types or required fields can still slip) but cannot verify that values are semantically correct, e.g., a total that doesn't sum or a value in the wrong field. D overclaims that semantic correctness is also guaranteed, which is exactly the gap a <code>calculated_total</code> vs. <code>stated_total</code> check exists to catch.<br><b>Not “It guarantees semantic correctness but not syntactic validity”</b> — This reverses the guarantee. A schema ensures valid structure, but it cannot ensure values are semantically correct.<br><b>Not “It guarantees neither, and offers no benefit over plain-text JSON o…”</b> — It does provide a benefit: output reliably parses and matches the schema, which plain-text JSON does not guarantee.<br><b>Not “It guarantees both syntactic validity and semantic correctness of e…”</b> — It does not guarantee semantic correctness. Values can sit in the wrong field or totals can fail to add up while the JSON stays valid."
     },
     {
       "domain": "Prompt Engineering & Structured Output",

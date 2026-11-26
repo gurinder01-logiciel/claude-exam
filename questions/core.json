@@ -69,7 +69,7 @@
         "Move the coordinator to a larger model"
       ],
       "correct": 0,
-      "explain": "Several <code>Task</code> calls in a single coordinator turn run concurrently. Merging loses focus and chaining keeps it sequential.<br><b>Not “Merge the three subtopics into one subagent prompt”</b> — One subagent covering three topics still works through them in sequence and loses focus on each.<br><b>Not “Let each subagent spawn the next when it finishes”</b> — Chaining keeps the work sequential and moves routing out of the coordinator.<br><b>Not “Move the coordinator to a larger model”</b> — A larger model does not make sequential calls run concurrently."
+      "explain": "Several <code>Task</code> calls in a single coordinator turn run concurrently. Merging loses focus and chaining keeps it sequential. Current docs: the Task tool is now named Agent; Task remains an alias.<br><b>Not “Merge the three subtopics into one subagent prompt”</b> — One subagent covering three topics still works through them in sequence and loses focus on each.<br><b>Not “Let each subagent spawn the next when it finishes”</b> — Chaining keeps the work sequential and moves routing out of the coordinator.<br><b>Not “Move the coordinator to a larger model”</b> — A larger model does not make sequential calls run concurrently."
     },
     {
       "domain": "Agentic Architecture & Orchestration",
@@ -97,7 +97,7 @@
         "The subagent descriptions are too long"
       ],
       "correct": 0,
-      "explain": "<code>Task</code> is the tool that spawns subagents. Without it in <code>allowedTools</code> the coordinator cannot delegate.<br><b>Not “The subagents lack a <code>tool_choice</code> setting”</b> — <code>tool_choice</code> controls whether a tool must be called on a request. It does not give the coordinator a way to spawn subagents.<br><b>Not “The coordinator has no <code>PostToolUse</code> hook”</b> — <code>PostToolUse</code> hooks process tool results. They play no part in delegation.<br><b>Not “The subagent descriptions are too long”</b> — Long descriptions cost tokens but do not block delegation. Without <code>Task</code> the coordinator cannot call any subagent at all."
+      "explain": "<code>Task</code> is the tool that spawns subagents. Without it in <code>allowedTools</code> the coordinator cannot delegate. Current docs: the Task tool is now named Agent; Task remains an alias.<br><b>Not “The subagents lack a <code>tool_choice</code> setting”</b> — <code>tool_choice</code> controls whether a tool must be called on a request. It does not give the coordinator a way to spawn subagents.<br><b>Not “The coordinator has no <code>PostToolUse</code> hook”</b> — <code>PostToolUse</code> hooks process tool results. They play no part in delegation.<br><b>Not “The subagent descriptions are too long”</b> — Long descriptions cost tokens but do not block delegation. Without <code>Task</code> the coordinator cannot call any subagent at all."
     },
     {
       "domain": "Agentic Architecture & Orchestration",

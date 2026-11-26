@@ -225,7 +225,7 @@
         "Leave tool_choice unset and validate afterward that a tool_use block is present, retrying the request when one is absent"
       ],
       "correct": 1,
-      "explain": "tool_choice set to 'any' forces exactly one tool call while leaving the schema selection to Claude, which is the requirement here. Naming a single tool with tool_choice 'tool' is the tempting near-miss: it also guarantees a call, but it makes you pre-choose the document type, which is precisely what you wanted to avoid.",
+      "explain": "tool_choice set to 'any' requires one of the tools to be called while leaving the schema selection to Claude, which is the requirement here. Naming a single tool with tool_choice 'tool' is the tempting near-miss: it also guarantees a call, but it makes you pre-choose the document type, which is precisely what you wanted to avoid. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs.",
       "scenario": 6
     },
     {
@@ -407,7 +407,7 @@
         "Check the stop_reason field instead of content type — continue while it is 'tool_use' and terminate when it is 'end_turn'."
       ],
       "correct": 3,
-      "explain": "stop_reason is the only authoritative loop-control signal, and it stays correct when text and tool_use blocks arrive in the same turn. The tempting near-miss is checking the last block rather than the first: block ordering is not guaranteed, a turn can carry several tool_use blocks, and it still cannot distinguish end_turn from max_tokens, which stop_reason reports directly.",
+      "explain": "stop_reason is the only authoritative loop-control signal, and it stays correct when text and tool_use blocks arrive in the same turn. The tempting near-miss is checking the last block rather than the first: block ordering is not guaranteed, a turn can carry several tool_use blocks, and it still cannot distinguish end_turn from max_tokens, which stop_reason reports directly. Current docs: other stop_reason values now exist (pause_turn, refusal, model_context_window_exceeded), but tool_use and end_turn remain the loop's core signals.",
       "scenario": 1
     },
     {
@@ -427,7 +427,7 @@
     {
       "domain": "Agentic Arch",
       "d": 2,
-      "q": "You're building a coordinator that delegates to subagents via the Task tool, but subagents behave as if they know nothing about the research context the coordinator has. Why?",
+      "q": "You're building a coordinator that delegates to subagents via the Task (now Agent) tool, but subagents behave as if they know nothing about the research context the coordinator has. Why?",
       "options": [
         "Subagent prompts are truncated to a fixed token budget, so long research context passed in is dropped before the run begins.",
         "Subagents inherit the parent transcript only up to the last compaction, so everything gathered after it is missing from their view.",
@@ -435,7 +435,7 @@
         "Subagents run with isolated context and do not inherit parent history, so needed findings must be restated in each subagent prompt."
       ],
       "correct": 3,
-      "explain": "Subagents start with isolated context and never inherit the coordinator's history, so every relevant finding has to be written into the subagent's prompt. The tempting near-miss is partial inheritance up to the last compaction — ruled out because the subagents behave as if they know nothing at all, not as if they are missing only the most recent stretch.",
+      "explain": "Subagents start with isolated context and never inherit the coordinator's history, so every relevant finding has to be written into the subagent's prompt. The tempting near-miss is partial inheritance up to the last compaction — ruled out because the subagents behave as if they know nothing at all, not as if they are missing only the most recent stretch. Current docs: non-fork subagents start fresh with no parent conversation; a fork is the exception.",
       "scenario": 3
     },
     {
@@ -477,7 +477,7 @@
         "Put the 18 tools behind one dispatcher tool taking an action name, so the model only ever has a single tool to choose from."
       ],
       "correct": 2,
-      "explain": "Selection reliability falls as the tool count grows, and an agent cannot misuse a tool it was never given, so scoping each role to a handful of tools is the structural fix. The tempting near-miss is grouping all 18 by role in the system prompt — the synthesis subagent still has web search available, so a soft instruction is all that stands between it and the same wrong call.",
+      "explain": "Selection reliability falls as the tool count grows, and an agent cannot misuse a tool it was never given, so scoping each role to a handful of tools is the structural fix. The tempting near-miss is grouping all 18 by role in the system prompt — the synthesis subagent still has web search available, so a soft instruction is all that stands between it and the same wrong call. Current docs: Claude Code defers MCP tool definitions by default (tool search), so the problem here is ambiguous selection, not context size.",
       "scenario": 3
     },
     {
@@ -771,7 +771,7 @@
         "Use tool_choice: 'none' and put the schema in the prompt, then validate the returned JSON text against that schema in the consumer"
       ],
       "correct": 0,
-      "explain": "With one known document type, naming the tool eliminates conversational replies and wrong-tool selection together. tool_choice 'any' is the strong near-miss: it does forbid text, but it leaves selection to the model, which matters as soon as a second tool is added and is not the guarantee the scenario asks for.",
+      "explain": "With one known document type, naming the tool eliminates conversational replies and wrong-tool selection together. tool_choice 'any' is the strong near-miss: it does forbid text, but it leaves selection to the model, which matters as soon as a second tool is added and is not the guarantee the scenario asks for. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs.",
       "scenario": 6
     },
     {
@@ -908,10 +908,10 @@
         "The subagent's system prompt is too terse for the coordinator's matcher to score it as relevant to the incoming request",
         "Subagent definitions must also be declared in CLAUDE.md before the coordinator will treat them as spawnable at runtime",
         "The subagent's description does not match the task wording, so the coordinator scores it as a poor fit and handles the request itself",
-        "The Task/Agent tool is absent from the coordinator's allowedTools, so it has no mechanism to delegate and silently does the work inline"
+        "The coordinator's tool set (tools/disallowedTools) excludes the Task/Agent tool, so it has no mechanism to delegate and silently does the work inline"
       ],
       "correct": 3,
-      "explain": "Delegation is explicit wiring: with no Task (Agent) tool in the coordinator's allowed tool list there is no mechanism to spawn anything, so it completes the work inline without erroring. The vague-description option is the strong near-miss — a poor description really can suppress selection, but that usually shows up as inconsistent delegation, whereas here the subagent is never spawned at all.",
+      "explain": "Delegation is explicit wiring: with the Task (Agent) tool excluded from the coordinator's tool set there is no mechanism to spawn anything, so it completes the work inline without erroring. The vague-description option is the strong near-miss — a poor description really can suppress selection, but that usually shows up as inconsistent delegation, whereas here the subagent is never spawned at all. Current docs: allowedTools only pre-approves tools; delegation is removed through tools or disallowedTools, and the Task tool is now named Agent; Task remains an alias.",
       "scenario": 3
     },
     {
@@ -1051,7 +1051,7 @@
         "Retype the field as a plain string and defer all interpretation to the consumer, which already knows which locale each source uses"
       ],
       "correct": 1,
-      "explain": "The schema types the field loosely enough that every observed form validates, so the canonical representation has to be specified in the extraction instructions — state ISO 8601 and consistency is produced at source. The format:'date' option is the strong near-miss: it names a real JSON Schema annotation, but format is advisory and commonly unenforced, and the scenario already reports validation passing on every variant.",
+      "explain": "The schema types the field loosely enough that every observed form validates, so the canonical representation has to be specified in the extraction instructions — state ISO 8601 and consistency is produced at source. The format:'date' option is the strong near-miss: it names a real JSON Schema annotation, but format:'date' is only enforced where the API's structured outputs support it, and the scenario already reports validation passing on every variant, so state ISO 8601 in the instructions and keep the schema consistent.",
       "scenario": 6
     },
     {
@@ -1247,7 +1247,7 @@
         "Force `record_invoice` with `tool_choice`, and sequence the work so the vendor lookup happens in an earlier call whose result is passed in."
       ],
       "correct": 3,
-      "explain": "Forcing the specific tool guarantees the structured call instead of prose, and because the forced turn cannot also call `fetch_vendor`, the prerequisite lookup has to be its own earlier step whose result is fed forward. The near-miss relies on a required schema field to force the lookup: a required field only makes the model fill the slot, which it can do by guessing rather than by calling `fetch_vendor`.",
+      "explain": "Forcing the specific tool guarantees the structured call instead of prose, and because the forced turn cannot also call `fetch_vendor`, the prerequisite lookup has to be its own earlier step whose result is fed forward. The near-miss relies on a required schema field to force the lookup: a required field only makes the model fill the slot, which it can do by guessing rather than by calling `fetch_vendor`. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs.",
       "scenario": 6
     },
     {

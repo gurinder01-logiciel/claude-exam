@@ -671,7 +671,7 @@
         "A <code>stop_reason</code> of <code>tool_use</code> with no tools left to run"
       ],
       "correct": 0,
-      "explain": "<code>end_turn</code> is the only reliable signal that the task is finished. The loop is: send, inspect <code>stop_reason</code>, run tools if it says <code>tool_use</code>, append the results, repeat. <code>tool_use</code> means the model asked for a tool, so the loop must continue; a message with no text blocks is not a protocol signal; <code>max_tokens</code> means the response was cut off, not that it finished."
+      "explain": "<code>end_turn</code> is the signal that the model has finished its turn. The loop is: send, inspect <code>stop_reason</code>, run tools if it says <code>tool_use</code>, append the results, repeat. <code>tool_use</code> means the model asked for a tool, so the loop must continue; a message with no text blocks is not a protocol signal; <code>max_tokens</code> means the response was cut off, not that it finished. Current docs: other stop reasons such as pause_turn, refusal and model_context_window_exceeded also exist, but end_turn is still the normal finish signal."
     },
     {
       "domain": "Agentic Architecture & Orchestration",
@@ -699,7 +699,7 @@
         "Only the first one is executed"
       ],
       "correct": 2,
-      "explain": "Several Task calls in one response run in parallel; that is the lever for spreading independent fieldwork. Queuing them one after another, running only the first, or failing as ambiguous do not happen — parallelism is precisely why you group the calls into one response."
+      "explain": "Several Task calls in one response run in parallel; that is the lever for spreading independent fieldwork. Queuing them one after another, running only the first, or failing as ambiguous do not happen — parallelism is precisely why you group the calls into one response. Current docs: the Task tool is now named Agent; Task remains an alias."
     },
     {
       "domain": "Agentic Architecture & Orchestration",
@@ -771,13 +771,13 @@
         "Only Markdown files can be imported, never configuration files",
         "Relative paths resolve against the file doing the importing",
         "Imported files load only when the model explicitly asks for them",
-        "Imports can nest, but only up to a maximum depth of five"
+        "Imports can nest, but only up to a maximum depth of four hops"
       ],
       "correct": [
         2,
         4
       ],
-      "explain": "Relative paths resolve against the importing file, and nesting is capped at five levels; imports are for splitting long conventions into maintainable pieces. Imports load with the CLAUDE.md that references them, not only when the model asks; there is no space between the @ and the path; and non-Markdown files such as a README or package.json can be imported."
+      "explain": "Relative paths resolve against the importing file, and nesting is capped at four hops; imports are for splitting long conventions into maintainable pieces. Imports load with the CLAUDE.md that references them, not only when the model asks; there is no space between the @ and the path; and non-Markdown files such as a README or package.json can be imported."
     },
     {
       "domain": "Claude Code Config & Workflows",
@@ -887,7 +887,7 @@
         1,
         4
       ],
-      "explain": "any forces the model to call some tool, which guarantees a structured result; forcing a specific tool enforces execution order. auto is the opposite of a guarantee — it lets the model answer in text, which is also why 'any when the model should be free to answer in text' describes auto, not any; forcing a tool controls which tool is called, not whether the facts are hallucinated."
+      "explain": "any forces the model to call some tool, which guarantees a structured result; forcing a specific tool enforces execution order. auto is the opposite of a guarantee — it lets the model answer in text, which is also why 'any when the model should be free to answer in text' describes auto, not any; forcing a tool controls which tool is called, not whether the facts are hallucinated. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs."
     },
     {
       "domain": "Prompt Engineering & Structured Output",
@@ -939,7 +939,7 @@
       "options": [
         "It costs around half of the equivalent synchronous calls",
         "It guarantees a response within a fixed low-latency window",
-        "It supports multi-turn tool calling inside a single batch entry",
+        "It runs the tool and continues the loop on its own inside a single batch entry",
         "The whole batch must be resubmitted if any single entry fails",
         "Requests are correlated to their responses by a custom identifier"
       ],
@@ -947,7 +947,7 @@
         0,
         4
       ],
-      "explain": "Batches save about 50% and use your own <code>custom_id</code> to pair each request with its response. The processing window is up to 24 hours with no latency guarantee, so a low-latency guarantee is wrong. Multi-turn tool calling inside one batch entry is not supported; and only the failed entries are resubmitted (in a new batch), not the whole batch."
+      "explain": "Batches save about 50% and use your own <code>custom_id</code> to pair each request with its response. The processing window is up to 24 hours with no latency guarantee, so a low-latency guarantee is wrong. A batch entry is one request and one response, so no tool loop runs inside it; and only the failed entries are resubmitted (in a new batch), not the whole batch."
     },
     {
       "domain": "Tool Design & MCP Integration",
