@@ -588,6 +588,174 @@
       ],
       "correct": 0,
       "explain": "The customer has asked for a person in plain words. An explicit request for a human is honoured at once, and the history goes with it so they do not have to explain a third time.<br><b>Not “Acknowledge the frustration and ask one targeted question about the…”</b> — The customer has already explained twice and asked for a person. One more question delays a clear request.<br><b>Not “Explain briefly what the agent can help with and offer a quick fix,…”</b> — This overrides what the customer asked for. Offering to help first fits only when they have not asked for a person.<br><b>Not “Call <code>get_customer</code> and <code>lookup_order</code> first to gather account cont…”</b> — Looking things up first makes an angry customer wait for work nobody asked for. The human agent can pull the account; what they need from the agent is the conversation history."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 3,
+      "q": "A research coordinator currently sends every incoming question through its full pipeline: decompose, spawn four search subagents, then synthesise. About a third of the questions are single-fact lookups such as the founding year of a company, and users of those expect an answer within a few seconds, with a citation. What change fits?",
+      "options": [
+        "Keep the full pipeline for everything but run the four search subagents in parallel, so the added decomposition and synthesis steps overlap with the searches",
+        "Let the coordinator size the delegation: one cited search subagent for a narrow lookup, full fan-out for broad questions",
+        "Route by a fixed rule: any question under twelve words skips subagents and is answered by the coordinator directly from its own knowledge",
+        "Cache every earlier answer and serve the nearest cached one first, falling back to the full pipeline on a miss"
+      ],
+      "correct": 1,
+      "constraint": "Single-fact lookups need a cited answer within seconds, while open-ended questions still need breadth.",
+      "breaks": [
+        "Single-fact lookups still pay for decomposition, four searches and synthesis, so the few-second target is missed",
+        null,
+        "Answering without a search subagent drops the required citation, and word count is a poor proxy for scope",
+        "New single-fact questions are rarely a cache hit, so most still take the slow full path"
+      ],
+      "explain": "The coordinator owns scope: it should size the delegation to the question. One cited subagent call handles a narrow lookup, and the fan-out is reserved for broad topics. Running the same pipeline in parallel (near-miss) still pays decomposition and synthesis on every question, and a word-count rule (near-miss) drops the citation requirement."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 2,
+      "scenario": 1,
+      "q": "To keep context small, a developer's agent loop executes each requested tool but appends only the string 'tool call completed' as the next user message. The agent then calls the same lookup tool again and again until the loop's iteration cap stops it. The loop already branches correctly on stop_reason. What is the fix?",
+      "options": [
+        "Append the real output as a tool_result with the matching tool_use_id, trimming bulky fields",
+        "Add a system prompt line forbidding the agent from repeating a tool call it already made in this conversation",
+        "Deduplicate identical tool calls in code and return an error on the second attempt so loops cannot form",
+        "Raise the iteration cap so the agent has more attempts to work out the result"
+      ],
+      "correct": 0,
+      "constraint": "The model can only act on what it receives: the result of each tool call must reach it.",
+      "breaks": [
+        null,
+        "a prompt cannot supply the missing data, so the model still cannot move to a different step",
+        "the result is still withheld, so the agent now errors instead of looping",
+        "more iterations, still no tool result, so the agent keeps repeating the call"
+      ],
+      "explain": "Tool results are the model's only view of what happened. Dropping them turns a control-flow bug into a loop; caps and firmer prompts (near-misses) treat the symptom. Keeping context small is done by trimming fields, not removing the result."
+    },
+    {
+      "domain": "Agentic Architecture & Orchestration",
+      "d": 3,
+      "scenario": 2,
+      "q": "A session mapped a payments module over two days. Since then a refactor rewrote about 70% of those files and renamed the main service class, so most earlier tool results in the transcript are wrong. The team still wants to keep the three architectural decisions the session reached, which remain valid. Which continuation fits?",
+      "options": [
+        "Resume the named session and tell it which files changed so it re-analyses only those files, keeping everything else",
+        "Use fork_session from the old transcript so the original stays untouched",
+        "Start a fresh session and inject a short summary of the three still-valid decisions",
+        "Start fresh with no summary and let the new session rediscover the design entirely from the current code"
+      ],
+      "correct": 2,
+      "constraint": "Most earlier tool results are stale, but a small set of conclusions is still valid and wanted.",
+      "breaks": [
+        "With most files rewritten, the transcript is dominated by stale results and the re-analysis list is nearly everything",
+        "The fork carries the same stale tool results into the new branch",
+        null,
+        "The three agreed decisions are lost and would have to be re-derived"
+      ],
+      "explain": "Resuming suits a mostly-unchanged codebase with a targeted heads-up about changed files. When most results are stale, a fresh start with a distilled summary keeps the conclusions and drops the stale evidence. Forking copies the staleness."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 2,
+      "scenario": 3,
+      "q": "A synthesis subagent needs to read contracts that sit in the company's own document store. Today it has a fetch_url tool that can download any address, and a security review flags that a poisoned search result could make it fetch an arbitrary external page. The subagent only ever needs documents by internal ID. What should the team do?",
+      "options": [
+        "Keep fetch_url and add a system prompt instruction to only fetch addresses that belong to the company document store",
+        "Move fetch_url to the coordinator and have the subagent ask the coordinator for each document it needs to read",
+        "Replace fetch_url with a load_document tool taking an internal document ID",
+        "Give the subagent every available tool and rely on tool descriptions to steer it"
+      ],
+      "correct": 2,
+      "constraint": "The subagent needs documents by internal ID only, and must not be able to reach arbitrary addresses.",
+      "breaks": [
+        "A prompt instruction is not a hard limit, so arbitrary fetches remain possible",
+        "fetch_url would still exist, so a poisoned result could still drive an arbitrary fetch, now from the coordinator",
+        null,
+        "A larger toolset and broader access make wrong selection and misuse more likely, not less"
+      ],
+      "explain": "Least privilege means giving a role a narrow tool shaped to its job, not a general fetch. A prompt rule (near-miss) is guidance, and routing everything through the coordinator (near-miss) adds latency for a simple, frequent need."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 2,
+      "scenario": 1,
+      "q": "An MCP server's issue_credit tool rejects a request over the account's monthly limit. The server returns a JSON-RPC protocol error with code -32602 and message 'Invalid params'. The agent's reply to the customer says the system is broken, instead of explaining the limit. The agent must be able to explain the limit to the customer. What is the better design?",
+      "options": [
+        "Keep the protocol error but change the message to describe the monthly limit and the account's current usage in more detail",
+        "Return a successful result with an empty body so the agent falls back to its default reply",
+        "Mark the error retryable so the agent tries again later until the monthly limit resets for the account",
+        "Return a normal tool result with isError: true and a business message stating the limit"
+      ],
+      "correct": 3,
+      "constraint": "The model must see the rejection as a tool result it can reason about.",
+      "breaks": [
+        "Protocol-level errors signal malformed requests and are not presented to the model as a result to reason on",
+        "An empty success looks like a valid empty answer and hides that a limit was hit",
+        "A business limit will not clear on retry, so retrying wastes calls and misleads the customer",
+        null
+      ],
+      "explain": "Protocol errors are for malformed or unsupported requests. A rule rejection is a tool-execution outcome, returned in the result with isError true and enough category and retry guidance for the model to respond. Marking it retryable (near-miss) invites loops. The near-miss is the first option: a protocol error with a better message is still a protocol-level failure and does not reach the model as a result it can explain."
+    },
+    {
+      "domain": "Tool Design & MCP Integration",
+      "d": 2,
+      "scenario": 4,
+      "q": "A team's .mcp.json has a remote code-search server added as {\"url\": \"https://search.vendor.example/mcp\", \"headers\": {\"Authorization\": \"Bearer ${SEARCH_TOKEN}\"}}. The server never appears among the available tools. The vendor hosts the server and no local process may be started. What is the most likely fix?",
+      "options": [
+        "Add \"type\": \"http\" to the entry so the client treats the URL as an HTTP server",
+        "Rewrite the entry as a stdio server launched with npx using the same token and arguments",
+        "Replace ${SEARCH_TOKEN} with the literal token to rule out expansion problems",
+        "Add a CLAUDE.md line telling Claude to use the search server"
+      ],
+      "correct": 0,
+      "constraint": "The server is vendor-hosted and cannot be run as a local process.",
+      "breaks": [
+        null,
+        "The server is hosted remotely and no local process may be started",
+        "A literal secret would be committed to a shared file, and expansion is not the problem",
+        "A prompt cannot create a connection that the configuration never declared"
+      ],
+      "explain": "A remote entry needs its transport declared; without it the client cannot treat the URL as an HTTP server. Environment-variable expansion is the correct way to keep the token out of the file, and prompts cannot connect servers. The near-miss is the stdio rewrite: it would work for a locally runnable server, but a url with no type is read as stdio and skipped, and this server is vendor-hosted so no local process is allowed."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 3,
+      "scenario": 1,
+      "q": "A support agent's system prompt starts with the customer's name and account, then a 22,000-token policy handbook that is identical for every customer; tool definitions are sent as usual. Prompt caching is enabled, yet the cache hit rate is near zero. What fix is most direct?",
+      "options": [
+        "Keep the customer details at the top and add a second cache breakpoint after the handbook",
+        "Put the handbook first in the system prompt and the customer details after it",
+        "Shorten the handbook to 5,000 tokens by deleting older sections",
+        "Summarise the handbook for each customer before sending it, to keep the prompt small and focused"
+      ],
+      "correct": 1,
+      "constraint": "The cached portion must be an unchanging prefix of the request.",
+      "breaks": [
+        "the prefix still changes at the top for every customer, so nothing after it can match the cache",
+        null,
+        "the content the agent needs would be lost, and the per-customer header would still defeat the cache",
+        "A per-customer summary also differs on every request"
+      ],
+      "explain": "Caching matches on an identical prefix, so static content goes first and dynamic content last. The near-miss is the extra breakpoint: it only helps when the text before it is unchanged, and a per-customer header changes the prefix on every request."
+    },
+    {
+      "domain": "Context Management & Reliability",
+      "d": 2,
+      "scenario": 1,
+      "q": "A customer asks the support agent for a refund on an item bought 90 days ago. The refund policy states explicitly that returns are accepted only within 30 days, with no exceptions for any product category. The customer is polite and has not asked for a human. What should the agent do?",
+      "options": [
+        "Ask the customer to rate their frustration and escalate if it is high",
+        "Escalate to a human because the request violates the stated policy and the agent cannot approve it",
+        "Issue the refund once as a goodwill gesture to protect satisfaction, then note it in the account history",
+        "Decline within policy, explain the 30-day rule, and offer what the policy does allow"
+      ],
+      "correct": 3,
+      "constraint": "The policy explicitly covers the request; it is not a gap.",
+      "breaks": [
+        "Self-reported sentiment is not a valid escalation signal",
+        "A clear policy answer exists, so escalation is not warranted",
+        "The agent has no authority to override an explicit policy",
+        null
+      ],
+      "explain": "Escalate for an explicit human request, a policy gap, or no progress. An explicit policy that says no is a case to apply, not to escalate. A sentiment trigger (near-miss) is unreliable."
     }
   ]
 }

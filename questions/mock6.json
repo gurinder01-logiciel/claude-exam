@@ -273,15 +273,15 @@
       "domain": "Claude Code Config & Workflows",
       "d": 3,
       "scenario": 2,
-      "q": "A skill at <code>.claude/skills/security-audit/SKILL.md</code> has <code>allowed-tools: [\"Read\", \"Grep\"]</code> in its frontmatter, meant to keep it to pure file analysis. Mid-run, it decides it needs to actually execute a quick <code>node --check</code> on a module to confirm it's syntactically importable, and attempts to use <code>Bash</code>. What stops this from working?",
+      "q": "A skill at <code>.claude/skills/security-audit/SKILL.md</code> has <code>allowed-tools: [\"Read\", \"Grep\"]</code> in its frontmatter, meant to keep it to pure file analysis. Mid-run, it decides it needs to actually execute a quick <code>node --check</code> on a module to confirm it's syntactically importable, and attempts to use <code>Bash</code>. What actually happens when it attempts to use <code>Bash</code>?",
       "options": [
         "<code>Bash</code> isn't in the skill's <code>allowed-tools</code> list, so the skill cannot invoke a tool outside that set",
-        "<code>allowed-tools</code> is only advisory — the call goes through, just with an extra permission prompt",
+        "Nothing in the skill blocks it: <code>allowed-tools</code> only pre-approves the listed tools, so <code>Bash</code> stays callable and the session's permission settings decide whether it prompts or runs",
         "<code>Bash</code> is categorically disallowed inside any skill, regardless of configuration",
-        "<code>allowed-tools</code> doesn't actually restrict anything; a skill can use any tool available to the parent session"
+        "<code>allowed-tools</code> is ignored entirely, so <code>Bash</code> runs at once with no permission check, whatever the permission settings say"
       ],
-      "correct": 0,
-      "explain": "<code>allowed-tools</code> genuinely restricts a skill to the listed tools; a skill can't reach for <code>Bash</code> if it isn't on that list, full stop — this isn't an advisory setting or a blanket ban on <code>Bash</code> specifically, and it does actually constrain what the skill can do (ruling out D).<br><b>Not “<code>allowed-tools</code> is only advisory — the call goes through, just with…”</b> — <code>allowed-tools</code> is not merely advisory in the way this describes. The skill cannot reach for a tool outside the list.<br><b>Not “<code>Bash</code> is categorically disallowed inside any skill, regardless of …”</b> — <code>Bash</code> is not banned in every skill. A skill can use it if it is on the allowed list, so this is not a blanket restriction.<br><b>Not “<code>allowed-tools</code> doesn't actually restrict anything; a skill can use…”</b> — <code>allowed-tools</code> does restrict the skill to the listed tools, so it is wrong that a skill can use any tool from the parent session."
+      "correct": 1,
+      "explain": "<code>allowed-tools</code> means “tools Claude can use without asking permission during the turn that invokes this skill”. It does not restrict which tools are available: every tool remains callable, and your permission settings still govern tools that are not listed, so <code>Bash</code> is subject to the normal permission flow. To actually block it, use <code>disallowed-tools</code> or a deny rule.<br><b>Not “<code>Bash</code> isn't in the skill's <code>allowed-tools</code> list…”</b> — this is the near-miss: it reads the field as a restriction, which it is not.<br><b>Not “<code>Bash</code> is categorically disallowed inside any skill…”</b> — <code>Bash</code> is not banned in skills.<br><b>Not “<code>allowed-tools</code> is ignored entirely…”</b> — the field does take effect (listed tools skip the prompt), and permission settings still govern <code>Bash</code>, so it does not run unchecked."
     },
     {
       "domain": "Claude Code Config & Workflows",

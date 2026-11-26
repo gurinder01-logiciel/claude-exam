@@ -527,13 +527,13 @@
       "scenario": 4,
       "q": "A skill should be limited to file-write operations only, with no ability to run destructive <code>Bash</code> commands. Which frontmatter option enforces this?",
       "options": [
-        "There is no way to restrict a skill's tool access",
+        "<code>disallowed-tools</code>",
         "<code>allowed-tools</code>",
         "<code>argument-hint</code>",
         "<code>context: fork</code>"
       ],
-      "correct": 1,
-      "explain": "<code>allowed-tools</code> directly restricts which tools a skill can invoke, letting it be scoped to file-write only; <code>context: fork</code> isolates context/output, not tool permissions.<br><b>Not “There is no way to restrict a skill's tool access”</b> — Tool access can be restricted for a skill, so there is a way to do this. The frontmatter provides an option for it.<br><b>Not “<code>argument-hint</code>”</b> — <code>argument-hint</code> merely describes expected arguments and has no effect on which tools the skill may use.<br><b>Not “<code>context: fork</code>”</b> — <code>context: fork</code> isolates the skill's context and output. It does not limit which tools it can invoke, so destructive <code>Bash</code> commands would still be possible."
+      "correct": 0,
+      "explain": "<code>disallowed-tools</code> in the skill's frontmatter (or a deny rule in permission settings) is what blocks a tool such as <code>Bash</code>. <code>allowed-tools</code> is the near-miss: it only lets Claude use the listed tools without asking permission during the skill's turn, and every other tool remains callable under your permission settings.<br><b>Not “<code>allowed-tools</code>”</b> — it pre-approves tools, it does not restrict which are available, so <code>Bash</code> would still be callable.<br><b>Not “<code>argument-hint</code>”</b> — <code>argument-hint</code> merely describes expected arguments and has no effect on which tools the skill may use.<br><b>Not “<code>context: fork</code>”</b> — <code>context: fork</code> isolates the skill's context and output. It does not limit which tools it can invoke, so destructive <code>Bash</code> commands would still be possible."
     },
     {
       "domain": "Claude Code Config & Workflows",

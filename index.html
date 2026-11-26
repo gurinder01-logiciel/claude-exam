@@ -448,6 +448,26 @@
   .review-opt.neutral { color: var(--text-dim); }
   .review-opt.struck-review { opacity: 0.5; text-decoration: line-through; text-decoration-color: var(--bad); }
   .review-explain { margin-top: 10px; padding: 12px 14px; background: var(--surface-2); border-radius: 8px; font-size: 0.86rem; color: var(--text-dim); line-height: 1.55; }
+  /* Trap review cards + tutor prompt button */
+  .trap-intro { color: var(--text-dim); font-size: 0.86rem; margin: 0 0 12px; }
+  .trap-card { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; }
+  .trap-card.flag-only { border-left-color: var(--amber); }
+  .trap-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .trap-q { font-size: 0.92rem; line-height: 1.55; margin-bottom: 10px; overflow-wrap: anywhere; }
+  .trap-row { font-size: 0.86rem; line-height: 1.5; margin: 6px 0; padding: 8px 10px; border-radius: 8px; background: var(--surface-2); overflow-wrap: anywhere; }
+  .trap-row .tr-lbl { display: block; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-dim); margin-bottom: 2px; }
+  .trap-row.constraint { border-left: 3px solid var(--amber); }
+  .trap-row.picked { border-left: 3px solid var(--bad); }
+  .trap-row.picked .breaks { color: var(--bad); font-weight: 600; margin-top: 4px; }
+  .trap-row.correct { border-left: 3px solid var(--good); }
+  .trap-actions { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .tutor-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); border-radius: 20px; padding: 5px 12px; font-size: 0.78rem; font-weight: 600; font-family: inherit; cursor: pointer; }
+  .tutor-btn:hover { border-color: var(--lime); color: var(--lime); }
+  .tutor-btn.copied { background: var(--lime-dim); border-color: var(--lime); color: var(--lime); }
+  .fb-constraint { margin-bottom: 8px; padding: 6px 10px; border-left: 3px solid var(--amber); background: var(--surface); border-radius: 6px; }
+  .fb-tools { margin-top: 10px; }
+  .len-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 12px; font-size: 0.82rem; color: var(--text-dim); }
+  .len-row .lbl { font-weight: 600; }
   .tag-mini { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 12px; }
   /* Prep resources — right-hand panel on the start screen, stacked below on narrow screens */
   .prep {
@@ -601,6 +621,23 @@ async function loadLevels() {
       questions: Array.isArray(lv.questions) ? lv.questions : []
     };
   });
+  warnBlueprintMismatch();
+}
+
+// A blueprint that doesn't match the question domains silently disables the
+// domain-weighted draw, so say so once per load (pool / scenarioPick levels
+// never use it and are skipped).
+function warnBlueprintMismatch() {
+  Object.entries(LEVELS).forEach(([key, lv]) => {
+    if (!Array.isArray(lv.blueprint) || !lv.blueprint.length || lv.pool || lv.scenarioPick || !lv.questions.length) return;
+    if (blueprintApplies(lv, lv.questions)) return;
+    const labels = new Set(lv.blueprint.map(b => b.label));
+    const domains = new Set(lv.questions.map(q => q.domain));
+    const noQs = [...labels].filter(l => !domains.has(l));
+    const noBp = [...domains].filter(d => !labels.has(d));
+    console.warn(`[blueprint] level "${key}": domain-weighted draw disabled (plain ramped draw used). ` +
+      `Blueprint labels with no questions: ${JSON.stringify(noQs)}; question domains not in blueprint: ${JSON.stringify(noBp)}`);
+  });
 }
 
 
@@ -608,6 +645,32 @@ const SECONDS_PER_QUESTION = 120; // real exam pace: 60 questions / 120 minutes
 const FULL_EXAM_COUNT = 60;       // real exam length
 const EXAM_DURATION = FULL_EXAM_COUNT * SECONDS_PER_QUESTION; // 120 minutes
 const PASS_SCORE = 720; // out of 1000
+
+// Levels that offer a choice of paper length. The real CCAR-P sitting is 63
+// items in 120 minutes (not 2 min/question), so a "real" length carries its own
+// time limit; any other length keeps the 2 min/question pace.
+const LENGTH_CHOICES = {
+  architectPro: { options: [60, 63], real: 63, realSeconds: 120 * 60, label: 'Architect Professional' }
+};
+const LENGTH_KEY = 'ccap_length';
+function chosenLength(key) {
+  const c = LENGTH_CHOICES[key];
+  if (!c) return null;
+  let v = c.options[0];
+  try { const s = Number(localStorage.getItem(LENGTH_KEY + ':' + key)); if (c.options.includes(s)) v = s; } catch {}
+  return v;
+}
+function setLength(key, n) {
+  try { localStorage.setItem(LENGTH_KEY + ':' + key, String(n)); } catch {}
+}
+// Questions and seconds for a level, honouring the chosen length.
+function paperSize(key, level) {
+  const bankN = level.count || level.questions.length;
+  const c = LENGTH_CHOICES[key];
+  const n = c ? Math.min(chosenLength(key), level.questions.length) : bankN;
+  const seconds = c && n === c.real ? c.realSeconds : n * SECONDS_PER_QUESTION;
+  return { n, seconds };
+}
 
 // Duration for a given level = 2 minutes per question (real exam pace)
 function durationFor(level) {
@@ -772,13 +835,58 @@ function buildScenarioPaper(bank, n, { pick, weights }) {
   return blocks.flatMap(b => b.questions);
 }
 
+// Domain-weighted draw. When a level has a `blueprint` ([{label, pct}]) whose
+// labels are exactly the domains used by its questions, each sitting draws per
+// domain by those percentages (largest remainder, summing to n). A domain with
+// fewer questions than its quota gives all it has, and the shortfall is
+// redistributed over the other domains in proportion to their pct. Levels whose
+// blueprint labels don't match question domains (older banks use loose labels)
+// are left to the plain ramped draw.
+function blueprintApplies(level, bank) {
+  const bp = level.blueprint;
+  if (!Array.isArray(bp) || !bp.length || level.pool || level.scenarioPick) return false;
+  const labels = new Set(bp.map(b => b.label));
+  const domains = new Set(bank.map(q => q.domain));
+  return [...domains].every(d => labels.has(d)) && bp.every(b => b.pct > 0 && domains.has(b.label));
+}
+function largestRemainder(weights, total, caps) {
+  // weights: array; caps: max per slot. Returns integer allocation summing to
+  // min(total, sum caps), never exceeding caps.
+  const out = weights.map(() => 0);
+  let left = total;
+  while (left > 0) {
+    const open = weights.map((w, i) => (out[i] < caps[i] ? i : -1)).filter(i => i >= 0);
+    if (!open.length) break;
+    const wsum = open.reduce((a, i) => a + weights[i], 0);
+    const exact = open.map(i => ({ i, want: left * weights[i] / wsum }));
+    let given = 0;
+    exact.forEach(e => { const g = Math.min(Math.floor(e.want), caps[e.i] - out[e.i]); out[e.i] += g; given += g; });
+    let rem = left - given;
+    exact.sort((a, b) => (b.want - Math.floor(b.want)) - (a.want - Math.floor(a.want)));
+    for (const e of exact) { if (rem > 0 && out[e.i] < caps[e.i]) { out[e.i]++; rem--; given++; } }
+    if (given === 0) break;
+    left -= given;
+  }
+  return out;
+}
+function drawByBlueprint(bank, n, blueprint) {
+  const groups = blueprint.map(b => shuffle(bank.filter(q => q.domain === b.label)));
+  const take = largestRemainder(blueprint.map(b => b.pct), n, groups.map(g => g.length));
+  return groups.flatMap((g, i) => g.slice(0, take[i]));
+}
+// Ramp-ordered paper of n questions, domain-weighted when the level allows it.
+function drawPaper(level, bank, n) {
+  const pool = blueprintApplies(level, bank) ? drawByBlueprint(bank, n, level.blueprint) : bank;
+  return buildRampedPaper(pool, n);
+}
+
 // Build the question pool for a level.
 //  - pool: true         → draw from every other level's bank (fresh paper each sitting)
 //  - scenarioPick set   → draw that many scenarios and group their questions
 //  - count set          → draw `count` from the bank
 //  - otherwise          → use the whole bank
 // In all cases difficulty ramps across the paper.
-function buildQuestions(level) {
+function buildQuestions(level, countOverride) {
   let bank;
   if (level.pool) {
     bank = [];
@@ -786,10 +894,10 @@ function buildQuestions(level) {
   } else {
     bank = level.questions;
   }
-  const n = Math.min(level.count || bank.length, bank.length);
+  const n = Math.min(countOverride || level.count || bank.length, bank.length);
   const raw = level.scenarioPick
     ? buildScenarioPaper(bank, n, { pick: level.scenarioPick, weights: level.scenarioWeights || {} })
-    : buildRampedPaper(bank, n);
+    : drawPaper(level, bank, n);
   return prepQuestions(raw, { keepOrder: true });
 }
 
@@ -1129,10 +1237,14 @@ function prepQuestions(raw, { keepOrder = false } = {}) {
   // the shuffled options, and `multi` records which kind the author wrote.
   return list.map(q => {
     const multi = Array.isArray(q.correct);
-    const correctTexts = (multi ? q.correct : [q.correct]).map(i => q.options[i]);
-    const opts = shuffle(q.options);
-    const correct = correctTexts.map(t => opts.indexOf(t)).sort((a, b) => a - b);
-    return { ...q, options: opts, multi, correct };
+    // Shuffle option *indices* so `correct` and the optional `breaks` array
+    // (one entry per authored option) follow the options through the shuffle.
+    const order = shuffle(q.options.map((_, i) => i));
+    const opts = order.map(i => q.options[i]);
+    const correct = (multi ? q.correct : [q.correct]).map(i => order.indexOf(i)).sort((a, b) => a - b);
+    const breaks = Array.isArray(q.breaks) && q.breaks.length === q.options.length
+      ? order.map(i => q.breaks[i] || null) : null;
+    return { ...q, options: opts, multi, correct, breaks };
   });
 }
 
@@ -1372,15 +1484,15 @@ function renderStart() {
     let badge, badgeClass;
     if (!lv.ready) { badge = 'Soon'; badgeClass = 'badge-soon'; }
     else if (!unlocked) { badge = '🔒 Locked'; badgeClass = 'badge-soon'; }
-    else { badge = (lv.count || lv.questions.length) + ' Qs · ' + Math.round(durationFor(lv)/60) + ' min'; badgeClass = 'badge-ready'; }
+    else { const ps = paperSize(key, lv); badge = ps.n + ' Qs · ' + Math.round(ps.seconds/60) + ' min'; badgeClass = 'badge-ready'; }
     let meta = '';
     if (!unlocked && lv.ready) {
       meta = `Finish <b>${escapeHtml(requiredName || '')}</b> to unlock`;
     } else if (available) {
       const bank = lv.pool ? Object.values(LEVELS).filter(x => !x.pool && x.inPool).flatMap(x => x.questions) : lv.questions;
-      const n = Math.min(lv.count || bank.length, bank.length);
+      const n = Math.min(paperSize(key, lv).n, bank.length);
       const c = { 1: 0, 2: 0, 3: 0 };
-      buildRampedPaper(bank, n).forEach(q => c[q.d || 2]++);
+      drawPaper(lv, bank, n).forEach(q => c[q.d || 2]++);
       const ramp = [c[1] && `${c[1]} easy`, c[2] && `${c[2]} medium`, c[3] && `${c[3]} hard`].filter(Boolean).join(' · ');
       meta = (bank.length > n ? `Fresh draw from ${bank.length} · ` : '') + ramp;
     }
@@ -1423,13 +1535,17 @@ function renderStart() {
         <span class="fb-d">${state.instantFeedback
           ? ' — answers are marked straight away with the correct answer and explanation; first pick is final.'
           : ' — real exam conditions; results only at the end.'}</span>
-        <span class="fb-note">Every exam here runs at the real pace of 2 min per question, and the timer can be paused.</span></span>
+        <span class="fb-note">Exams run at 2 min per question (the 63-item Architect Professional sitting gets the real 120 min), and the timer can be paused.</span></span>
       <span class="switch ${state.instantFeedback ? 'on' : ''}"></span>
     </button>
     <div class="sec-head">
       <div class="sec-title">Exam Path</div>
       <div class="sec-sub">Warm up, practise by scenario, then sit the full mock — each level unlocks the next.</div>
     </div>
+    ${Object.entries(LENGTH_CHOICES).filter(([k]) => LEVELS[k] && LEVELS[k].ready).map(([k, c]) => `
+    <div class="len-row"><span class="lbl">${c.label} exam length:</span>
+      ${c.options.map(n => `<button class="filter-btn${chosenLength(k) === n ? ' active' : ''}" data-len-level="${k}" data-len="${n}">${n}${n === c.real ? ' (real)' : ''}</button>`).join('')}
+      <span>${c.real} items · ${c.realSeconds / 60} min is the real sitting</span></div>`).join('')}
     <div class="levels path">${pathCards}</div>
     ${bankCards ? `
     <div class="sec-head">
@@ -1447,6 +1563,10 @@ function renderStart() {
     btn.addEventListener('click', () => beginExam(btn.dataset.level));
   });
   wireBuilder();
+  app.querySelectorAll('[data-len-level]').forEach(b => b.addEventListener('click', () => {
+    setLength(b.dataset.lenLevel, Number(b.dataset.len));
+    renderStart();
+  }));
   document.getElementById('fbToggle')?.addEventListener('click', () => {
     state.instantFeedback = !state.instantFeedback;
     renderStart();
@@ -1584,10 +1704,11 @@ function startCustomQuiz() {
 
 function beginExam(levelKey) {
   const lv = LEVELS[levelKey];
-  startPaper(levelKey, buildQuestions(lv), Boolean(lv.scenarioPick));
+  const ps = paperSize(levelKey, lv);
+  startPaper(levelKey, buildQuestions(lv, LENGTH_CHOICES[levelKey] ? ps.n : null), Boolean(lv.scenarioPick), ps.seconds);
 }
 
-function startPaper(levelKey, questions, grouped) {
+function startPaper(levelKey, questions, grouped, totalSeconds) {
   state.level = levelKey;
   state.grouped = grouped;
   state.questions = questions;
@@ -1595,13 +1716,96 @@ function startPaper(levelKey, questions, grouped) {
   state.struck = state.questions.map(() => new Set());
   state.flagged = new Array(state.questions.length).fill(false);
   state.current = 0;
-  state.totalTime = state.questions.length * SECONDS_PER_QUESTION;
+  state.totalTime = totalSeconds || state.questions.length * SECONDS_PER_QUESTION;
   state.timeLeft = state.totalTime;
   state.submitted = false;
   state.screen = 'exam';
   syncUserMenu();
   renderExam();
   startTimer();
+}
+
+// ---- Trap review + tutor prompt ----
+const LETTERS = ['A','B','C','D','E','F'];
+function plain(s) { return String(s == null ? '' : s).replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim(); }
+
+function tutorPrompt(q, ans) {
+  const picked = Array.isArray(ans) && ans.length ? ans : [];
+  const fmt = idxs => idxs.map(i => `${LETTERS[i]}. ${plain(q.options[i])}`).join('\n');
+  return 'You are my tutor for the Claude Certified Architect \u2013 Professional exam. ' +
+    'Here is a scenario question, the option I picked, and the correct answer. ' +
+    'Do not just tell me the answer again. Ask me one question at a time to get me to find ' +
+    '(a) the deciding constraint in the scenario and (b) which constraint my pick breaks. ' +
+    'Correct me as we go, then give me one similar new question to test me.\n\n' +
+    'QUESTION' + (q.multi ? ` (select ${q.correct.length})` : '') + ':\n' + plain(q.q) + '\n\n' +
+    'OPTIONS:\n' + q.options.map((o, i) => `${LETTERS[i]}. ${plain(o)}`).join('\n') + '\n\n' +
+    'MY PICK:\n' + (picked.length ? fmt(picked) : '(I did not answer)') + '\n\n' +
+    'CORRECT ANSWER' + (q.correct.length > 1 ? 'S' : '') + ':\n' + fmt(q.correct);
+}
+
+async function copyText(text) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; }
+  } catch {}
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.setAttribute('readonly', '');
+  ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+  document.body.appendChild(ta); ta.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch {}
+  ta.remove();
+  return ok;
+}
+
+// One delegated handler serves every tutor button (exam panel, side panel, trap cards).
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-tutor]');
+  if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  const i = Number(b.dataset.tutor);
+  const q = state.questions[i];
+  if (!q) return;
+  const ok = await copyText(tutorPrompt(q, state.answers[i]));
+  const old = b.dataset.label || b.textContent;
+  b.dataset.label = old;
+  b.textContent = ok ? 'Copied' : 'Copy failed';
+  b.classList.toggle('copied', ok);
+  setTimeout(() => { b.textContent = old; b.classList.remove('copied'); }, 1600);
+});
+
+function tutorBtn(i) {
+  return `<button type="button" class="tutor-btn" data-tutor="${i}" title="Copy a prompt that makes Claude coach you on this question">Copy tutor prompt</button>`;
+}
+
+// One card per question that was answered wrong or flagged.
+function trapCardHtml(q, i) {
+  const your = state.answers[i];
+  const answered = isAnswered(q, your);
+  const right = isRight(q, your);
+  const pickedIdx = Array.isArray(your) ? your : [];
+  const wrongPicks = pickedIdx.filter(o => !q.correct.includes(o));
+  const pickedHtml = pickedIdx.length
+    ? pickedIdx.map(o => `<div>${LETTERS[o]}. ${q.options[o]}</div>`).join('')
+    : '<div>(no answer)</div>';
+  const breaksHtml = q.breaks
+    ? wrongPicks.filter(o => q.breaks[o]).map(o => `<div class="breaks">This breaks: ${escapeHtml(q.breaks[o])}</div>`).join('')
+    : '';
+  const tag = !answered ? '<span class="tag-mini" style="background:#ffffff11;color:var(--text-dim)">Skipped</span>'
+    : right ? '<span class="tag-mini" style="background:#7ed95722;color:var(--good)">Correct</span>'
+    : '<span class="tag-mini" style="background:#e5674b22;color:var(--bad)">Wrong</span>';
+  return `
+    <div class="trap-card${right ? ' flag-only' : ''}" id="trap-${i}">
+      <div class="trap-head">
+        <span class="domain-tag">${q.domain}</span>
+        <span>${tag} ${state.flagged[i] ? '<span class="tag-mini" style="background:#e8b04b22;color:var(--amber)">\u2605 Flagged</span>' : ''}</span>
+      </div>
+      <div class="trap-q">Q${i + 1}. ${formatQuestion(q.q)}${q.multi ? ` <span class="review-scenario">Select ${q.correct.length}</span>` : ''}</div>
+      ${q.constraint ? `<div class="trap-row constraint"><span class="tr-lbl">Deciding detail</span>${escapeHtml(q.constraint)}</div>` : ''}
+      <div class="trap-row picked"><span class="tr-lbl">You picked</span>${pickedHtml}${breaksHtml}</div>
+      <div class="trap-row correct"><span class="tr-lbl">Correct answer${q.correct.length > 1 ? 's' : ''}</span>${q.correct.map(o => `<div>${LETTERS[o]}. ${q.options[o]}</div>`).join('')}</div>
+      <div class="review-explain"><b style="color:var(--lime)">Why:</b> ${q.explain}</div>
+      <div class="trap-actions">${tutorBtn(i)}</div>
+    </div>`;
 }
 
 function renderExam() {
@@ -1623,7 +1827,9 @@ function renderExam() {
     return `<div class="fb-panel ${right ? 'ok' : 'no'}">
          <div class="fb-verdict">${right ? '✓ Correct' : '✗ Incorrect'}</div>
          ${right ? '' : `<div class="fb-answer">Correct answer${q.correct.length > 1 ? 's' : ''}:<br>${answerText}</div>`}
+         ${q.constraint ? `<div class="fb-constraint"><b>Deciding detail:</b> ${escapeHtml(q.constraint)}</div>` : ''}
          ${q.explain ? `<div class="fb-explain">${q.explain}</div>` : ''}
+         <div class="fb-tools">${tutorBtn(state.current)}</div>
        </div>`;
   })() : '';
   const side = document.getElementById('explainSide');
@@ -1935,6 +2141,7 @@ function renderResults() {
       <button class="filter-btn" data-filter="incorrect">Wrong only</button>
       <button class="filter-btn" data-filter="skipped">Skipped</button>
       <button class="filter-btn" data-filter="flagged">Flagged</button>
+      <button class="filter-btn" data-filter="traps" id="trapsBtn">Review traps (${qs.filter((q, i) => (isAnswered(q, state.answers[i]) && !isRight(q, state.answers[i])) || state.flagged[i]).length})</button>
     </div>
     <div id="reviewList"></div>
   `;
@@ -1967,6 +2174,13 @@ function renderReviewList() {
   const qs = state.questions;
   const letters = ['A','B','C','D','E'];
   const list = document.getElementById('reviewList');
+  if (state.reviewFilter === 'traps') {
+    const cards = qs.map((q, i) => ((isAnswered(q, state.answers[i]) && !isRight(q, state.answers[i])) || state.flagged[i]) ? trapCardHtml(q, i) : '').join('');
+    list.innerHTML = cards
+      ? `<p class="trap-intro">Every question you got wrong or flagged: the one detail that decides it, and what your pick quietly broke.</p>${cards}`
+      : `<p style="color:var(--text-dim);text-align:center;padding:20px">No wrong or flagged questions to review.</p>`;
+    return;
+  }
   const items = qs.map((q, i) => {
     const your = state.answers[i];
     const chosen = your || [];

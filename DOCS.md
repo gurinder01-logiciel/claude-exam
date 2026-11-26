@@ -156,7 +156,7 @@ never sits in a fixed slot.
 ## 4. Features
 
 ### Timer
-120 minutes for a 60-question paper (2 min/question on every level). **Pause**
+120 minutes for a 60-question paper (2 min/question on every level; the 63-item Architect Professional sitting also gets 120 minutes). **Pause**
 stops the clock entirely — for real breaks. Amber under 15 minutes, red and
 blinking under 5.
 
@@ -210,6 +210,29 @@ both copies and CSS shows one; `syncPrep()` clears the side copy off the exam sc
 - Domain-by-domain breakdown with colour-coded bars
 - Full question review with explanations, filterable: All / Wrong only /
   Skipped / Flagged
+
+### Review traps and tutor prompt
+Scenario items are built so each wrong option quietly breaks one stated
+constraint. On the results screen the **Review traps (N)** filter shows one card
+per question answered wrong or flagged: the stem, **Deciding detail** (`constraint`),
+the option you picked with **This breaks:** (`breaks[picked]`), the correct
+option(s) and the `explain` text. Questions without those optional fields show the
+explanation only. Instant feedback also shows the deciding detail when present.
+
+**Copy tutor prompt** (on every trap card and in the instant-feedback panel) copies
+a prompt for Claude: a tutor brief (find the deciding constraint, find what your
+pick breaks, one question at a time, then a fresh test question) followed by the
+stem, lettered options, your pick and the correct answer(s). It uses
+`navigator.clipboard`, falling back to a hidden textarea and `execCommand('copy')`,
+and the button reads "Copied" for a moment.
+
+### Exam length (Architect Professional)
+A chip row above the Exam Path picks **60** or **63 (real)** items. 63 gets the
+real 120-minute limit (not 2 min/question); 60 keeps the 2 min/question pace. The
+choice is remembered in `localStorage` (`ccap_length:<level>`). Both draw through
+the same domain-weighted draw and difficulty ramp (see below), scaled to the length; the choices
+live in `LENGTH_CHOICES` in `index.html`. "Select N" hints on multiple-response
+items are unchanged.
 
 ### Flag
 Mark a question to revisit. Flagged questions get their own review filter.
@@ -310,7 +333,7 @@ questions/
   scenario.json    94 questions (Scenario Practice)
   architect.json   100 questions (Architect Scenarios; 60 drawn per sitting)
   architect-pro.json  100 questions (Architect Professional, CCAR-P; 60 drawn)
-  core.json        40 questions (Core Concepts Drill)      ┐ "Mock Exam Bank"
+  core.json        48 questions (Core Concepts Drill)      ┐ "Mock Exam Bank"
   mock1-6.json     60/58/56/54/51/55 (Mock Exam 1-6)       │ section
                    Imported from the CCA Foundations Prep artifact; mock items
                    are MIT-licensed, see each file's `source`/`licence`. d: core
@@ -364,6 +387,8 @@ const SCENARIOS = { 1: …, 6: … };  // the six official exam scenarios
 | `q` | Question text. The legacy `SCENARIO — <name>.` prefix still renders a banner, but prefer the `scenario` field |
 | `options` | Four options recommended. Order as written; shuffled at runtime |
 | `correct` | Index into `options` **as written**. No need to vary the position by hand. An array of indices (e.g. `[0, 2]`) makes it a **multiple-response** item: the candidate is told to "Select N", it counts as answered only once N options are chosen, and it scores only if every pick is correct — no partial credit, as on the real exam |
+| `constraint` | Optional. The one deciding detail in the stem that settles the question (e.g. "the filing cannot be undone"). Shown in instant feedback and the Review traps cards |
+| `breaks` | Optional array, same length as `options`, indexed as authored: for each option a short string naming the stated constraint it violates, or `null` for a correct option. Remapped through the runtime shuffle. Ignored if the length differs |
 | `explain` | Shown in the review. Explain why distractors fail, not just why the answer is right — that's where the exam's difficulty lives |
 
 ### Level file schema
@@ -398,6 +423,19 @@ const SCENARIOS = { 1: …, 6: … };  // the six official exam scenarios
   Bank: always unlocked, compact cards without the blueprint bar).
 - `inPool: false` — keep this bank out of pool levels, so Full Mock Exam stays
   built from the Exam Path banks only. Every bank level sets it.
+
+### Domain-weighted draw
+If a level has a `blueprint` and its labels match the domains used by its
+questions exactly (and it has no `scenarioPick` and is not a pool), each sitting
+draws per domain by the blueprint percentages (`drawByBlueprint`): largest-remainder
+rounding to the paper length. A domain with fewer questions than its quota gives
+all it has and the shortfall is spread over the other domains in proportion to
+their percentages. The drawn set is then ordered by the difficulty ramp. Today
+only Architect Professional qualifies; other levels have loose bank labels or use
+scenario/pool draws, and keep the plain ramped draw. The results-by-domain
+breakdown groups by each question's own `domain`, so it is unchanged.
+A level with a `blueprint` that doesn't match falls back to the plain draw and logs a
+`console.warn` naming the unmatched labels/domains once per page load.
 
 ### Custom quiz builder
 Sits at the top of the Mock Exam Bank section. Pick one or more official domains

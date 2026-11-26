@@ -99,11 +99,11 @@
       "options": [
         "User-level wins, since personal preferences are loaded last and override project files",
         "The more specific, local configuration wins, so project-level overrides user-level",
-        "The files are concatenated and Claude asks you which conflicting instruction to follow",
+        "Neither overrides the other: all discovered files are concatenated, so contradictory instructions may be followed arbitrarily",
         "Whichever file is larger is treated as authoritative for the overlapping instructions"
       ],
-      "correct": 1,
-      "explain": "Memory files cascade from broad to specific, and the closest scope to the work (project, then directory) takes precedence on conflicts. 'User-level loaded last' is the near-miss: load order is real, but it runs the other way, with narrower project context taking priority.",
+      "correct": 2,
+      "explain": "Memory files are all discovered and concatenated into context rather than overriding each other, so there is no precedence rule to rely on: if two instructions contradict, Claude may pick one arbitrarily. The fix is to remove the conflict, not to expect a winner. 'Project-level overrides user-level' is the near-miss: files are ordered from the root down to the working directory so closer files are read last, which feels like precedence, but reading order is not an override. 'User-level loaded last' and 'larger file wins' invent rules that do not exist.",
       "scenario": 2
     },
     {

@@ -192,12 +192,12 @@
       "q": "A skill for generating boilerplate files should never be allowed to run destructive shell commands, even accidentally. Which frontmatter field enforces this restriction directly?",
       "options": [
         "<code>argument-hint</code>",
-        "<code>paths</code>",
+        "<code>disallowed-tools</code>",
         "<code>context: fork</code>",
         "<code>allowed-tools</code>"
       ],
-      "correct": 3,
-      "explain": "<code>allowed-tools</code> frontmatter directly restricts which tools a skill can invoke, so scoping it away from shell/<code>Bash</code> access structurally prevents destructive commands. <code>context: fork</code> isolates output/context, it doesn't restrict tool access.<br><b>Not “<code>argument-hint</code>”</b> — <code>argument-hint</code> only describes expected arguments. It does not limit which tools the skill may run.<br><b>Not “<code>paths</code>”</b> — <code>paths</code> controls which files the skill applies to. It does not stop it from running destructive shell commands.<br><b>Not “<code>context: fork</code>”</b> — <code>context: fork</code> isolates the skill's context and output. It leaves tool access unrestricted, so destructive commands remain possible."
+      "correct": 1,
+      "explain": "<code>disallowed-tools</code> frontmatter (or a deny rule in permission settings) is what blocks shell access for the skill. <code>allowed-tools</code> is the near-miss: it only pre-approves the listed tools for the skill's turn and does not restrict which tools are available, so <code>Bash</code> stays callable under your permission settings.<br><b>Not “<code>argument-hint</code>”</b> — <code>argument-hint</code> only describes expected arguments. It does not limit which tools the skill may run.<br><b>Not “<code>allowed-tools</code>”</b> — it grants permission-free use of listed tools; it is not a restriction, so unlisted tools such as <code>Bash</code> remain callable.<br><b>Not “<code>context: fork</code>”</b> — <code>context: fork</code> isolates the skill's context and output. It leaves tool access unrestricted, so destructive commands remain possible."
     },
     {
       "domain": "Tool Design & MCP Integration",
