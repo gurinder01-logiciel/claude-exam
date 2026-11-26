@@ -43,8 +43,10 @@
      column (not the board) is sticky and scrolls if both together are too tall. */
   .left-col {
     width: 290px; flex-shrink: 0; position: sticky; top: 20px; order: -1;
-    max-height: calc(100vh - 40px); overflow-y: auto; display: flex; flex-direction: column; gap: 14px;
+    max-height: calc(100vh - 110px); overflow-y: auto; display: flex; flex-direction: column; gap: 14px;
+    /* 20px top offset + ~90px so the last line clears the floating 🏆 button */
   }
+  .explain-side .fb-verdict { position: sticky; top: 0; z-index: 1; background: var(--surface); padding: 2px 0 4px; }
   .explain-side .fb-panel { margin-top: 0; background: var(--surface); border: 1px solid var(--border); border-left-width: 3px; box-shadow: 0 2px 12px rgba(46,46,46,0.05); }
   .explain-side .section-label { margin: 4px 0 8px; }
   /* The left column only exists during an exam; elsewhere the main column is centred. */
@@ -57,8 +59,19 @@
   body[data-screen="prep"] .board-dock, body[data-screen="prep"] .board-toggle { display: none !important; }
   @media (min-width: 1081px) { body[data-screen="exam"] .board-dock, body[data-screen="paused"] .board-dock { display: none; } }
   /* Wide screens show the explanation in the left column, so hide the inline copy. */
-  @media (min-width: 1081px) { .fb-inline { display: none; } }
-  @media (max-width: 1080px) {
+  @media (min-width: 900px) { .fb-inline { display: none; } }
+  .fb-panel.idle { border-left-color: var(--border); color: var(--text-dim); }
+  .fb-panel.idle .fb-verdict { color: var(--text); }
+  /* Keep the floating leaderboard button from covering the last lines on narrow screens. */
+  @media (max-width: 1080px) { body[data-screen="exam"], body[data-screen="paused"], body[data-screen="results"] { padding-bottom: 110px; } }
+  .fb-lbl { display: block; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-dim); }
+  .fb-breaks { margin-bottom: 8px; color: var(--bad); }
+  /* 900-1080px: keep the explanation column beside the question during a sitting. */
+  @media (min-width: 900px) and (max-width: 1080px) {
+    body[data-screen="exam"] .shell, body[data-screen="paused"] .shell { display: flex; flex-wrap: wrap; padding-right: 12px; /* room for the side arrow */ }
+    body[data-screen="exam"] .left-col, body[data-screen="paused"] .left-col { width: 260px; position: sticky; top: 20px; max-height: calc(100vh - 110px); overflow-y: auto; display: flex; }
+  }
+  @media (max-width: 899px) {
     .left-col { width: auto; position: static; max-height: none; overflow: visible; display: block; }
     .explain-side { display: none !important; }
   }
@@ -1727,6 +1740,8 @@ function startPaper(levelKey, questions, grouped, totalSeconds) {
 
 // ---- Trap review + tutor prompt ----
 const LETTERS = ['A','B','C','D','E','F'];
+// Header code for the sitting: the Professional level is CCAR-P, the rest CCAR-F.
+function examBrand() { return /^architectPro/.test(state.level || '') ? 'CCAR-P' : 'CCAR-F'; }
 function plain(s) { return String(s == null ? '' : s).replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim(); }
 
 function tutorPrompt(q, ans) {
@@ -1824,23 +1839,35 @@ function renderExam() {
   const fbHtml = locked ? (() => {
     const right = isRight(q, ans);
     const answerText = q.correct.map(i => `<b>${letters[i]}.</b> ${q.options[i]}`).join('<br>');
+    const pickText = (ans || []).map(i => `<b>${letters[i]}.</b> ${q.options[i]}`).join('<br>');
+    const breakLines = q.breaks ? (ans || []).filter(i => !q.correct.includes(i) && q.breaks[i])
+      .map(i => `<div class="fb-breaks"><b>Your pick breaks:</b> ${escapeHtml(q.breaks[i])}</div>`).join('') : '';
     return `<div class="fb-panel ${right ? 'ok' : 'no'}">
          <div class="fb-verdict">${right ? '✓ Correct' : '✗ Incorrect'}</div>
-         ${right ? '' : `<div class="fb-answer">Correct answer${q.correct.length > 1 ? 's' : ''}:<br>${answerText}</div>`}
+         <div class="fb-answer"><span class="fb-lbl">Your pick</span>${pickText}</div>
+         ${right ? '' : `<div class="fb-answer"><span class="fb-lbl">Correct answer${q.correct.length > 1 ? 's' : ''}</span>${answerText}</div>`}
          ${q.constraint ? `<div class="fb-constraint"><b>Deciding detail:</b> ${escapeHtml(q.constraint)}</div>` : ''}
+         ${breakLines}
          ${q.explain ? `<div class="fb-explain">${q.explain}</div>` : ''}
          <div class="fb-tools">${tutorBtn(state.current)}</div>
        </div>`;
   })() : '';
   const side = document.getElementById('explainSide');
   if (side) {
-    side.innerHTML = fbHtml ? `<div class="section-label">Explanation · Question ${state.current + 1}</div>${fbHtml}` : '';
-    side.toggleAttribute('hidden', !fbHtml);
+    // Before the answer, a quiet placeholder keeps the column from jumping.
+    const idle = `<div class="fb-panel idle">
+         <div class="fb-verdict">Question ${state.current + 1} of ${state.questions.length}</div>
+         <div class="fb-answer">${q.domain}</div>
+         <div class="fb-explain">${q.multi && !isAnswered(q, ans) ? `Pick ${q.correct.length} options` : 'Answer'} to see the explanation.</div>
+       </div>`;
+    const sideBody = fbHtml || (state.instantFeedback ? idle : '');
+    side.innerHTML = sideBody ? `<div class="section-label">Explanation · Question ${state.current + 1}</div>${sideBody}` : '';
+    side.toggleAttribute('hidden', !sideBody);
   }
 
   app.innerHTML = `
     <div class="topbar">
-      <div class="brand">CCAR-F <span>Simulator</span></div>
+      <div class="brand">${examBrand()} <span>Simulator</span></div>
       <div class="timer" id="timer">${fmtTime(state.timeLeft)}</div>
       <div class="timer-controls">
         <button class="icon-btn" id="pauseBtn">⏸ Pause</button>
@@ -2099,7 +2126,7 @@ function renderResults() {
 
   app.innerHTML = `
     <div class="topbar">
-      <div class="brand">CCAR-F <span>Results</span></div>
+      <div class="brand">${examBrand()} <span>Results</span></div>
       <button class="icon-btn" id="homeBtn">↺ New Exam</button>
     </div>
 

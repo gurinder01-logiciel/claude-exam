@@ -197,11 +197,18 @@ on the last question the right arrow becomes ✓ Submit. ←/→ on the keyboard
 same, except while typing or when a pause/confirm overlay is open. Every move
 scrolls back to the top. The side arrows hide below 760px wide.
 
-**Where the explanation shows.** Wider than 1080px, the verdict, correct answer
-and explanation appear in the left column under the leaderboard (`#explainSide`,
-inside `.left-col`, which is the sticky element and scrolls if both are tall), so
-the question card stays short. At 1080px and below, where the leaderboard becomes
-a drawer, the same panel renders inline under the options. `renderExam()` writes
+**Where the explanation shows.** At 900px and wider, a detail panel sits in the left
+column beside the question (`#explainSide`, inside `.left-col`, which is the sticky
+element and scrolls if tall) on every level, mock exams included. Before an answer
+it shows a quiet placeholder (question number, domain, "Answer to see the
+explanation") so the layout does not jump; for a multi-select item it asks for N
+picks. Once the item is answered it shows the verdict (text and colour), your pick,
+the correct option(s), the deciding detail and "Your pick breaks" when the item
+has `constraint`/`breaks`, the explanation and the tutor-prompt button. Going back
+to an answered question shows it again. Below 900px it is a single column and the
+same panel renders inline under the options. Instant feedback is on by default for
+every level; the toggle on the start screen still turns it off (then the panel
+stays hidden). No level or mode forces it off. `renderExam()` writes
 both copies and CSS shows one; `syncPrep()` clears the side copy off the exam screen.
 
 ### Results
