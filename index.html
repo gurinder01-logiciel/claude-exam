@@ -246,8 +246,12 @@
   .bq-title { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; }
   .bq-sub, .bq-foot { font-size: 0.78rem; color: var(--text-dim); margin-top: 2px; }
   .bq-row { display: grid; grid-template-columns: 90px 1fr; gap: 10px; align-items: start; }
-  /* Mock Exam Bank: a 50/50 centre split — exam tiles (2 per row) on the left,
-     the quiz builder on the right; both halves stretch to the same height. */
+  /* Mock Exam Bank: exam tiles in their own full-width block (4 per row), then a
+     50/50 row with the custom-quiz builder and the course-chapter drill. */
+  .levels.bank.bank-full { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 14px; }
+  @media (max-width: 1100px) { .levels.bank.bank-full { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .levels.bank.bank-full { grid-template-columns: 1fr; } }
+  .practice-split > .builder { margin-bottom: 0; }
   .bank-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: stretch; }
   .bank-split .levels.bank { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 0; align-content: start; }
   .bank-split .builder { margin-bottom: 0; align-content: start; }
@@ -1588,10 +1592,8 @@ function renderStart() {
       <div class="sec-title">Mock Exam Bank</div>
       <div class="sec-sub">Complete practice exams, always unlocked — or build a quiz on the domains you want to drill.</div>
     </div>
-    <div class="bank-split">
-      <div class="levels bank">${bankCards}</div>
-      <div class="bq-stack">${renderBuilder()}${renderChapterDrill()}</div>
-    </div>` : ''}
+    <div class="levels bank bank-full">${bankCards}</div>
+    <div class="bank-split practice-split">${renderBuilder()}${renderChapterDrill()}</div>` : ''}
     <p class="start-foot">Taking this as <b>${escapeHtml(user.name || '—')}</b> · <a href="#" id="changeName">change name</a></p>
   `;
 
