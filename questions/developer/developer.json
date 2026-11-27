@@ -316,7 +316,7 @@
   },
   {
    "domain": "Agents and Workflows",
-   "d": 2,
+   "d": 1,
    "scenario": 0,
    "task": "1.2",
    "q": "Engineers keep forgetting to run the formatter after Claude edits files, and the system prompt asking Claude to run it is followed only some of the time. Which approach makes formatting happen on every edit?",
@@ -623,7 +623,7 @@
   },
   {
    "domain": "Applications and Integration",
-   "d": 2,
+   "d": 1,
    "scenario": 0,
    "task": "2.1",
    "q": "A nightly job downloads the results of a Message Batches job to rebuild a report, but a re-run 40 days after submission finds that the results can no longer be downloaded. What explains this?",
@@ -651,7 +651,7 @@
   },
   {
    "domain": "Applications and Integration",
-   "d": 2,
+   "d": 1,
    "scenario": 0,
    "task": "2.1",
    "q": "An agent loop answers a tool call by sending a user message whose content array holds a short text note first and the tool_result block second. The API rejects the request. What is the fix?",
@@ -763,7 +763,7 @@
   },
   {
    "domain": "Applications and Integration",
-   "d": 2,
+   "d": 1,
    "scenario": 0,
    "task": "2.2",
    "q": "A chat feature built directly on the Messages API loses track of earlier turns: each user message is answered as if it were the first. The code sends only the latest user message in the messages array. What is the correct design?",
@@ -815,7 +815,7 @@
   },
   {
    "domain": "Applications and Integration",
-   "d": 2,
+   "d": 1,
    "scenario": 0,
    "task": "2.3",
    "q": "A production service calls Claude with a model identifier copied from a tutorial. The team wants upgrades to happen only after regression evaluations pass, never silently. Which configuration practice supports this?",
@@ -896,7 +896,7 @@
   },
   {
    "domain": "Applications and Integration",
-   "d": 2,
+   "d": 1,
    "scenario": 0,
    "task": "2.4",
    "q": "A client library sees HTTP 429 responses carrying a retry-after header and retries after a fixed 100 ms. The retries keep failing and make the congestion worse. Which behaviour matches the API's documented semantics?",
@@ -1011,7 +1011,7 @@
   },
   {
    "domain": "Applications and Integration",
-   "d": 2,
+   "d": 1,
    "scenario": 0,
    "task": "2.4",
    "q": "A report generator sends a very long non-streaming request and intermittently receives a timeout error after a long wait. Which change follows the API guidance for long-running requests?",
@@ -1182,7 +1182,7 @@
   },
   {
    "domain": "Claude Code",
-   "d": 2,
+   "d": 1,
    "scenario": 0,
    "task": "3.2",
    "q": "A team has a /deploy workflow with real side effects. They want it to run only when a developer types the command, never because Claude decided that the conversation seemed to call for it. Which setting achieves this?",
@@ -1209,7 +1209,7 @@
   },
   {
    "domain": "Claude Code",
-   "d": 2,
+   "d": 1,
    "scenario": 0,
    "task": "3.2",
    "q": "A platform team wants to give all fifteen repositories the same bundle: three skills, a formatting hook and an MCP server configuration, installed and updated together. Which mechanism fits?",
@@ -1638,7 +1638,7 @@
   },
   {
    "domain": "Model Selection and Optimization",
-   "d": 2,
+   "d": 1,
    "scenario": 0,
    "task": "5.1",
    "q": "To make sure nothing is missed, a team puts the whole 600-page policy manual into the context window for every question about vacation days. Answers have become less accurate than when they sent a few relevant sections. What explains this?",
@@ -1944,7 +1944,7 @@
   },
   {
    "domain": "Prompt and Context Engineering",
-   "d": 2,
+   "d": 1,
    "scenario": 0,
    "task": "6.1",
    "q": "A developer has used one Claude Code session for a database migration, then a CSS fix, then a release-notes draft, and now asks it to debug a flaky test. Answers are getting worse and slower. What is the best move?",
@@ -2195,7 +2195,7 @@
   },
   {
    "domain": "Prompt and Context Engineering",
-   "d": 2,
+   "d": 1,
    "scenario": 0,
    "task": "6.4",
    "q": "A contract-review feature must show users exactly which passage supports each claim in the model's answer. Which request design delivers that?",
@@ -2463,7 +2463,7 @@
   },
   {
    "domain": "Security and Safety",
-   "d": 2,
+   "d": 1,
    "scenario": 0,
    "task": "7.3",
    "q": "A mobile app calls the Claude API directly from the phone, with the API key bundled in the app binary so that no backend is needed. A security audit flags it. What is the correct redesign?",
@@ -2634,7 +2634,7 @@
   },
   {
    "domain": "Tools and MCP",
-   "d": 2,
+   "d": 1,
    "scenario": 0,
    "task": "8.2",
    "q": "A company's inventory service must be reachable by Claude applications on many different machines and maintained independently by the platform team. Which MCP deployment fits?",
@@ -2662,7 +2662,7 @@
   },
   {
    "domain": "Tools and MCP",
-   "d": 2,
+   "d": 1,
    "scenario": 0,
    "task": "8.2",
    "q": "An application built on the Agent SDK needs Claude to call three small Python functions that already live in the same codebase, with no need for any other application to use them. What is the simplest suitable integration?",
@@ -2690,7 +2690,7 @@
   },
   {
    "domain": "Tools and MCP",
-   "d": 2,
+   "d": 1,
    "scenario": 0,
    "task": "8.2",
    "q": "Analysts want to attach a database schema document to a Claude Code prompt in the same way they @-mention a file, and the schema is maintained by the data team in an MCP server. Which MCP capability should the server use?",
@@ -2775,7 +2775,7 @@
   },
   {
    "domain": "Tools and MCP",
-   "d": 2,
+   "d": 1,
    "scenario": 0,
    "task": "8.3",
    "q": "A team needs Claude to look up live prices from an internal service owned by another team, usable by several of the company's Claude applications and agents, with changes shipped by the owning team. Which mechanism fits best?",
