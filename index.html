@@ -1141,15 +1141,33 @@ async function submitScore(entry) {
   }
 }
 
-// Short exam code for leaderboard labels: initials of the level name, digits
-// kept whole, anything after " · " dropped — "Scenario Practice" → "SP",
-// "Mock Exam 4 · Hard" → "ME4". A one-word name keeps the whole word
-// ("Foundations"), since a lone initial reads badly next to a name.
+// Leaderboard labels. Scores store the exam's display name, so names that were
+// later renamed are mapped to the current one first; otherwise old and new rows
+// for the same exam would show as two exams.
+const LEGACY_EXAM_NAMES = {
+  'Architect Scenarios': 'Architect Foundations',
+  'Mock Exam 1': 'Architect Mock 1', 'Mock Exam 2': 'Architect Mock 2',
+  'Mock Exam 3': 'Architect Mock 3', 'Mock Exam 4 · Hard': 'Architect Mock 4 · Hard',
+  'Mock Exam 5 · Hard': 'Architect Mock 5 · Hard', 'Mock Exam 6 · Hard': 'Architect Mock 6 · Hard'
+};
+function currentExamName(name) { return LEGACY_EXAM_NAMES[name] || name || ''; }
+
+// Readable exam tag shown after a name on the leaderboard: at least 4 characters,
+// so "AS" or "ME5" never has to be decoded.
+const EXAM_CODES = {
+  'Developer': 'DEV-F', 'Developer Professional': 'DEV-PRO',
+  'Architect Foundations': 'ARCH-F', 'Architect Professional': 'ARCH-PRO',
+  'Claude Code Foundations': 'CC-FOUND', 'Scenario Practice': 'SCENARIO',
+  'Full Mock Exam': 'FULL-MOCK', 'Core Concepts Drill': 'CORE-DRILL',
+  'Foundations Bank (translated)': 'ARCH-F-ES'
+};
 function examCode(levelName) {
-  const base = String(levelName || '').split(' · ')[0].trim();
-  const words = base.split(/\s+/).filter(Boolean);
-  if (words.length === 1) return words[0];
-  return words.map(w => /^\d+$/.test(w) ? w : w[0].toUpperCase()).join('');
+  const name = currentExamName(levelName);
+  if (EXAM_CODES[name]) return EXAM_CODES[name];
+  const m = name.match(/^Architect Mock (\d+)/);
+  if (m) return 'ARCH-MOCK' + m[1];
+  const base = name.split(' · ')[0].trim();
+  return base.length >= 4 ? base.replace(/\s+/g, '-').toUpperCase().slice(0, 12) : (base.toUpperCase() + '-EXAM');
 }
 
 function renderBoard(scores, live) {
@@ -1159,6 +1177,7 @@ function renderBoard(scores, live) {
   const best = {};
   scores.forEach(s => {
     if (!s || !s.name) return;
+    s = { ...s, level: currentExamName(s.level) };
     const key = s.name + '\u0000' + (s.level || '');
     const cur = best[key];
     if (!cur) best[key] = { ...s, attempts: 1 };
