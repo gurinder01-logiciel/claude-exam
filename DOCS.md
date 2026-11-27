@@ -269,8 +269,10 @@ exam frames them.
 Each person enters a name once (remembered in their browser). Finished exams post
 to `/api/scores`, and the leaderboard (bottom of the start screen) shows **one row
 per person per exam** — their best score on that exam, labelled `name-CODE` where
-CODE is the exam's initials (`examCode()`: Claude Code Foundations → CCF, Scenario Practice → SP, a one-word name kept whole,
-Full Mock Exam → FME, Mock Exam 4 · Hard → ME4) — ranked by score, with
+CODE is a readable tag of at least 4 characters from `EXAM_CODES` (DEV-F, DEV-PRO, ARCH-F, ARCH-PRO, CC-FOUND,
+SCENARIO, FULL-MOCK, CORE-DRILL, ARCH-F-ES; Architect Mock N → ARCH-MOCKN). Scores store the exam's display
+name, so `LEGACY_EXAM_NAMES` maps renamed exams (Architect Scenarios, Mock Exam 1–6) to the current name
+before grouping — ranked by score, with
 "best of N" once they have sat it more than once. Your own rows are highlighted.
 
 Every attempt is retained in Redis, so **My history** — in the account menu at
