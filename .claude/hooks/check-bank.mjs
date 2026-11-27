@@ -20,7 +20,7 @@ const SCENARIO_IDS = new Set([0, 1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16]);
 
 function isBank(file) {
   const abs = path.resolve(ROOT, file);
-  return path.dirname(abs) === QDIR && abs.endsWith('.json');
+  return abs.startsWith(QDIR + path.sep) && abs.endsWith('.json');
 }
 
 function checkQuestion(q, i) {
@@ -81,7 +81,8 @@ if (!args.length) {
 }
 if (!payload?.tool_input) {
   // CLI mode
-  const files = args.length ? args : fs.readdirSync(QDIR).filter(f => f.endsWith('.json')).map(f => path.join('questions', f));
+  const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : e.name.endsWith('.json') ? [path.relative(ROOT, path.join(d, e.name))] : []);
+  const files = args.length ? args : walk(QDIR);
   const errs = files.flatMap(checkFile);
   if (errs.length) { console.error(errs.join('\n')); process.exit(1); }
   console.log(`OK — ${files.length} file(s) valid`);

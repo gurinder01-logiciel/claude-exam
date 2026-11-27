@@ -1,6 +1,6 @@
 # FACTS-DEV: verified product facts behind the Developer and Developer Professional banks
 
-Shared by `questions/developer.json` (Developer, CCDVF) and `questions/developer-pro.json`
+Shared by `questions/developer/developer.json` (Developer, CCDVF) and `questions/developer/developer-pro.json`
 (Developer Professional, CCDVP). Every question carries a `facts` array of ids from this file;
 `facts: []` marks a pure judgment item that rests on the official guide's decision principles
 (`BLUEPRINT-DEV.md`, `BLUEPRINT-DEV-PRO.md`) rather than on a product feature.
@@ -13,7 +13,7 @@ normalisations (markdown links flattened to their text, whitespace collapsed; `*
 and curly quotes are ignored). Re-run the check any time:
 
 ```
-python3 .claude/skills/bank-audit/verify-facts.py questions/FACTS-DEV.md
+python3 .claude/skills/bank-audit/verify-facts.py questions/developer/FACTS-DEV.md
 ```
 
 Result on 27 Nov 2026: every fact in both sections passes (0 failed). The pages are newer than

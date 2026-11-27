@@ -24,7 +24,7 @@ exam: 60 scenario questions in 120 minutes, with a shared team leaderboard.
 - **Developer** and **Developer Professional** — always open, shown first: a random 60 from a
   100-question bank each, for the official **CCDVF** and **CCDVP** exams, domain-weighted to
   their eight-domain blueprints (`BLUEPRINT-DEV.md`, `BLUEPRINT-DEV-PRO.md`). Every product
-  fact behind the questions is quoted from the docs in `questions/FACTS-DEV.md`. Length switch:
+  fact behind the questions is quoted from the docs in `questions/developer/FACTS-DEV.md`. Length switch:
   60 (2 min each) or the real 70 items in 120 minutes. Every question is tagged with the official
   prep course and chapter it is closest to, and **Study by course chapter** on the home screen drills one
   chapter at a time.
@@ -51,14 +51,12 @@ This matters — a flattened folder is the most common cause of a broken deploy:
 ```
 .
 ├── index.html
-├── questions/
+├── questions/                 one folder per track; index.json lists every bank as <folder>/<name>
 │   ├── index.json
-│   ├── mock.json
-│   ├── basic.json
-│   ├── scenario.json
-│   ├── core.json
-│   ├── mock1.json … mock6.json
-│   └── foundations-es.json
+│   ├── developer/             developer.json, developer-pro.json, FACTS-DEV.md
+│   ├── architect/             architect.json, architect-pro.json, foundations-es.json
+│   ├── claude-code/           basic.json, scenario.json, core.json
+│   └── mock/                  mock.json (Full Mock Exam), mock1.json … mock6.json
 ├── api/
 │   └── scores.js
 ├── package.json
@@ -67,11 +65,11 @@ This matters — a flattened folder is the most common cause of a broken deploy:
 └── DOCS.md
 ```
 
-`api/scores.js` must be inside `api/`, and the four JSON files inside
+`api/scores.js` must be inside `api/`, and the track folders inside
 `questions/`. Verify:
 
 ```bash
-ls questions api
+ls questions questions/developer api
 ```
 
 ### 2. Push to GitHub
@@ -173,7 +171,7 @@ Each level is its own JSON file, so you never touch `index.html`:
   Use an array of indices (e.g. `[0, 2]`) for a multiple-response "Select N" item —
   all-or-nothing scoring
 
-To add a whole level: create `questions/my-level.json` and add `"my-level"` to
+To add a whole level: create `questions/<track>/my-level.json` and add `"<track>/my-level"` to
 the `levels` array in `questions/index.json`. See [DOCS.md](DOCS.md) §7 for the
 full schema.
 
@@ -184,7 +182,7 @@ full schema.
 | Symptom | Fix |
 |---|---|
 | "Couldn't load questions" | Serve over HTTP; check `questions/` sits beside `index.html` |
-| 404 on `questions/index.json` | Files were flattened — `mkdir -p questions && mv basic.json index.json mock.json scenario.json questions/` |
+| 404 on `questions/index.json` | Files were flattened — restore the folder layout shown in the tree above |
 | `/api/scores` 404s on Vercel | `mkdir -p api && mv scores.js api/scores.js`, commit, redeploy |
 | Leaderboard "offline" on Vercel | Attach the Upstash integration, then **redeploy** |
 | Can't change an answer | Instant feedback is on (the default) — first pick is final by design |

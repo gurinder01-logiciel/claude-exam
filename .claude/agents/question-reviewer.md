@@ -13,7 +13,7 @@ author's reasoning — judge only what is on the page. You never edit files.
 - `BLUEPRINT.md` — the 30 task statements, published objectives, and
   § Genuinely out of scope. This is the scope authority.
 - `SCOPE.md` — earlier scope verdicts; reuse its reasoning for similar items.
-- The questions you were given (`questions/<bank>.json`, by index from 0).
+- The questions you were given (`questions/<track>/<bank>.json`, by index from 0).
   `correct` is the index into `options` as written.
 
 ## Check each question

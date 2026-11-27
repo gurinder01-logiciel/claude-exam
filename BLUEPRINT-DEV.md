@@ -1,6 +1,6 @@
 # CCDVF official blueprint (reference)
 
-Scope authority for `questions/developer.json` (level **Developer**, the *Claude Certified
+Scope authority for `questions/developer/developer.json` (level **Developer**, the *Claude Certified
 Developer – Foundations* exam). Every fact below is tagged with where it came from:
 
 - **[Guide]** — *Claude Certified Developer – Foundations Exam Guide*, **Version 1.1,
@@ -131,7 +131,7 @@ What could and could not be read: the course pages are public and show each cour
 learning objectives and (for the prerequisite courses) lesson list. The lesson bodies of the five modules
 sit behind the free Partner Academy sign-in, which was not used, so **chapters for the five modules are the
 learning objectives, paraphrased here**, and no lesson text was read or copied. Prerequisite courses use their
-public lesson titles. Questions were still written from the live docs (`questions/FACTS-DEV.md`); the course
+public lesson titles. Questions were still written from the live docs (`questions/developer/FACTS-DEV.md`); the course
 tag says which chapter a question is closest to, not that the lesson teaches that exact fact.
 
 Each question carries `course` and `chapter`. The home screen's "Study by course chapter" panel drills them.
@@ -228,4 +228,4 @@ The number after each chapter is how many of the 100 questions carry that tag.
 - Exam administration (fees, retakes, Pearson logistics).
 - Exact per-token prices and model release dates; items reason about relative cost and latency.
 - Third-party frameworks by name (only the v1.0 guide names Strands, LangGraph and PydanticAI).
-- Anything the Architect banks already test at the identical mechanism level (see the dedupe rule in `questions/FACTS-DEV.md`).
+- Anything the Architect banks already test at the identical mechanism level (see the dedupe rule in `questions/developer/FACTS-DEV.md`).

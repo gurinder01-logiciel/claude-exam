@@ -1,6 +1,6 @@
 # CCDVP official blueprint (reference)
 
-Scope authority for `questions/developer-pro.json` (level **Developer Professional**, the *Claude
+Scope authority for `questions/developer/developer-pro.json` (level **Developer Professional**, the *Claude
 Certified Developer – Professional* exam). Every fact below is tagged with where it came from:
 
 - **[Guide]** — *Claude Certified Developer – Professional Exam Guide*, **Version 1.0, effective
@@ -115,7 +115,7 @@ What could and could not be read: each course page publicly lists its curriculum
 bodies need the free Partner Academy sign-in, which was not used, so no lesson text was read or copied. A **chapter** here is
 one of the path page's own study headings for that domain (each groups lessons, docs, articles and cookbook items). Where
 the guide tests a skill that no listed lesson or doc covers, the chapter is called "No listed lesson: ... (study the docs)".
-The tag says which chapter a question is closest to; the facts behind each answer are in `questions/FACTS-DEV.md`.
+The tag says which chapter a question is closest to; the facts behind each answer are in `questions/developer/FACTS-DEV.md`.
 
 Each question carries `course` (the domain's course) and `chapter`. The home screen's "Study by course chapter" panel
 drills them. The number after each chapter is how many of the 100 questions carry that tag.

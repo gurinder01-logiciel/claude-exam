@@ -16,7 +16,7 @@ and two-right-answer items got into the bank before (see SCOPE.md, AUDIT.md).
 - Check `BLUEPRINT.md` § Genuinely out of scope and the cut list in `SCOPE.md`.
   If the topic is there, stop and tell the user instead of writing it.
 - Grep the banks for the same concept so you don't add a near-duplicate:
-  `grep -il "<key term>" questions/*.json`.
+  `grep -ril "<key term>" questions/`.
 
 ## 2. Pick the bank
 - `basic.json` — standalone concept checks, usually `scenario: 0`.
@@ -49,7 +49,7 @@ and two-right-answer items got into the bank before (see SCOPE.md, AUDIT.md).
 
 ## 4. Validate
 ```bash
-node .claude/hooks/check-bank.mjs questions/<bank>.json
+node .claude/hooks/check-bank.mjs questions/<track>/<bank>.json
 ```
 (The PostToolUse hook also runs this after every edit to a bank and blocks on
 errors.) Fix anything it reports.

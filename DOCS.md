@@ -240,8 +240,8 @@ Same chip row as Architect Professional, with **60** or **70 (real)**: the offic
 sittings are 70 items (60 scored, 10 unscored) in 120 minutes, so 70 gets the real limit. The
 three chips sit in one row (`LENGTH_CHOICES` in `index.html`). Banks: `developer.json` and
 `developer-pro.json`; scope in `BLUEPRINT-DEV.md` / `BLUEPRINT-DEV-PRO.md`; verified facts in
-`questions/FACTS-DEV.md` (re-check with `python3 .claude/skills/bank-audit/verify-facts.py questions/FACTS-DEV.md`);
-length bias with `node .claude/skills/bank-audit/longest.mjs questions/developer.json`. The Exam
+`questions/developer/FACTS-DEV.md` (re-check with `python3 .claude/skills/bank-audit/verify-facts.py questions/developer/FACTS-DEV.md`);
+length bias with `node .claude/skills/bank-audit/longest.mjs questions/developer/developer.json`. The Exam
 Path lists the tracks in the order of `questions/index.json` (Developer, Developer Professional,
 Architect Foundations, Architect Professional, Claude Code Foundations, Scenario Practice, Full
 Mock Exam) and shows all seven in one row from 1180px up; below that it wraps to 3 columns, then 1.
@@ -348,16 +348,22 @@ that, the leaderboard needs real auth.
 index.html         app shell, all logic, no build step (~1030 lines)
 questions/
   index.json       load order — the manifest
-  mock.json        pool config (no questions of its own)
-  basic.json       49 questions (Claude Code Foundations)
-  scenario.json    94 questions (Scenario Practice)
-  developer.json   100 questions (Developer, CCDVF; 60 drawn)
-  developer-pro.json  100 questions (Developer Professional, CCDVP; 60 drawn)
-  FACTS-DEV.md     verified doc quotes behind both Developer banks
-  architect.json   100 questions (Architect Foundations; 60 drawn per sitting)
-  architect-pro.json  100 questions (Architect Professional, CCAR-P; 60 drawn)
-  core.json        48 questions (Core Concepts Drill)      ┐ "Mock Exam Bank"
-  mock1-6.json     60/58/56/54/51/55 (Mock Exam 1-6)       │ section
+  (one folder per track; index.json names each bank as <folder>/<name>)
+  developer/
+    developer.json     100 questions (Developer, CCDVF; 60 drawn)
+    developer-pro.json 100 questions (Developer Professional, CCDVP; 60 drawn)
+    FACTS-DEV.md       verified doc quotes behind both Developer banks
+  architect/
+    architect.json     100 questions (Architect Foundations; 60 drawn per sitting)
+    architect-pro.json 100 questions (Architect Professional, CCAR-P; 60 drawn)
+    foundations-es.json (see below)
+  claude-code/
+    basic.json         49 questions (Claude Code Foundations)
+    scenario.json      94 questions (Scenario Practice)
+    core.json          48 questions (Core Concepts Drill)      ┐ "Mock Exam Bank"
+  mock/                                                        │ section
+    mock.json          pool config (no questions of its own)
+    mock1-6.json       60/58/56/54/51/55 (Mock Exam 1-6)       │
                    Imported from the CCA Foundations Prep artifact; mock items
                    are MIT-licensed, see each file's `source`/`licence`. d: core
                    1, mocks 1-3 → 2, mocks 4-6 (labelled hard by the source) → 3.

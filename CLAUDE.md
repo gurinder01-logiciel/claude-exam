@@ -38,7 +38,8 @@ Three moving parts:
 - **`index.html`** — the entire app: markup, CSS custom properties, and all logic
   in one inline `<script>`. This is the file to edit.
 - **`questions/`** — data only. `index.json` is a manifest (`{"levels": [...]}`)
-  naming which `questions/<name>.json` files to load, in order.
+  naming which `questions/<folder>/<name>.json` files to load, in order (one folder per track:
+  `developer/`, `architect/`, `claude-code/`, `mock/`).
 - **`api/scores.js`** — single Vercel serverless function, `GET`/`POST
   /api/scores`, backed by a Redis list (`ccaf:scores`, capped at 500 entries) via
   raw `fetch` to Upstash's REST API. No SDK.
@@ -120,7 +121,7 @@ length and a 0–1000 score range, nothing more.
 
 ## Claude Code setup (`.claude/`)
 
-- **Hooks** (`.claude/settings.json`): after any Edit/Write to `questions/*.json`,
+- **Hooks** (`.claude/settings.json`): after any Edit/Write to a bank under `questions/` (any depth),
   `.claude/hooks/check-bank.mjs` validates the bank and blocks (exit 2) on bad
   `correct` indices, `d`, `scenario`, empty `explain` or duplicate options. Edits to
   `CCAF_Exam_Simulator.html` are blocked outright. Run the validator by hand with
@@ -132,7 +133,7 @@ length and a 0–1000 score range, nothing more.
 
 ## Adding questions or a level
 
-Edit `questions/*.json` only — no code change is needed (unless you add a new
+Edit the bank files under `questions/` only — no code change is needed (unless you add a new
 scenario id, which needs a `SCENARIOS` entry). Per-question fields: `domain`
 (free text, drives the results breakdown), `d` (1/2/3), `q` (prefix
 `SCENARIO — <name>.` to render a context banner — legacy; prefer `scenario`),
@@ -144,5 +145,5 @@ guide task statements); `SCOPE.md` records per-question scope verdicts and
 `AUDIT.md` the last bank audit. Check a new question against them. Explanations should say why the tempting distractor fails, not just
 why the answer is right.
 
-A new level = create `questions/<name>.json` in the level shape (see DOCS.md §7)
-and append `"<name>"` to `levels` in `questions/index.json`.
+A new level = create `questions/<track>/<name>.json` in the level shape (see DOCS.md §7)
+and append `"<track>/<name>"` to `levels` in `questions/index.json`.
