@@ -197,7 +197,7 @@
         "Set tool_choice to {\"type\": \"tool\", \"name\": \"get_customer\"} on every request in the conversation"
       ],
       "correct": 2,
-      "explain": "Forcing the named tool on the first request guarantees the prerequisite call, and returning to auto lets the conversation continue normally. tool_choice any is the near-miss: it guarantees that some tool is called, but the model can still pick lookup_order. Forcing get_customer on every request would trap the agent calling it repeatedly, and tool order is not a priority setting. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs."
+      "explain": "Forcing the named tool on the first request guarantees the prerequisite call, and returning to auto lets the conversation continue normally. tool_choice any is the near-miss: it guarantees that some tool is called, but the model can still pick lookup_order. Forcing get_customer on every request would trap the agent calling it repeatedly, and tool order is not a priority setting. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs. Model note: forcing a tool with tool_choice any/tool works on models that support it, but Claude Opus 5.5 rejects it with a 400. On Opus 5.5, use auto with strict tool use or structured outputs. Source: https://platform.claude.com/docs/en/models/opus-5-5/migration-guide"
     },
     {
       "domain": "Context Management & Reliability",
@@ -1175,7 +1175,7 @@
         "Tool use with a JSON schema for the dashboard tags; a prefilled opening brace for the ERP invoice records"
       ],
       "correct": 2,
-      "explain": "Pick the method by how strict the output must be. A loose, human-read output can use prompt-based formatting, while a system that rejects anything off-schema needs tool use with a schema and the tool forced. The prefill for the ERP is the near-miss: it makes the reply start as JSON, but nothing makes the rest match the schema (and prefill is not supported on the newest models anyway). Parse-and-retry accepts failures as routine, and the last option puts the strict method on the output that needs it least. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs."
+      "explain": "Pick the method by how strict the output must be. A loose, human-read output can use prompt-based formatting, while a system that rejects anything off-schema needs tool use with a schema and the tool forced. The prefill for the ERP is the near-miss: it makes the reply start as JSON, but nothing makes the rest match the schema (and prefill is not supported on the newest models anyway). Parse-and-retry accepts failures as routine, and the last option puts the strict method on the output that needs it least. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs. Model note: forcing a tool with tool_choice any/tool works on models that support it, but Claude Opus 5.5 rejects it with a 400. On Opus 5.5, use auto with strict tool use or structured outputs. Source: https://platform.claude.com/docs/en/models/opus-5-5/migration-guide"
     },
     {
       "domain": "Prompt Engineering & Structured Output",
@@ -1189,7 +1189,7 @@
         "none, followed by a second request asking the model which of the three tools it would use instead"
       ],
       "correct": 2,
-      "explain": "any guarantees a tool call while letting the model pick which one fits the document. auto is the near-miss: the model will usually pick a tool, but auto allows a plain-text reply, which breaks the pipeline's guarantee. Forcing extract_invoice sends receipts and contracts through the wrong schema, and none just adds a round trip. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs."
+      "explain": "any guarantees a tool call while letting the model pick which one fits the document. auto is the near-miss: the model will usually pick a tool, but auto allows a plain-text reply, which breaks the pipeline's guarantee. Forcing extract_invoice sends receipts and contracts through the wrong schema, and none just adds a round trip. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs. Model note: forcing a tool with tool_choice any/tool works on models that support it, but Claude Opus 5.5 rejects it with a 400. On Opus 5.5, use auto with strict tool use or structured outputs. Source: https://platform.claude.com/docs/en/models/opus-5-5/migration-guide"
     },
     {
       "domain": "Prompt Engineering & Structured Output",

@@ -225,7 +225,7 @@
         "Leave tool_choice unset and validate afterward that a tool_use block is present, retrying the request when one is absent"
       ],
       "correct": 1,
-      "explain": "tool_choice set to 'any' requires one of the tools to be called while leaving the schema selection to Claude, which is the requirement here. Naming a single tool with tool_choice 'tool' is the tempting near-miss: it also guarantees a call, but it makes you pre-choose the document type, which is precisely what you wanted to avoid. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs.",
+      "explain": "tool_choice set to 'any' requires one of the tools to be called while leaving the schema selection to Claude, which is the requirement here. Naming a single tool with tool_choice 'tool' is the tempting near-miss: it also guarantees a call, but it makes you pre-choose the document type, which is precisely what you wanted to avoid. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs. Model note: forcing a tool with tool_choice any/tool works on models that support it, but Claude Opus 5.5 rejects it with a 400. On Opus 5.5, use auto with strict tool use or structured outputs. Source: https://platform.claude.com/docs/en/models/opus-5-5/migration-guide",
       "scenario": 6
     },
     {
@@ -771,7 +771,7 @@
         "Use tool_choice: 'none' and put the schema in the prompt, then validate the returned JSON text against that schema in the consumer"
       ],
       "correct": 0,
-      "explain": "With one known document type, naming the tool eliminates conversational replies and wrong-tool selection together. tool_choice 'any' is the strong near-miss: it does forbid text, but it leaves selection to the model, which matters as soon as a second tool is added and is not the guarantee the scenario asks for. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs.",
+      "explain": "With one known document type, naming the tool eliminates conversational replies and wrong-tool selection together. tool_choice 'any' is the strong near-miss: it does forbid text, but it leaves selection to the model, which matters as soon as a second tool is added and is not the guarantee the scenario asks for. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs. Model note: forcing a tool with tool_choice any/tool works on models that support it, but Claude Opus 5.5 rejects it with a 400. On Opus 5.5, use auto with strict tool use or structured outputs. Source: https://platform.claude.com/docs/en/models/opus-5-5/migration-guide",
       "scenario": 6
     },
     {
@@ -1247,7 +1247,7 @@
         "Force `record_invoice` with `tool_choice`, and sequence the work so the vendor lookup happens in an earlier call whose result is passed in."
       ],
       "correct": 3,
-      "explain": "Forcing the specific tool guarantees the structured call instead of prose, and because the forced turn cannot also call `fetch_vendor`, the prerequisite lookup has to be its own earlier step whose result is fed forward. The near-miss relies on a required schema field to force the lookup: a required field only makes the model fill the slot, which it can do by guessing rather than by calling `fetch_vendor`. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs.",
+      "explain": "Forcing the specific tool guarantees the structured call instead of prose, and because the forced turn cannot also call `fetch_vendor`, the prerequisite lookup has to be its own earlier step whose result is fed forward. The near-miss relies on a required schema field to force the lookup: a required field only makes the model fill the slot, which it can do by guessing rather than by calling `fetch_vendor`. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs. Model note: forcing a tool with tool_choice any/tool works on models that support it, but Claude Opus 5.5 rejects it with a 400. On Opus 5.5, use auto with strict tool use or structured outputs. Source: https://platform.claude.com/docs/en/models/opus-5-5/migration-guide",
       "scenario": 6
     },
     {

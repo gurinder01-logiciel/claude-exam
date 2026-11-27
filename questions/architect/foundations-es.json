@@ -887,7 +887,7 @@
         1,
         4
       ],
-      "explain": "any forces the model to call some tool, which guarantees a structured result; forcing a specific tool enforces execution order. auto is the opposite of a guarantee — it lets the model answer in text, which is also why 'any when the model should be free to answer in text' describes auto, not any; forcing a tool controls which tool is called, not whether the facts are hallucinated. Current docs: on Opus 5.5, Sonnet 5.5 and Fable 5.x, tool_choice any/tool returns a 400; use auto with strict tool use, or structured outputs."
+      "explain": "any forces the model to call some tool, which guarantees a structured result; forcing a specific tool enforces execution order. auto is the opposite of a guarantee — it lets the model answer in text, which is also why 'any when the model should be free to answer in text' describes auto, not any; forcing a tool controls which tool is called, not whether the facts are hallucinated. Nota sobre el modelo: forzar una herramienta con tool_choice any/tool funciona en los modelos que lo admiten, pero Claude Opus 5.5 lo rechaza con un error 400. En Opus 5.5, usa auto con uso estricto de herramientas (strict tool use) o salidas estructuradas. Fuente: https://platform.claude.com/docs/en/models/opus-5-5/migration-guide"
     },
     {
       "domain": "Prompt Engineering & Structured Output",

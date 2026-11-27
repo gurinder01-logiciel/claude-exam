@@ -577,6 +577,10 @@ Source: https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overvi
 Source: https://code.claude.com/docs/en/agent-sdk/mcp
 
 
+### F-148 · Forced tool_choice is model-specific (Opus 5.5 rejects it)
+> Claude Opus 5.5 doesn't support forced tool use.
+Source: https://platform.claude.com/docs/en/models/opus-5-5/whats-new-opus-5-5
+
 ## Section B: Developer Professional (ids P-nn)
 
 ### P-01 · Spend-cap 429 has no retry-after
