@@ -45,21 +45,21 @@
    "d": 1,
    "scenario": 0,
    "task": "1.1",
-   "q": "A lender's loan-pack service always runs the same four steps in the same order: extract fields from the application, check them against policy rules, draft a summary, and queue it for an underwriter. Auditors must be able to replay every step, and the steps never change with the input. Which architecture fits?",
+   "q": "A claims-intake service always runs the same four stages in the same order: extract fields, validate them against policy, draft a letter, and queue it for sending. When the drafting stage fails, the team wants to retry just that stage from the saved output of the validation stage without repeating earlier work. Which architecture fits?",
    "options": [
-    "An autonomous agent given all four capabilities as tools and left to decide which to use, so the system adapts to each application it receives",
-    "A supervisor agent that spawns one subagent per step and lets them agree among themselves on the order in which the steps should run each time",
-    "A workflow in which code fixes the order of the four steps and calls Claude inside each one, so every run follows the same replayable path",
-    "One long prompt that lists the four steps and asks Claude to work through them and return the finished pack in a single response each time"
+    "An autonomous agent given all four capabilities as tools and left to decide which to call, with its whole conversation re-run after a failure",
+    "A supervisor agent that spawns one subagent per stage and lets them agree among themselves on the order in which the stages should run each time",
+    "A workflow in which code runs the four stages in a fixed order and saves each stage's output, so a failed stage can be retried on its own",
+    "One long prompt that lists the four stages and asks Claude to work through them and return the finished letter in a single response each time"
    ],
    "correct": 2,
-   "explain": "The path is fixed and auditors need replay, so code should own the order and Claude should do the work inside each step. An agent earns its extra cost only when the path emerges at run time. A supervisor negotiating step order makes runs differ, and one long prompt hides the intermediate steps that auditors want to inspect.",
-   "constraint": "fixed order of steps, replayable by auditors",
+   "explain": "The path is fixed and one stage must be retried on its own, so code should own the order, save each stage's output and call Claude inside each stage. An agent earns its extra cost only when the path emerges at run time, a supervisor negotiating stage order makes runs differ, and one long prompt leaves no intermediate output to resume from.",
+   "constraint": "fixed order of stages, retry one stage alone",
    "breaks": [
-    "autonomy adds nothing for a fixed path and makes the order vary between runs",
-    "the order is negotiated at run time, so a run cannot be replayed step by step",
+    "autonomy adds nothing for a fixed path and gives no stage boundary to resume from",
+    "the order is negotiated at run time, so a run cannot be repeated stage by stage",
     null,
-    "all steps collapse into one call, so auditors cannot replay or inspect any individual step"
+    "all stages collapse into one call, so there is no saved intermediate output to retry from"
    ],
    "facts": [],
    "course": "Production-Grade Prompting, Agents & Tool Use",
@@ -74,8 +74,8 @@
    "options": [
     "An agent loop with the relevant lookup tools, where Claude chooses the next step from each result, and a cap on iterations",
     "A fixed workflow with twelve hard-coded branches, one for each failure pattern the team has seen so far, and a catch-all branch for everything else",
-    "A single Claude call that receives every tool's output for every case up front, so that no decision about which lookup to run is ever needed",
-    "A prompt chain of five fixed stages that always runs carrier, warehouse and refund checks in turn and passes each result forward to the next"
+    "A single Claude call that receives every tool's output for every case up front, so that no decision about which lookup to run is needed",
+    "A prompt chain of five fixed stages that runs carrier, warehouse and refund checks in turn and passes each result forward to the next"
    ],
    "correct": 0,
    "explain": "When the path depends on what each result shows, the model should pick the next step and a loop cap should bound cost. A fixed branch list needs the very knowledge the team lacks, running every lookup wastes cost, and a fixed chain cannot adapt to a case.",
@@ -126,10 +126,10 @@
    "task": "1.1",
    "q": "A healthcare company's compliance rules forbid sending data to any service that is not eligible for zero data retention. It still wants Claude Managed Agents rather than building its own harness. Which statement fits the requirement?",
    "options": [
-    "Use the default cloud environment, since a sandbox that Anthropic runs inherits the ZDR terms of the organisation's main API agreement automatically",
+    "Use the default cloud environment, since a sandbox that Anthropic runs inherits the ZDR terms of the organisation's main API agreement",
     "Use a self-hosted sandbox, because Managed Agents is not eligible for ZDR except in its self-hosted form",
     "Add a system prompt asking the agent to forget session data once each task completes, which satisfies a zero data retention requirement in practice",
-    "Switch to the Message Batches API for the same workload, because batch processing is the only mode in which responses are never stored by the platform"
+    "Switch to the Message Batches API for the same workload, because batch processing is the mode in which responses are not stored by the platform"
    ],
    "correct": 1,
    "explain": "The Managed Agents page states it is not eligible for ZDR except for self-hosted Managed Agents, so the compliance rule decides the environment: self-hosted sandbox. The cloud environment is the near-miss; it is easier to start with but sits outside ZDR. A prompt instruction does not change what is retained.",
@@ -207,7 +207,7 @@
    "task": "1.2",
    "q": "A nightly job built on the Agent SDK reports success whenever the loop finishes without an exception. One night it silently stopped at the spend cap and returned half the work. Which change makes the job report correctly?",
    "options": [
-    "Read the ResultMessage subtype and treat only the success subtype as done, handling error_max_turns and error_max_budget_usd as incomplete",
+    "Read the ResultMessage subtype and treat only the success subtype as done, because a limit arrives as error_max_turns or error_max_budget_usd",
     "Check that the final text block is non-empty, since a limit always produces an empty final message and a finished run always produces some text",
     "Wrap the loop in a try/except block and mark failure on any exception, because hitting a limit raises an error that the caller can catch",
     "Remove the spend cap so the loop can always run to completion, and rely on the cloud provider's billing alerts to catch runaway usage instead"
@@ -235,9 +235,9 @@
    "task": "1.2",
    "q": "An Agent SDK application registers two PreToolUse hooks for the Bash tool. For one command, the first hook returns allow and the second returns deny. Which TWO statements are correct? Select TWO.",
    "options": [
-    "The first registered hook decides the outcome, so its allow stands and the later deny is only logged for the audit trail of the session",
+    "The first registered hook decides the outcome, so its allow stands and the later deny is logged for the audit trail of the session",
     "The call is denied, because when PreToolUse hooks disagree deny outranks defer, ask and allow",
-    "An allow from a hook skips the deny rules in the settings file, so the hook is the last word on any command that it explicitly approves",
+    "An allow from a hook skips the deny rules in the settings file, so the hook is the last word on a command that it explicitly approves",
     "Each hook should act on its own, because hook completion order is non-deterministic and no hook can rely on another having run first"
    ],
    "correct": [
@@ -321,8 +321,8 @@
    "task": "1.2",
    "q": "Engineers keep forgetting to run the formatter after Claude edits files, and the system prompt asking Claude to run it is followed only some of the time. Which approach makes formatting happen on every edit?",
    "options": [
-    "Repeat the formatting instruction at the start and end of every user message, so that the model sees it twice and follows it consistently",
-    "Add the formatter as an extra tool and set tool_choice to any on every request, so the model must call some tool before each response",
+    "Repeat the formatting instruction at the start and end of each user message, so that the model sees it twice and follows it consistently",
+    "Add the formatter as an extra tool and set tool_choice to any on each request, so the model must call some tool before each response",
     "Configure a PostToolUse hook on the edit tools that runs the formatter, so the action does not depend on the model choosing to run it",
     "Ask the model to rate its own confidence that formatting was done and re-run the task when the rating falls below an agreed threshold"
    ],
@@ -375,10 +375,10 @@
    "task": "1.3",
    "q": "A custom loop calls the Messages API with the web search server tool. Occasionally a task stops after the first response with stop_reason pause_turn, and the user sees an unfinished answer. The loop only continues when stop_reason is tool_use. Which change fixes the defect?",
    "options": [
-    "Treat pause_turn as an error and retry the original request unchanged, because the server tool simply failed and a fresh attempt should succeed",
+    "Treat pause_turn as an error and retry the original request unchanged, because the server tool failed and a fresh attempt should succeed",
     "Raise max_tokens until pause_turn stops appearing, since the stop reason is produced when the answer is longer than the output budget allows",
-    "Treat pause_turn as not finished: send the assistant content back in a new request so the server-tool loop can continue until its work is done",
-    "Execute the pending tool call locally and append a tool_result block, because every non-end_turn stop reason means a client tool is waiting"
+    "Treat pause_turn as not finished: send the assistant content back in a new request so the server-tool loop can continue to completion",
+    "Execute the pending tool call locally and append a tool_result block, because a non-end_turn stop reason means a client tool is waiting"
    ],
    "correct": 2,
    "explain": "pause_turn means a server-tool loop reached its iteration limit, and the documented action is to send the assistant content back to continue. Retrying unchanged repeats the work, and no client-side tool_result is owed for a server tool.",
@@ -402,9 +402,9 @@
    "task": "1.3",
    "q": "An agent calls a flaky inventory tool. When the tool throws, the harness returns the raw stack trace as normal tool output. The agent then repeats the identical call 30 times before the run hits its cost cap. Which change corrects the pattern?",
    "options": [
-    "Return the failure as a tool_result with is_error set to true and a short actionable message, and cap how many retries the loop allows",
-    "Delete the tool_result entirely when a call fails, so the model has no failure text to react to and moves on to a different action by itself",
-    "Pass the full stack trace to the model with a note asking it to diagnose the server fault and fix it, because more detail always leads to better recovery",
+    "Return the failure as a tool_result with is_error true and a short actionable message, because the model may retry, and cap retries in the loop",
+    "Delete the tool_result when a call fails, so the model has no failure text to react to and moves on to a different action by itself",
+    "Pass the full stack trace to the model with a note asking it to diagnose the server fault and fix it, because more detail leads to better recovery",
     "Raise the model's effort level so it reasons for longer before each call, since the repeated calls come from too little thinking on each turn"
    ],
    "correct": 0,
@@ -459,8 +459,8 @@
    "options": [
     "Keep the conversation in a process variable and rebuild it from the last user message after each restart, because the model can infer the rest",
     "Store each conversation's session ID and pass it to resume when the user returns, so the SDK reloads that session's history",
-    "Use continue so the most recent session in the directory is resumed, since the user will always want the conversation that ended last",
-    "Fork the session on every restart to protect the original copy, then show the user whichever fork was created most recently on the host"
+    "Use continue so the most recent session in the directory is resumed, since the user will want the conversation that ended last",
+    "Fork the session on each restart to protect the original copy, then show the user whichever fork was created most recently on the host"
    ],
    "correct": 1,
    "explain": "Resuming a specific past session means capturing its session ID and passing it to resume; continue only picks up the most recent session. Fork is for exploring an alternative without losing the original.",
@@ -486,9 +486,9 @@
    "task": "1.3",
    "q": "A coordinator agent delegates a code-review task to a subagent. The subagent keeps asking about decisions made earlier in the conversation because it starts with a fresh context. The coordinator's earlier discussion is essential to the review. Which fix is the most direct?",
    "options": [
-    "Raise the subagent's tool limit so it can call a search tool to retrieve earlier discussion, since a fresh context can always be rebuilt by search",
+    "Raise the subagent's tool limit so it can call a search tool to retrieve earlier discussion, since a fresh context can be rebuilt by search",
     "Start the delegate as a fork, which copies the conversation so far instead of starting fresh, so the delegate sees the earlier discussion needed",
-    "Move every instruction into the subagent's description field so that the description acts as the shared conversation history for each new delegate",
+    "Move the instructions into the subagent's description field so that the description acts as the shared conversation history for each new delegate",
     "Merge the subagent back into the coordinator so one agent does everything, which removes context isolation along with the delegation overhead"
    ],
    "correct": 1,
@@ -513,9 +513,9 @@
    "task": "2.1",
    "q": "A streaming handler totals output tokens by adding the usage.output_tokens value from every message_delta event it receives. For a long answer the stream shows three such events, and the monthly report is roughly double what the billing page shows. What is wrong?",
    "options": [
-    "The usage field in message_delta counts only the tokens since the previous event, so the handler must add the values but also subtract the input tokens",
-    "Streaming responses are billed at twice the rate of non-streaming ones, so the report is correct and the billing page must be showing only half",
-    "The handler should sum the values from content_block_delta events instead, because message_delta events are only sent when a response is truncated",
+    "The usage field in message_delta counts the tokens since the previous event, so the handler must add the values but also subtract the input tokens",
+    "Streaming responses are billed at twice the rate of non-streaming ones, so the report is correct and the billing page must be showing half",
+    "The handler should sum the values from content_block_delta events instead, because message_delta events are sent when a response is truncated",
     "The usage counts in message_delta events are cumulative, so the handler should take the last value instead of adding them together"
    ],
    "correct": 3,
@@ -540,9 +540,9 @@
    "task": "2.1",
    "q": "A tool-using app streams responses. When Claude calls a tool, the handler tries to run JSON.parse on the input_json_delta text of each delta as soon as it arrives, and throws on most of them. What is the correct approach?",
    "options": [
-    "Concatenate the partial_json strings for that content block and parse once, after the block's content_block_stop event, keyed by the block index",
-    "Ask the API to disable streaming for tool calls only, because partial tool input cannot be reassembled by a client once it has been split into deltas",
-    "Parse each delta separately and merge the resulting objects, since every delta is a complete JSON object describing one argument of the call",
+    "Concatenate the partial_json strings per block index and parse once at content_block_stop, because fragments are valid JSON only when joined",
+    "Ask the API to disable streaming for tool calls, because partial tool input is not reassembled by a client once it has been split into deltas",
+    "Parse each delta separately and merge the resulting objects, since each delta is a complete JSON object describing one argument of the call",
     "Wait for the message_stop event and parse the whole stream body as one JSON document, since the entire response is a single JSON value in the end"
    ],
    "correct": 0,
@@ -568,8 +568,8 @@
    "task": "2.1",
    "q": "A service builds its tools array from a dictionary, so the order of the tool definitions changes between processes. Everything else in the request is identical, yet prompt-cache reads are near zero and cache writes happen on almost every request. Why?",
    "options": [
-    "Cache entries are keyed by request id, so no two requests can ever share an entry unless they are retried with exactly the same request id each time",
-    "Only the system prompt is eligible for caching, and tool definitions are always excluded, so a changing tools array just adds noise to the usage fields",
+    "Cache entries are keyed by request id, so no two requests can ever share an entry unless they are retried with the same request id",
+    "The system prompt is eligible for caching, and tool definitions are excluded, so a changing tools array just adds noise to the usage fields",
     "Tools come first in the cached prefix, so a change in tool order changes the prefix and invalidates the cache from the start",
     "The cache lifetime is shortened whenever more than one process writes to it, so concurrent services must raise the lifetime to the one-hour option instead"
    ],
@@ -598,8 +598,8 @@
    "q": "A developer adds cache_control to a 900-token system prompt on a model whose minimum cacheable prompt is longer than that. Requests succeed with no error. Which TWO statements describe what is happening? Select TWO.",
    "options": [
     "The prompt is shorter than the minimum cacheable length, so it is processed without caching and no error is returned",
-    "The cache_control field was rejected silently because it may be attached only to tool definitions and never to a block of system prompt text",
-    "The cache is warming up and reads begin after five minutes, so a first request that writes nothing is normal for a cacheable prompt of any size",
+    "The cache_control field was rejected silently because it may be attached to tool definitions but not to a block of system prompt text",
+    "The cache is warming up and reads begin after five minutes, so a first request that writes nothing is normal for a cacheable prompt",
     "Both cache_creation_input_tokens and cache_read_input_tokens read 0 in the usage fields, which shows the prompt was not cached"
    ],
    "correct": [
@@ -630,8 +630,8 @@
    "options": [
     "Batches expire if processing is not complete within 24 hours, so the job's results were discarded on the day after submission and none existed",
     "Batch results are available for 29 days after creation; later you can still view the batch but not download its results",
-    "Results are deleted automatically once downloaded for the first time, so a second download is never possible even within the first day",
-    "Results stay available only while the custom_id values remain unique, and reusing one in a later batch removes the older result from the platform"
+    "Results are deleted once downloaded for the first time, so a second download is not possible even within the first day",
+    "Results stay available while the custom_id values remain unique, and reusing one in a later batch removes the older result from the platform"
    ],
    "correct": 1,
    "explain": "Batch results remain available for 29 days after creation. After that the batch can still be viewed, but results cannot be downloaded. The 24-hour limit is the processing window, so it is a different clock.",
@@ -683,10 +683,10 @@
    "task": "2.1",
    "q": "A chat UI streams text into the page. Users sometimes see an answer that stops mid-sentence with no warning, and the logs show a stop reason of model_context_window_exceeded on those responses. What should the handler do?",
    "options": [
-    "Treat the response as truncated, flag it to the user, and shorten or restructure the input before trying again",
-    "Show the text as a complete answer, because that stop reason is sent when Claude has finished and the context window is simply full of the result",
+    "Treat the response as truncated, flag it to the user, and shorten or restructure the input, because the window filled before the answer ended",
+    "Show the text as a complete answer, because that stop reason is sent when Claude has finished and the context window is full of the result",
     "Resend the identical request with a higher max_tokens value, because this stop reason means the output limit was reached before the window was full",
-    "Resume the same stream automatically with a fresh connection, because the stop reason indicates a dropped connection that the client can recover"
+    "Resume the same stream with a fresh connection, because the stop reason indicates a dropped connection that the client can recover"
    ],
    "correct": 0,
    "explain": "model_context_window_exceeded means the response filled the model's context window, and the documented handling is to treat the response as truncated. Distinguish it from max_tokens, which is the output cap you set, and from a dropped connection.",
@@ -712,9 +712,9 @@
    "q": "A document-analysis service receives the same 20 MB contract PDF with many different questions over a day, and each request re-uploads the file as base64. Requests are slow and sometimes rejected as too large. Which change addresses both problems?",
    "options": [
     "Compress the base64 text with gzip before sending, since the API decompresses request bodies and the smaller payload avoids the limit",
-    "Split the PDF into single pages and send all pages with every question, so that each request stays below the size limit for each single page",
-    "Upload the file once through the Files API and reference its file_id in a document block for each question, rather than re-sending it",
-    "Reference the file as an image block with its file_id, because the image block type accepts any file type and skips the size checks"
+    "Split the PDF into single pages and send all pages with each question, so that each request stays below the size limit for each single page",
+    "Upload the file once through the Files API and reference its file_id in a document block, so the content is not re-sent each time",
+    "Reference the file as an image block with its file_id, because the image block type accepts other file types and skips the size checks"
    ],
    "correct": 2,
    "explain": "The Files API exists so content is uploaded once and referenced by file_id instead of re-sent with each request. PDFs are referenced in document blocks; images use image blocks.",
@@ -737,13 +737,13 @@
    "domain": "Applications and Integration",
    "d": 2,
    "scenario": 0,
-   "task": "2.2",
+   "task": "2.3",
    "q": "A team's Agent SDK worker runs in a container built from the repository, which contains a CLAUDE.md with instructions meant only for human developers using Claude Code. In production the worker follows those instructions unexpectedly. The team wants the agent to use only what the application passes in code. What should they do?",
    "options": [
     "Pass an empty settingSources list so the SDK loads no filesystem settings, and supply the system prompt and options in code",
     "Delete the CLAUDE.md from the repository, since the SDK has no other way of being told to ignore a project instruction file that exists on disk",
-    "Rename the file to claude.md in lower case, because the SDK only loads project instructions when the file name uses the exact upper-case spelling",
-    "Set the permission mode to plan for the worker, because plan mode makes the agent ignore any project instructions while it prepares its work"
+    "Rename the file to claude.md in lower case, because the SDK loads project instructions when the file name uses the exact upper-case spelling",
+    "Set the permission mode to plan for the worker, because plan mode makes the agent ignore project instructions while it prepares its work"
    ],
    "correct": 0,
    "explain": "When settingSources is omitted, query() reads the same filesystem settings as the CLI, including CLAUDE.md files and .claude/ skills and agents. Passing an empty list limits the agent to what the application configures programmatically.",
@@ -797,8 +797,8 @@
    "options": [
     "Move the customer text to the very end of the system prompt, so that the role instructions above it carry more weight than the pasted line",
     "Keep the role and rules in the system prompt, and pass the customer's text in a user turn clearly delimited as data to be processed",
-    "Strip every sentence that contains the word ignore from the customer's text before inserting it, so that the known attack phrase cannot appear",
-    "Tell customers in the interface that pasting instructions is not allowed, and treat any breach as a policy violation reported afterwards"
+    "Strip the sentences that contain the word ignore from the customer's text before inserting it, so the known attack phrase does not appear",
+    "Tell customers in the interface that pasting instructions is not allowed, and treat a breach as a policy violation reported afterwards"
    ],
    "correct": 1,
    "explain": "Untrusted content should not sit in the privileged system prompt. Keeping rules in the system prompt and passing customer text as delimited data in a user turn changes what crosses the boundary. Keyword stripping and warnings are weaker than structure.",
@@ -875,9 +875,9 @@
    "q": "A team ships a Claude Code plugin that depends on another team's plugin for its MCP server. After the other team publishes a breaking release, the first plugin stops working for everyone who updates. Which change prevents a repeat?",
    "options": [
     "Declare a version constraint on the dependency, a semantic-version range the team has tested against, in the plugin's manifest",
-    "Copy the other plugin's files into the first plugin's folder so that nothing outside the repository can change what the plugin loads",
-    "Ask every user to disable automatic updates on their machines, so that no plugin is ever upgraded without a manual review by that user",
-    "Remove the dependency declaration entirely, since an undeclared plugin is installed at the version the user already has on the machine"
+    "Copy the other plugin's files into the first plugin's folder so that changes outside the repository do not alter what the plugin loads",
+    "Ask users to disable automatic updates on their machines, so that no plugin is upgraded without a manual review by that user",
+    "Remove the dependency declaration, since an undeclared plugin is installed at the version the user already has on the machine"
    ],
    "correct": 0,
    "explain": "A dependency tracks the latest version its marketplace provides unless a version constraint is declared. A semantic-version range such as ^2.0 limits it to versions the team has tested.",
@@ -902,9 +902,9 @@
    "q": "A client library sees HTTP 429 responses carrying a retry-after header and retries after a fixed 100 ms. The retries keep failing and make the congestion worse. Which behaviour matches the API's documented semantics?",
    "options": [
     "Retry immediately and as often as possible, because a 429 means the request was not counted and a faster retry gets a slot sooner",
-    "Treat the 429 as a permanent failure and surface it to the user without any retry, because rate limits never clear within a session",
-    "Wait for the number of seconds in the retry-after header before retrying, and limit the number of attempts",
-    "Switch to a larger model on every 429, since only the smaller model's limits are low and a larger one would accept the request at once"
+    "Treat the 429 as a permanent failure and surface it to the user without a retry, because rate limits do not clear within a session",
+    "Wait for the number of seconds in the retry-after header, because the server says when to retry, and limit the number of attempts",
+    "Switch to a larger model on each 429, since the smaller model limits are low and a larger one would accept the request without delay"
    ],
    "correct": 2,
    "explain": "When the response has a retry-after header, the client should wait that long before retrying, and retries should be limited. The SDKs already follow retry-after and x-should-retry; hand-written clients should do the same.",
@@ -1043,10 +1043,10 @@
    "task": "2.4",
    "q": "An ingestion service handles uploads of PDFs, plain text files and screenshots through the Files API. It sends every uploaded file_id inside an image content block, and PDF uploads fail while screenshots work. What is the defect?",
    "options": [
-    "The Files API only supports images, so PDFs and plain text files must be converted to screenshots before they are uploaded and referenced",
-    "The file_id values for PDFs expire after one minute, so the service must upload each PDF again immediately before every request that uses it",
-    "The content block type must match the file type: PDFs and plain text go in document blocks and images go in image blocks, per the file type",
-    "Image blocks accept any file type when the MIME type is set to application/pdf in the request, so the upload call must set that value correctly"
+    "The Files API supports images, so PDFs and plain text files must be converted to screenshots before they are uploaded and referenced",
+    "The file_id values for PDFs expire after one minute, so the service must upload each PDF again immediately before each request that uses it",
+    "The content block type must match the file type: PDFs and plain text go in document blocks and images in image blocks, per the file type",
+    "Image blocks accept PDF files when the MIME type is set to application/pdf in the request, so the upload call must set that value correctly"
    ],
    "correct": 2,
    "explain": "The documented mapping is PDF and plain text to document blocks, images (jpeg, png, gif, webp) to image blocks, and other datasets to container_upload. A PDF sent in an image block is the defect.",
@@ -1127,10 +1127,10 @@
    "task": "3.1",
    "q": "A team needs three Claude Code workers on one refactor, where the frontend worker must negotiate an interface directly with the backend worker. Plain subagents that only report back to the lead have not worked. Which TWO statements about agent teams are correct? Select TWO.",
    "options": [
-    "Teammates share one context window, so only the lead pays for the tokens and the cost matches that of a single session working alone",
+    "Teammates share one context window, so the lead pays for the tokens and the cost matches that of a single session working alone",
     "Teammates work independently, each in its own context window, and communicate directly with each other",
     "Agent teams add coordination overhead and use significantly more tokens than a single session",
-    "Agent teams are the best fit for sequential work and same-file edits, because the teammates can all edit one file at the same moment safely"
+    "Agent teams are the best fit for sequential work and same-file edits, because the teammates can edit one file at the same moment safely"
    ],
    "correct": [
     1,
@@ -1150,7 +1150,7 @@
     "F-79"
    ],
    "course": "Claude Code, MCP & Integration",
-   "chapter": "Durable project context: CLAUDE.md, rules, hooks and subagents"
+   "chapter": "Explore-plan-code loop and permission modes"
   },
   {
    "domain": "Claude Code",
@@ -1159,10 +1159,10 @@
    "task": "3.1",
    "q": "Claude Code creates a git worktree for a parallel task, but tests in it fail because the .env file and installed dependencies are missing, although both exist in the main checkout. What should the team do?",
    "options": [
-    "Commit the .env file to the repository so every checkout, including worktrees, receives it through version control, along with the dependencies",
+    "Commit the .env file to the repository so each checkout, including worktrees, receives it through version control, along with the dependencies",
     "List the gitignored files to copy in a .worktreeinclude file at the repo root, and run dependency installation as part of worktree setup",
     "Symlink the worktree's folder to the main checkout so both directories point to the same files, even while the two tasks edit them in parallel",
-    "Run the tests only in the main checkout and treat the worktree failures as expected, since a worktree is not meant to run the test suite at all"
+    "Run the tests in the main checkout and treat the worktree failures as expected, since a worktree is not meant to run the test suite"
    ],
    "correct": 1,
    "explain": "A worktree is a fresh checkout, so gitignored files such as .env and installed dependencies are not there. A .worktreeinclude file at the repo root lists the gitignored files Claude Code should copy into every worktree it creates; dependencies still need installing.",
@@ -1270,9 +1270,9 @@
    "q": "A team upgrades Claude Code and worries that its older .claude/commands/ markdown files for slash commands will stop working now that skills exist. What is the accurate position?",
    "options": [
     "They stop working and must be rewritten as plugins first, because commands are not recognised once the skills feature is enabled by default",
-    "They work, but only when each file is also registered in a settings file that lists every command by name for the project",
-    "They work only for the user who created them, because command files are always personal and cannot be shared through a repository",
-    "Existing command files keep working, and a command can be moved into a skill folder later, where the folder name becomes the command"
+    "They work, but each file must also be registered by name in a settings file for the project",
+    "They work for the user who created them, because command files are personal and are not shared through a repository",
+    "Existing command files keep working because commands were merged into skills, and a command moved to a skill folder keeps its name"
    ],
    "correct": 3,
    "explain": "Custom commands have been merged into skills, and existing .claude/commands/ files keep working. Moving one to .claude/skills/<name>/SKILL.md keeps the same /name command.",
@@ -1296,7 +1296,7 @@
    "task": "4.1",
    "q": "A team is building a golden set to evaluate a ticket-summarisation prompt. Which TWO practices make it a useful starting point? Select TWO.",
    "options": [
-    "Generate a few hundred typical tickets with Claude itself, since synthetic examples are cheap and keep the whole set perfectly balanced",
+    "Generate the whole set with Claude itself so no real tickets are involved, since synthetic examples are cheap and keep it perfectly balanced",
     "Sample real, anonymised tickets from production so the set resembles what the prompt will actually see",
     "Add deliberately hard edge cases, each with an expected outcome that reviewers agreed on in advance",
     "Keep only tickets that the current prompt already handles well, so the evaluation shows a stable baseline when the prompt is edited later"
@@ -1350,9 +1350,9 @@
    "q": "A classification prompt scores 92% on the golden set in one run and 88% in the next with the same model and no changes. The team wonders whether the prompt is unstable. Which interpretation and action fit?",
    "options": [
     "Sampling makes outputs non-deterministic, so run each case several times and compare pass rates, not single runs, before and after a change",
-    "The run-to-run gap proves a bug in the evaluation harness, so the harness should be rewritten before any more results are taken seriously by the rest of the team",
-    "Four points is within the margin that every evaluation shows, so a single run is always enough and no repeated runs are ever needed",
-    "The prompt must be unstable only if the gap exceeds ten points, so smaller gaps can be ignored without checking how they were produced"
+    "The run-to-run gap proves a bug in the evaluation harness, so the harness should be rewritten before more results are taken seriously by the rest of the team",
+    "Four points is within the margin that evaluations show, so a single run is enough and repeated runs are not needed",
+    "The prompt is unstable if the gap exceeds ten points, so smaller gaps can be ignored without checking how they were produced"
    ],
    "correct": 0,
    "explain": "Generation is non-deterministic, so one run is a noisy estimate. Running each case several times and comparing pass rates gives a fairer before-and-after comparison.",
@@ -1376,7 +1376,7 @@
    "options": [
     "Use the judge for everything, since a single scoring method is easier to explain and the judge can also compare numbers against the labels",
     "Compare outputs to the labels by exact string match only, including whitespace and key order, so that anything slightly different counts as a failure",
-    "Check structure and field values with deterministic assertions against the labelled answers, and reserve a judge for qualities code cannot check",
+    "Check fields with deterministic assertions against the labelled answers, because code is exact, and reserve a judge for qualities code cannot check",
     "Skip evaluation until the feature is live and use customer complaints as the signal, since complaints measure the quality that really matters"
    ],
    "correct": 2,
@@ -1427,7 +1427,7 @@
     "Lower the temperature to zero so that the model stops inventing details and always repeats the exact figures it saw during its training",
     "Add more catalogue documents to the prompt on every request, since a larger context makes any missing detail appear somewhere in it",
     "Switch to a larger model, because larger models never state a figure that is absent from the documents they have been supplied with",
-    "Instruct the assistant to answer only from the supplied documents and to say the information was not found when it is absent from them"
+    "Tell the assistant to answer only from the supplied documents and to say not found when absent, because it was given no way to decline"
    ],
    "correct": 3,
    "explain": "The documents lack the answer and the prompt gives the model no way to decline, so it produces a plausible one. Grounding the answer in the supplied documents and returning \"not found\" when they do not contain it addresses the cause.",
@@ -1450,7 +1450,7 @@
    "q": "A request that worked yesterday now comes back with stop_reason refusal. The prompt is unchanged. What is the right handling in the integration code?",
    "options": [
     "Retry the identical request up to five times with backoff, because a refusal is a transient server error that resolves by waiting a few seconds",
-    "Read the stop details, route the case to a safe path, and use a fallback model where policy allows, instead of retrying the same request",
+    "Read the stop details and use a fallback model where policy allows, because retrying the same request repeats the refusal at extra cost",
     "Treat the empty or partial text as the answer and show it, since the response finished normally and a refusal is just a short assistant reply",
     "Add the word please to the prompt and send it again, because a refusal is only a tone problem that a politer instruction resolves each time"
    ],
@@ -1476,10 +1476,10 @@
    "task": "4.2",
    "q": "Users report that an assistant ignores its formatting rules. Prompt engineers rewrite the prompt three times without success. A developer then logs the raw request body and finds that the system field arrives empty because of a templating bug. What does this show?",
    "options": [
-    "The model is ignoring instructions, so the prompt should be made longer and louder until the formatting rules are followed in every reply",
+    "The model is ignoring instructions, so the prompt should be made longer and louder until the formatting rules are followed in each reply",
     "The failure was in the integration layer, not model output, so inspecting what was actually sent should come before rewriting prompts",
     "The templating bug is a model failure, because the model should have refused to answer when its system prompt was missing from the request",
-    "Nothing can be concluded without a larger evaluation set, because one request body is too small a sample to show anything about the system"
+    "Little can be concluded without a larger evaluation set, because one request body is too small a sample to show much about the system"
    ],
    "correct": 1,
    "explain": "Isolating the origin means checking whether the integration layer sent what was intended before blaming the model. Logging the raw request exposed the empty system field. Every response also carries a request-id header, which helps correlate such a log with the API's record.",
@@ -1671,7 +1671,7 @@
    "task": "5.2",
    "q": "A service asks Claude for JSON by ending its messages array with a prefilled assistant turn that starts with an opening brace. After the team switches the model to claude-opus-5-5, every request fails with a 400 error. Which migration step is correct?",
    "options": [
-    "Drop the prefilled turn and request JSON with structured outputs, or with explicit system prompt instructions, then rerun the regression evaluations",
+    "Drop the prefilled turn and request JSON with structured outputs or system prompt instructions, because that model rejects a prefilled turn; then rerun the evaluations",
     "Keep the prefill but wrap it in a system message so that the request no longer ends with an assistant turn and is therefore accepted",
     "Switch the request to streaming, because streamed requests are exempt from the rule that rejects a prefilled assistant turn on this model",
     "Pin the service to the previous model permanently, because a model that rejects prefill cannot return JSON reliably in any other way at all, however the request is written"
@@ -1727,9 +1727,9 @@
    "q": "A product shows an \"extra fast\" option for premium users. The same conversation can switch between fast and standard speed on consecutive turns, and the team notices cache reads collapsing after each switch. What is the cause and the fix?",
    "options": [
     "Changing the speed setting invalidates the system and message caches, so keep the speed fixed for the life of a conversation",
-    "Fast requests are never cached by design, so the team should remove cache_control from all requests, including the ones sent at standard speed",
-    "The cache expires after exactly one switch of any kind, so the team should add a second breakpoint to refresh it after each change in speed",
-    "Fast mode requires a different system prompt, so the cache misses are expected and the prompts should simply be written twice in the code"
+    "Fast requests are not cached by design, so the team should remove cache_control from the requests, including the ones sent at standard speed",
+    "The cache expires after one switch between modes, so the team should add a second breakpoint to refresh it after each change in speed",
+    "Fast mode requires a different system prompt, so the cache misses are expected and the prompts should be written twice in the code"
    ],
    "correct": 0,
    "explain": "Switching between speed fast and standard invalidates the system and message caches (the tools cache stays valid). Keeping speed constant within a conversation avoids repeated cache rewrites.",
@@ -1810,16 +1810,16 @@
    "task": "5.3",
    "q": "A nightly-use tool sends a request with the same large prompt prefix about every eight minutes. The team enabled caching, but usage shows a cache write on nearly every request and almost no reads. What is the best change?",
    "options": [
-    "Keep the 5-minute lifetime and send a tiny keep-alive request every seven minutes, so the cached content is never allowed to expire at all",
+    "Keep the 5-minute lifetime and add a second breakpoint on the system prompt, so two cache entries together cover the eight-minute gap between requests",
     "Use the 1-hour cache duration, because the default 5-minute lifetime expires between the requests, accepting the higher write price, for the gain",
-    "Remove cache_control and rely on automatic reuse, since an eight-minute gap is short enough for the platform to reuse any prefix it has seen",
+    "Remove cache_control and rely on automatic reuse, since an eight-minute gap is short enough for the platform to reuse a prefix it has seen",
     "Place the breakpoint on the user's question instead, since the question's position decides whether a cache entry is still alive after eight minutes"
    ],
    "correct": 1,
    "explain": "By default the cache lasts five minutes and is refreshed when used; with an eight-minute gap the entry expires every time. The 1-hour duration costs more to write (2 times the base input price) but turns writes into reads.",
    "constraint": "eight-minute gaps with a five-minute cache",
    "breaks": [
-    "adds extra calls for a result the longer lifetime gives directly",
+    "a second breakpoint adds an entry but does not lengthen the 5-minute lifetime, so each entry still expires between requests",
     null,
     "without caching the prefix is billed fully each time",
     "the lifetime, not the breakpoint position, is the problem here"
@@ -1868,8 +1868,8 @@
    "q": "Usage data for an agentic feature shows that output tokens, including thinking, make up most of the spend, while input tokens are small and mostly uncached short prompts. Which optimisation targets the dominant cost?",
    "options": [
     "Tune effort down where quality allows and constrain verbose output, since effort controls how many tokens Claude spends responding",
-    "Add cache_control to every short prompt, because caching reduces the cost of output tokens by the same factor as input tokens",
-    "Move the whole feature to the batch endpoint immediately, regardless of whether users are waiting, because batching always lowers output cost",
+    "Add cache_control to each short prompt, because caching reduces the cost of output tokens by the same factor as input tokens",
+    "Move the whole feature to the batch endpoint immediately, even though users are waiting, because batching lowers output cost",
     "Increase the context window setting, since a larger window makes the model produce shorter answers for the same question and prompt"
    ],
    "correct": 0,
@@ -2059,10 +2059,10 @@
    "task": "6.2",
    "q": "A prompt says \"Do not use markdown in your response\", yet the answers keep containing bullet lists and headings. Which revision is most likely to close the gap?",
    "options": [
-    "State what to do instead of what not to do, for example: write the answer as smooth prose paragraphs",
+    "State what to do instead of what not to do, because a positive format description is followed more reliably: write smooth prose paragraphs",
     "Repeat \"Do not use markdown\" five more times in capital letters, because stronger repetition of a prohibition is the documented way to enforce it",
-    "Move the sentence into the user turn, because instructions placed in the user turn always override the system prompt for formatting questions",
-    "Add a post-processing step that always deletes asterisks and hash characters, so the formatting rule is guaranteed whatever the model writes"
+    "Move the sentence into the user turn, because instructions placed in the user turn override the system prompt for formatting questions",
+    "Add a post-processing step that deletes asterisks and hash characters, so the formatting rule is met in the delivered text"
    ],
    "correct": 0,
    "explain": "Telling Claude what to do instead of what not to do is the documented guidance: a positive description of the desired format is followed more reliably than a prohibition.",
@@ -2086,10 +2086,10 @@
    "task": "6.3",
    "q": "A pipeline requests JSON through structured outputs and parses the reply text immediately. Occasionally parsing fails on a long extraction, and the logs show stop_reason max_tokens. Which TWO actions are correct? Select TWO.",
    "options": [
-    "Check the stop reason before parsing, and treat a max_tokens stop as incomplete output",
+    "Check the stop reason before parsing, because a max_tokens stop means the output is incomplete and may not match the schema",
     "Parse the partial text anyway and fill any missing fields with default values, since constrained decoding makes truncated output safe to repair",
     "Remove the schema from the request, because the schema is what makes the reply long enough to be cut off by the output limit in the first place",
-    "Retry with a higher max_tokens value to get the complete structured output"
+    "Retry with a higher max_tokens value, because that is how the complete structured output is obtained"
    ],
    "correct": [
     0,
@@ -2117,10 +2117,10 @@
    "task": "6.3",
    "q": "A structured-output request is sent for a borderline input that Claude declines to process. The application parses the reply as the schema's object and crashes. What should the integration have done?",
    "options": [
-    "Rely on the schema guarantee alone, since constrained decoding always forces the model to emit an object that fits, even on refusals",
+    "Rely on the schema guarantee alone, since constrained decoding forces the model to emit an object that fits, even on refusals",
     "Check for a refusal stop reason before parsing, because the refusal message takes precedence over the schema constraints",
     "Catch the exception and resend the same request until the reply parses, since a refusal is a random formatting failure that goes away",
-    "Turn off structured outputs for the whole application, because outputs can never be trusted whenever the model declines one single request"
+    "Turn off structured outputs for the whole application, because outputs are not trusted once the model declines a single request"
    ],
    "correct": 1,
    "explain": "Structured outputs guarantee compliance only for normal completions: when stop_reason is refusal the output might not match the schema, so the code must check the stop reason first.",
@@ -2173,8 +2173,8 @@
    "q": "A team uses an SDK helper with a Pydantic model that has a score field limited to 0-100. A response arrives with score 140 and nothing in the pipeline complains. Which explanation and fix fit?",
    "options": [
     "Numeric limits are enforced by constrained decoding, so the 140 must be a transport error and the response should be fetched again from the platform until the model returns a value inside the permitted range",
-    "The helper adds a limit to every integer automatically, so a score of 140 means the helper itself needs to be reinstalled at the latest version",
-    "Pydantic limits do not exist at runtime, so scores should be capped with a clamp in the database layer and never checked against the model",
+    "The helper adds a limit to each integer, so a score of 140 means the helper itself needs to be reinstalled at the latest version",
+    "Pydantic limits do not exist at runtime, so scores should be capped with a clamp in the database layer and not checked against the model",
     "The schema sent to the API drops unsupported constraints such as minimum and maximum, so the application must validate responses against the original model's constraints"
    ],
    "correct": 3,
@@ -2201,8 +2201,8 @@
    "q": "A contract-review feature must show users exactly which passage supports each claim in the model's answer. Which request design delivers that?",
    "options": [
     "Send the contracts as document content with citations enabled, so the response carries the exact supporting passages for users to check",
-    "Ask Claude in the prompt to write the clause numbers it used, since a model's own clause numbers are always accurate without any checking",
-    "Return a fixed disclaimer with every answer saying that the supporting passages are available on request from the contract owner",
+    "Ask Claude in the prompt to write the clause numbers it used, since a model's own clause numbers are accurate without checking",
+    "Return a fixed disclaimer with each answer saying that the supporting passages are available on request from the contract owner",
     "Split each contract into one-sentence chunks and number them, then trust the numbers the model writes beside each claim without checking"
    ],
    "correct": 0,
@@ -2227,10 +2227,10 @@
    "task": "6.4",
    "q": "A RAG application retrieves snippets from the company's own knowledge base through its own search service. The team wants Claude's answers to carry citations naming the source and title of each snippet, with minimal prompt engineering. Which feature fits?",
    "options": [
-    "Concatenate the snippets into plain text in the system prompt and ask the model to append a source line to every sentence it writes",
-    "Enable web search in the request so Claude finds the snippets itself, since citations only come from public web pages and never from private data",
+    "Concatenate the snippets into plain text in the system prompt and ask the model to append a source line to each sentence it writes",
+    "Enable web search in the request so Claude finds the snippets itself, since citations come from public web pages and not from private data",
     "Return the snippets as search_result blocks in a tool result or user message, so each citation carries the source and title provided",
-    "Fine-tune a model to memorise the knowledge base, because only memorised content can be cited back to the source with its title"
+    "Fine-tune a model to memorise the knowledge base, because memorised content can be cited back to the source with its title"
    ],
    "correct": 2,
    "explain": "Search result content blocks let Claude cite your own content the way it cites web search results: each citation carries the source and title provided, and no special prompting is needed.",
@@ -2284,7 +2284,7 @@
    "q": "When answering questions about a 40-page report, the assistant sometimes states figures that are close to, but not the same as, the report. Which prompt technique reduces this for long-document tasks?",
    "options": [
     "Ask Claude to answer in as few words as possible, since shorter answers contain fewer chances for a figure to be misremembered",
-    "Ask Claude to quote the relevant parts of the report first, then answer using only those quotes",
+    "Ask Claude to quote the relevant parts first, because answering from the quotes ties each figure to the report text",
     "Ask Claude to estimate the figures to the nearest round number, so that small differences from the report no longer count as errors",
     "Increase max_tokens so the answer has room for more detail, since longer answers contain the exact figure at some point in the text"
    ],
@@ -2310,10 +2310,10 @@
    "task": "7.1",
    "q": "An agent summarises customer-submitted web pages and also holds a customer database tool. The team enables the web fetch tool so it can follow links in those pages. A security reviewer is concerned. Which concern and mitigation match the documentation?",
    "options": [
-    "Web fetch is safe in any environment because Claude cannot fetch a URL unless a person types it, so no extra controls on domains are needed",
-    "The only risk is cost, so the mitigation is to cap max_tokens and leave the domain list open for the model to choose where to fetch from",
+    "Web fetch is safe in most environments because Claude cannot fetch a URL unless a person types it, so no extra controls on domains are needed",
+    "The main risk is cost, so the mitigation is to cap max_tokens and leave the domain list open for the model to choose where to fetch from",
     "Untrusted input alongside sensitive data raises data exfiltration risk, so restrict fetching with allowed_domains and limit fetches per turn with max_uses",
-    "Move the customer database tool into the user turn as plain text, since tools in the user turn cannot be reached by instructions found on a page, however many pages the agent reads in a session"
+    "Move the customer database tool into the user turn as plain text, since tools in the user turn are not reached by instructions found on a page, however many pages the agent reads in a session"
    ],
    "correct": 2,
    "explain": "The docs warn that enabling web fetch where Claude processes untrusted input alongside sensitive data poses data exfiltration risks, and suggest limiting fetches with max_uses and restricting domains with allowed_domains.",
@@ -2338,7 +2338,7 @@
    "task": "7.1",
    "q": "A CI job runs Claude Code to review pull requests from external contributors. A PR description contains hidden text telling the reviewer to print environment variables and post them as a comment. The runner's environment holds a deployment token. Which combination best limits the damage?",
    "options": [
-    "Run the job with sandboxed shell commands, keep the deployment token out of that environment and give the job only the minimum repository permission it needs",
+    "Run the job with sandboxed shell commands, keep the deployment token out of that environment and grant minimum permissions, because the injection may succeed",
     "Add a line to the review prompt saying that text inside pull request descriptions must never be obeyed, and keep the token in the environment",
     "Trust the contributors who have previously merged code, and skip sandboxing for them because their descriptions are unlikely to contain hidden text, reviewing only first-time authors' pull requests with extra care",
     "Switch to a larger model for reviews, since a more capable model is documented to recognise every injected instruction in a pull request body"
@@ -2366,10 +2366,10 @@
    "task": "7.1",
    "q": "A public chatbot's only defence against users who try role-play tricks to extract policy-breaking answers is one paragraph in the system prompt. After a successful bypass, the team wants to improve resilience. Which design is the strongest?",
    "options": [
-    "Make the system prompt paragraph longer and more emphatic, since a single stronger instruction is the most reliable single defence against all the tricks that users might try",
-    "Block any user message that contains the words role-play, pretend or ignore, since those words always signal an attempt to bypass the policy",
-    "Layer defences: screen inputs and outputs with a separate check, keep sensitive actions behind code-level controls, and test with adversarial prompts",
-    "Remove the system prompt entirely, because with no policy text there is nothing for a user to override or extract from the conversation"
+    "Make the system prompt paragraph longer and more emphatic, since a single stronger instruction is the most reliable single defence against the tricks that users might try",
+    "Block a user message that contains the words role-play, pretend or ignore, since those words signal an attempt to bypass the policy",
+    "Layer defences with input and output screening, code-level controls on sensitive actions and adversarial testing, since no single instruction is a boundary",
+    "Remove the system prompt, because with no policy text there is little for a user to override or extract from the conversation"
    ],
    "correct": 2,
    "explain": "No single instruction is a boundary. Defence in depth combines input and output screening, deterministic controls on sensitive actions, and adversarial testing so a bypass of one layer does not cause harm.",
@@ -2391,10 +2391,10 @@
    "task": "7.2",
    "q": "An engineer wants Claude Code's shell commands to be able to run package installs from the company's registry but not to reach arbitrary internet hosts, even if a prompt injection asks it to. Which control provides this regardless of the model's decisions?",
    "options": [
-    "Turn on sandboxing and set the network domains and filesystem paths that shell commands and their child processes may reach",
-    "Write in CLAUDE.md that only the company registry may be contacted, because instruction files are enforced by the operating system at runtime",
+    "Turn on sandboxing and set the network domains and filesystem paths commands may reach, because the limits hold whatever the model decides",
+    "Write in CLAUDE.md that the company registry is the host to contact, because instruction files are enforced by the operating system at runtime",
     "Ask the model to confirm each hostname with the user in chat before running a command, and rely on users to notice a suspicious address",
-    "Disable Bash entirely and let Claude write scripts that the engineer runs by hand afterwards, since scripts cannot make network requests"
+    "Disable Bash and let Claude write scripts that the engineer runs by hand afterwards, since scripts do not make network requests"
    ],
    "correct": 0,
    "explain": "The sandbox lets you set which files and network domains shell commands can reach, and the limits apply to the commands and the processes they start. That is deterministic enforcement outside the model.",
@@ -2444,7 +2444,7 @@
    "q": "A team stores a partner's signing secret and the internal admin URL in the system prompt of a customer-facing assistant, with a line saying never to reveal them. A tester extracts both with a few attempts. What is the right fix?",
    "options": [
     "Add a stricter line to the system prompt and a second warning in the user turn, since two warnings are always enough to protect any secret",
-    "Keep secrets out of prompts entirely and hold them in server-side code the model cannot read, passing only what each call needs",
+    "Keep secrets out of prompts and in server-side code, because anything in a prompt can be elicited, passing in only what a call needs",
     "Encode the secret in base64 inside the prompt, because the model cannot decode encoded strings and so cannot repeat them to a user",
     "Tell the tester the secret was extracted by mistake and rotate it later, since secrets in a prompt expire after a few hours of exposure"
    ],
@@ -2468,10 +2468,10 @@
    "task": "7.3",
    "q": "A mobile app calls the Claude API directly from the phone, with the API key bundled in the app binary so that no backend is needed. A security audit flags it. What is the correct redesign?",
    "options": [
-    "Obfuscate the key inside the binary and rotate it every release, since an obfuscated string cannot be extracted by anyone who has the app",
+    "Obfuscate the key inside the binary and rotate it each release, since an obfuscated string is hard to extract for anyone who has the app",
     "Route requests through a server-side proxy that holds the key, authenticates the user and applies per-user limits, so no key ships in-app",
     "Store the key in the app's local storage after the first launch, because local storage on the phone is encrypted against other apps and users",
-    "Give every user their own key by email, so each person's usage is isolated and a leaked key harms only the one user who received it"
+    "Give each user their own key by email, so each person's usage is isolated and a leaked key harms the one user who received it"
    ],
    "correct": 1,
    "explain": "A key embedded in client code is available to anyone who has the client. Keeping it on a server-side proxy lets the backend authenticate the caller, rate-limit, and revoke access without shipping secrets.",
@@ -2553,10 +2553,10 @@
    "task": "8.1",
    "q": "A developer adds the web search server tool. After the first response, the code looks for a tool_use block for it, runs its own search and sends a tool_result back, and the API reports a conflict. What is the misunderstanding?",
    "options": [
-    "Server tools must be executed by the application exactly like client tools, so the defect is that the tool_result was sent in the wrong block order",
-    "Server tools run only when tool_choice is set to any, so the defect is a missing tool_choice field in the original request from the application",
+    "Server tools must be executed by the application like client tools, so the defect is that the tool_result was sent in the wrong block order",
+    "Server tools run when tool_choice is set to any, so the defect is a missing tool_choice field in the original request from the application",
     "Server tools run on the platform and return their results inside the response, so the application does not execute them or send is_error results",
-    "Server tools return nothing to the application, so the answer must be assembled from a second request that asks the model to recall the search"
+    "Server tools return no results to the application, so the answer must be assembled from a second request that asks the model to recall the search"
    ],
    "correct": 2,
    "explain": "A server tool is executed by Anthropic's platform, and its results (or errors) come back in the response. The application only executes client tools and only sends is_error tool results for those.",
@@ -2640,9 +2640,9 @@
    "q": "A company's inventory service must be reachable by Claude applications on many different machines and maintained independently by the platform team. Which MCP deployment fits?",
    "options": [
     "A stdio server installed on each machine, since stdio servers are the recommended way to share one service with many remote clients",
-    "A server that is copied into each application's repository, so every team keeps its own version and updates it whenever it suits them",
+    "A server that is copied into each application's repository, so each team keeps its own version and updates it whenever it suits them",
     "A remote MCP server over HTTP, which is the recommended option for connecting to remote servers from many clients, owned by one team",
-    "A prompt template in each application that describes the inventory API in text, so the model writes the calls itself without any server"
+    "A prompt template in each application that describes the inventory API in text, so the model writes the calls itself without a server"
    ],
    "correct": 2,
    "explain": "HTTP servers are the recommended option for remote MCP servers, which suits one independently maintained service used by many clients. stdio servers run locally with their client.",
@@ -2668,9 +2668,9 @@
    "q": "An application built on the Agent SDK needs Claude to call three small Python functions that already live in the same codebase, with no need for any other application to use them. What is the simplest suitable integration?",
    "options": [
     "Define them as custom tools in the SDK's in-process MCP server, so they run inside the application without a separate server process",
-    "Build a standalone remote MCP server with its own deployment and authentication, since any function Claude calls must live in a separate service",
+    "Build a standalone remote MCP server with its own deployment and authentication, since a function Claude calls must live in a separate service",
     "Describe the functions in the system prompt and ask Claude to emulate them, because the model can reproduce the code's behaviour accurately",
-    "Rewrite them as Skills with scripts and drop the application's own code, since a Skill is the only way to expose functions to an SDK agent"
+    "Rewrite them as Skills with scripts and drop the application's own code, since a Skill is the way to expose functions to an SDK agent"
    ],
    "correct": 0,
    "explain": "MCP servers can execute directly within the SDK application, and the SDK's in-process MCP server is the documented way to give Claude your own functions without running a separate process.",
@@ -2695,10 +2695,10 @@
    "task": "8.2",
    "q": "Analysts want to attach a database schema document to a Claude Code prompt in the same way they @-mention a file, and the schema is maintained by the data team in an MCP server. Which MCP capability should the server use?",
    "options": [
-    "Expose it as a tool with side effects, since only tools can be referenced in a prompt and resources are limited to server configuration data",
-    "Expose it as a prompt template, since templates are the only MCP feature that can hold a document as long as a database schema",
+    "Expose it as a tool with side effects, since tools can be referenced in a prompt and resources are limited to server configuration data",
+    "Expose it as a prompt template, since templates are the MCP feature that can hold a document as long as a database schema",
     "Expose the schema as an MCP resource, which Claude Code lets users reference with @ mentions like a file, rather than as a tool",
-    "Bundle the schema into the server's startup logs, since log output is shown to the analysts' prompts automatically at the start of a session"
+    "Bundle the schema into the server's startup logs, since log output is shown to the analysts' prompts at the start of a session"
    ],
    "correct": 2,
    "explain": "MCP servers can expose resources that users reference with @ mentions, similar to files. Tools are for actions, and prompts are reusable templates, so a referenceable document is a resource.",
@@ -2722,10 +2722,10 @@
    "task": "8.2",
    "q": "A remote MCP server adds a new tool while a Claude Code session is open and sends a list_changed notification. A developer asks whether they must restart the session to see the tool. What is correct?",
    "options": [
-    "No restart is needed: the server can change its tools, prompts or resources while connected and notify the client, which refreshes its list",
-    "A restart is required, because Claude Code reads the server's tool list once at start and ignores every later change in the server",
-    "The new tool appears only after the developer removes and re-adds the server, since a notification cannot change a registered server's tool list",
-    "The notification works only for stdio servers, so a remote HTTP server must always be restarted by its owner after any change to its tools"
+    "No restart is needed: a connected server can change its tools, prompts or resources and notify the client, which refreshes its list",
+    "A restart is required, because Claude Code reads the server's tool list once at start and ignores later changes in the server",
+    "The new tool appears after the developer removes and re-adds the server, since a notification cannot change a registered server's tool list",
+    "The notification works for stdio servers, so a remote HTTP server must be restarted by its owner after a change to its tools"
    ],
    "correct": 0,
    "explain": "An MCP server can change the tools, prompts or resources it offers while connected and send a list_changed notification; the client refreshes without a restart.",
