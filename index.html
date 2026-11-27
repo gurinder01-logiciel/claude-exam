@@ -911,6 +911,23 @@ function drawPaper(level, bank, n) {
   return buildRampedPaper(pool, n);
 }
 
+// The start screen previews each card's easy/medium/hard mix from a drawn paper.
+// That draw is kept per level and length, so re-rendering the screen (toggling
+// instant feedback, changing a length chip) shows the same numbers, and Start
+// sits exactly the paper the card described. It is used once, then redrawn.
+const previewPapers = new WeakMap();
+function previewPaper(level, bank, n) {
+  let byN = previewPapers.get(level);
+  if (!byN) { byN = new Map(); previewPapers.set(level, byN); }
+  if (!byN.has(n)) byN.set(n, drawPaper(level, bank, n));
+  return byN.get(n);
+}
+function takePreviewPaper(level, bank, n) {
+  const paper = previewPaper(level, bank, n);
+  previewPapers.get(level).delete(n);
+  return paper;
+}
+
 // Build the question pool for a level.
 //  - pool: true         → draw from every other level's bank (fresh paper each sitting)
 //  - scenarioPick set   → draw that many scenarios and group their questions
@@ -928,7 +945,7 @@ function buildQuestions(level, countOverride) {
   const n = Math.min(countOverride || level.count || bank.length, bank.length);
   const raw = level.scenarioPick
     ? buildScenarioPaper(bank, n, { pick: level.scenarioPick, weights: level.scenarioWeights || {} })
-    : drawPaper(level, bank, n);
+    : takePreviewPaper(level, bank, n);
   return prepQuestions(raw, { keepOrder: true });
 }
 
@@ -1551,7 +1568,7 @@ function renderStart() {
       const bank = lv.pool ? Object.values(LEVELS).filter(x => !x.pool && x.inPool).flatMap(x => x.questions) : lv.questions;
       const n = Math.min(paperSize(key, lv).n, bank.length);
       const c = { 1: 0, 2: 0, 3: 0 };
-      drawPaper(lv, bank, n).forEach(q => c[q.d || 2]++);
+      previewPaper(lv, bank, n).forEach(q => c[q.d || 2]++);
       const ramp = [c[1] && `${c[1]} easy`, c[2] && `${c[2]} medium`, c[3] && `${c[3]} hard`].filter(Boolean).join(' · ');
       meta = (bank.length > n ? `Fresh draw from ${bank.length} · ` : '') + ramp;
     }
