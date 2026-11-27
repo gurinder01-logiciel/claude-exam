@@ -203,6 +203,7 @@
   }
   .brand { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.01em; font-size: 0.95rem; }
   .brand span { color: var(--lime); }
+  .brand .brand-code { font-family: var(--font-mono, monospace); font-size: 0.72em; font-weight: 600; color: var(--text-dim); margin: 0 4px; }
   .timer {
     font-family: var(--font-mono); font-size: 1.15rem; font-weight: 600;
     display: flex; align-items: center; gap: 12px;
@@ -1918,7 +1919,8 @@ function examInfo() {
   const lv = state.level || '';
   return EXAM_INFO.find(x => x.re.test(lv)) || { code: 'CCAR-F', name: 'Claude Certified Architect \u2013 Foundations' };
 }
-function examBrand() { return examInfo().code; }
+// Header shows the exam's full name, with its code alongside in small type.
+function examBrand() { const x = examInfo(); return `${x.name} <small class="brand-code">${x.code}</small>`; }
 function plain(s) { return String(s == null ? '' : s).replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim(); }
 
 function tutorPrompt(q, ans) {
