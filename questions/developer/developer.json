@@ -233,25 +233,29 @@
    "d": 3,
    "scenario": 0,
    "task": "1.2",
-   "q": "An SDK application registers two PreToolUse hooks for the Bash tool. One returns allow for commands on the team's safe-list. The other returns deny for anything containing rm -rf. A command matches both rules. A developer assumes whichever hook was registered first will decide. What actually happens?",
+   "q": "An Agent SDK application registers two PreToolUse hooks for the Bash tool. For one command, the first hook returns allow and the second returns deny. Which TWO statements are correct? Select TWO.",
    "options": [
-    "The call is allowed, because the earlier-registered hook decides and its allow stops any later hook from changing the outcome for the command",
-    "The user is prompted to approve, because conflicting decisions between hooks always fall back to an ask step so that a person settles the tie",
-    "The call is denied, because when PreToolUse hooks disagree deny takes priority over every other decision",
-    "The result is undefined, because hooks run in parallel and whichever finishes last overwrites the earlier decision for that call every time"
+    "The first registered hook decides the outcome, so its allow stands and the later deny is only logged for the audit trail of the session",
+    "The call is denied, because when PreToolUse hooks disagree deny outranks defer, ask and allow",
+    "An allow from a hook skips the deny rules in the settings file, so the hook is the last word on any command that it explicitly approves",
+    "Each hook should act on its own, because hook completion order is non-deterministic and no hook can rely on another having run first"
    ],
-   "correct": 2,
-   "explain": "When multiple PreToolUse hooks return different decisions, deny outranks defer, which outranks ask, which outranks allow. Hook completion order is non-deterministic, so each hook should act independently. An allow hook cannot rescue a command another hook denies.",
+   "correct": [
+    1,
+    3
+   ],
+   "explain": "When PreToolUse hooks return different decisions, deny takes priority over defer, which takes priority over ask, which takes priority over allow. Completion order is non-deterministic, so each hook should act independently. Registration order does not decide, and a hook's allow never skips the deny-rule step.",
    "constraint": "two hooks disagree on one call",
    "breaks": [
-    "registration order does not decide; decisions are merged by priority",
-    "ask ranks below deny, so it only wins against allow",
+    "registration order does not decide",
     null,
-    "completion order is non-deterministic, which is why priority rules, not timing, decide"
+    "a hook's allow does not skip deny rules",
+    null
    ],
    "facts": [
     "F-04",
-    "F-05"
+    "F-05",
+    "F-06"
    ],
    "course": "Claude Code in Action",
    "chapter": "Hooks"
@@ -591,20 +595,23 @@
    "d": 2,
    "scenario": 0,
    "task": "2.1",
-   "q": "A developer adds cache_control to a 900-token system prompt on a model whose minimum cacheable prompt is longer than that. The requests succeed with no error, but both cache_creation_input_tokens and cache_read_input_tokens are 0. How should the developer read this?",
+   "q": "A developer adds cache_control to a 900-token system prompt on a model whose minimum cacheable prompt is longer than that. Requests succeed with no error. Which TWO statements describe what is happening? Select TWO.",
    "options": [
-    "The cache_control field was rejected silently because it can only be attached to tool definitions and never to the system prompt text block",
-    "The cache is warming up and reads will begin after the first five minutes, so the developer only needs to wait before expecting any cache activity",
-    "The API counted the tokens against the cache quota already, which is why both counters show zero until the daily quota resets for the organisation",
-    "The prompt is below the minimum cacheable length, so it was processed without caching and no error was raised, so nothing was written or read"
+    "The prompt is shorter than the minimum cacheable length, so it is processed without caching and no error is returned",
+    "The cache_control field was rejected silently because it may be attached only to tool definitions and never to a block of system prompt text",
+    "The cache is warming up and reads begin after five minutes, so a first request that writes nothing is normal for a cacheable prompt of any size",
+    "Both cache_creation_input_tokens and cache_read_input_tokens read 0 in the usage fields, which shows the prompt was not cached"
    ],
-   "correct": 3,
+   "correct": [
+    0,
+    3
+   ],
    "explain": "Prompts shorter than the model's minimum are processed without caching and no error is returned; when both cache counters are 0 the prompt was not cached. The fix is to cache a longer stable prefix or accept that this prompt is too short to benefit.",
    "constraint": "no error and zero cache counters",
    "breaks": [
-    "cache_control can be attached to system content; the cause is length",
-    "a cacheable prompt writes on the first request; zero writes means it was not cached",
-    "there is no daily cache quota that produces zero counters",
+    null,
+    "cache_control is accepted on system content",
+    "a cacheable prompt writes on its first request",
     null
    ],
    "facts": [
@@ -948,21 +955,24 @@
    "d": 3,
    "scenario": 0,
    "task": "2.4",
-   "q": "A streaming endpoint returns HTTP 200 and begins sending events. Halfway through, an event of type error with overloaded_error arrives and the stream ends. The client code only checks the HTTP status before streaming and shows a half-finished answer as complete. What should change?",
+   "q": "A streaming endpoint returns HTTP 200 and begins sending events. Midway, an event of type error with overloaded_error arrives and the stream ends. The client only checks the HTTP status. Which TWO statements are correct? Select TWO.",
    "options": [
-    "Check the status code again after the stream closes, because the 200 is replaced by a 529 once the server notices the overload has occurred",
-    "Handle error events inside the stream: stop, mark the answer incomplete and retry or fail, rather than relying on the HTTP status",
-    "Ignore the event, because overloaded errors inside a stream are informational and the partial text already received is complete enough to show",
-    "Disable streaming for all requests, since errors can only be detected reliably when the entire response arrives in a single non-streaming payload"
+    "The status code is rewritten to 529 once the server notices the overload, so checking the status again after the stream closes will reveal it to the client code",
+    "An error can be delivered inside the event stream after the 200 status has already been sent, so the client must read error events",
+    "An overloaded_error in the stream normally corresponds to an HTTP 529 in a non-streaming context, so the answer received so far is incomplete",
+    "Errors can only occur before the first content block starts, so any text that has already been received is safe to show as a finished answer to the user"
    ],
-   "correct": 1,
-   "explain": "Errors can be sent in the event stream, and an overloaded_error there normally corresponds to an HTTP 529 in a non-streaming context. Because the 200 has already been sent, the client must read the error event and treat the response as unfinished.",
+   "correct": [
+    1,
+    2
+   ],
+   "explain": "Errors can be sent in the event stream, and an overloaded_error there normally corresponds to an HTTP 529 in a non-streaming context. Because the 200 was already sent, the client has to read the error event and treat the response as unfinished.",
    "constraint": "error event after an HTTP 200",
    "breaks": [
-    "the HTTP status was already sent as 200; it is not rewritten",
+    "the HTTP status is not rewritten after it is sent",
     null,
-    "the event means the response did not finish",
-    "streaming is recommended for long requests and the stream's errors can be handled"
+    null,
+    "errors can arrive at any point in the stream"
    ],
    "facts": [
     "F-21",
@@ -1115,21 +1125,24 @@
    "d": 3,
    "scenario": 0,
    "task": "3.1",
-   "q": "A team needs three Claude Code workers on one refactor, where the frontend worker must negotiate an interface directly with the backend worker while a third reviews both. Plain subagents that only report back to the lead have not worked. Which Claude Code feature fits, and what is its main cost?",
+   "q": "A team needs three Claude Code workers on one refactor, where the frontend worker must negotiate an interface directly with the backend worker. Plain subagents that only report back to the lead have not worked. Which TWO statements about agent teams are correct? Select TWO.",
    "options": [
-    "A single subagent with three tools, because one subagent can hold all three roles and talks to itself, which is cheaper than coordinating workers",
-    "Agent teams: teammates work in their own context windows and message each other directly, at the cost of extra coordination overhead and more tokens",
-    "Three headless runs started in parallel from a shell script, because separate processes automatically share one conversation and exchange messages with one another through the shared repository",
-    "Agent teams with the same cost as one session, because teammates share a single context window and only the lead pays for the tokens used"
+    "Teammates share one context window, so only the lead pays for the tokens and the cost matches that of a single session working alone",
+    "Teammates work independently, each in its own context window, and communicate directly with each other",
+    "Agent teams add coordination overhead and use significantly more tokens than a single session",
+    "Agent teams are the best fit for sequential work and same-file edits, because the teammates can all edit one file at the same moment safely"
    ],
-   "correct": 1,
+   "correct": [
+    1,
+    2
+   ],
    "explain": "Teammates work independently, each in its own context window, and communicate directly with each other. That fits negotiation between workers, but it adds coordination overhead and uses significantly more tokens than a single session. For sequential or same-file work, one session or subagents are more effective.",
    "constraint": "workers must talk to each other",
    "breaks": [
-    "one subagent cannot negotiate between independent workers' contexts",
+    "teammates each have their own context window",
     null,
-    "separate runs share nothing unless something connects them",
-    "teammates each have their own context window, which is why more tokens are used"
+    null,
+    "for sequential or same-file work a single session or subagents are more effective"
    ],
    "facts": [
     "F-77",
@@ -1281,21 +1294,24 @@
    "d": 1,
    "scenario": 0,
    "task": "4.1",
-   "q": "A team is building a golden set to evaluate a ticket-summarisation prompt. Which composition is the most useful starting point?",
+   "q": "A team is building a golden set to evaluate a ticket-summarisation prompt. Which TWO practices make it a useful starting point? Select TWO.",
    "options": [
-    "A few hundred tickets that Claude itself wrote to look typical, since synthetic examples are cheaper to produce and keep the set perfectly balanced",
-    "Real, anonymised tickets sampled from production, plus deliberately hard edge cases, each with an expected outcome agreed by reviewers",
-    "The five tickets the team remembers best, because well-known cases are the ones stakeholders will check first when a new version is released",
-    "Only tickets that the current prompt already handles well, so that the evaluation shows a stable baseline whenever the prompt is edited later"
+    "Generate a few hundred typical tickets with Claude itself, since synthetic examples are cheap and keep the whole set perfectly balanced",
+    "Sample real, anonymised tickets from production so the set resembles what the prompt will actually see",
+    "Add deliberately hard edge cases, each with an expected outcome that reviewers agreed on in advance",
+    "Keep only tickets that the current prompt already handles well, so the evaluation shows a stable baseline when the prompt is edited later"
    ],
-   "correct": 1,
-   "explain": "A golden set should resemble production and include the cases that go wrong, with an expected result agreed in advance. Synthetic-only, tiny or success-only sets give a comfortable number that says little about real behaviour.",
+   "correct": [
+    1,
+    2
+   ],
+   "explain": "A golden set should resemble production and include the cases that go wrong, with an expected result agreed in advance. Synthetic-only or success-only sets give a comfortable number that says little about real behaviour.",
    "constraint": "building a first golden set",
    "breaks": [
-    "synthetic tickets can miss the real distribution and its messy cases",
+    "synthetic-only sets can miss the real distribution",
     null,
-    "a handful of memorable cases is too small and biased",
-    "excluding failures hides the very cases a change should improve"
+    null,
+    "excluding failures hides the cases a change should improve"
    ],
    "facts": [],
    "course": "Production Engineering, Evals & Security",
@@ -1594,21 +1610,24 @@
    "d": 3,
    "scenario": 0,
    "task": "5.1",
-   "q": "A test suite sets temperature to 0 so that Claude's answers are identical on every run, and the team plans to move it to claude-opus-5-5. What should they expect and do?",
+   "q": "A test suite sets temperature to 0 so that Claude's answers are identical on every run, and the team plans to move it to claude-opus-5-5. Which TWO statements are correct? Select TWO.",
    "options": [
-    "Keep temperature 0 and add top_k 1, because that pair makes the new model fully deterministic and its outputs identical across all runs",
-    "Remove the sampling parameters, because the model rejects them, and design tests that tolerate variation, since temperature 0 never guaranteed identical outputs",
-    "Set temperature to a tiny positive value such as 0.01, which the new model accepts and which gives the same repeatability that 0 gave before in the team's older test runs on the previous model",
-    "Leave the code unchanged, because unsupported sampling parameters are ignored silently on newer models and tests will still pass as before"
+    "A tiny positive value such as 0.01 is accepted by the new model and gives the same repeatability that 0 gave on the older model before the upgrade was planned",
+    "The model requires temperature, top_p and top_k to be omitted, and prompting is the recommended way to guide its behaviour",
+    "Temperature 0 never guaranteed identical outputs on earlier models either, so the tests should check properties of the answers rather than exact text",
+    "Adding top_k 1 next to temperature 0 makes the new model fully deterministic, so its outputs are identical across all runs of the suite, whatever the prompt"
    ],
-   "correct": 1,
-   "explain": "Claude Opus 5.5 requires temperature, top_p and top_k to be omitted, and prompting is the recommended way to steer behaviour. Temperature 0 never guaranteed identical outputs on earlier models either, so tests should check properties, not exact text.",
+   "correct": [
+    1,
+    2
+   ],
+   "explain": "Claude Opus 5.5 requires temperature, top_p and top_k to be omitted, and prompting is the recommended way to steer behaviour. Temperature 0 never guaranteed identical outputs on earlier models, so tests should check properties, not exact text.",
    "constraint": "temperature 0 used for repeatable tests",
    "breaks": [
-    "the sampling parameters are rejected and never guaranteed identical outputs",
+    "sampling parameters are rejected",
     null,
-    "any value of the parameter is rejected, and repeatability was never guaranteed",
-    "the parameters are not ignored; the request is rejected"
+    null,
+    "the parameters are rejected and never guaranteed identical outputs"
    ],
    "facts": [
     "F-91",
@@ -2065,20 +2084,23 @@
    "d": 2,
    "scenario": 0,
    "task": "6.3",
-   "q": "A pipeline requests JSON through structured outputs and parses the text of the reply immediately. Occasionally parsing fails on a long extraction, and the logs show stop_reason max_tokens. What should the code do?",
+   "q": "A pipeline requests JSON through structured outputs and parses the reply text immediately. Occasionally parsing fails on a long extraction, and the logs show stop_reason max_tokens. Which TWO actions are correct? Select TWO.",
    "options": [
+    "Check the stop reason before parsing, and treat a max_tokens stop as incomplete output",
     "Parse the partial text anyway and fill any missing fields with default values, since constrained decoding makes truncated output safe to repair",
-    "Remove the schema from the request, since the schema is what makes the reply too long and is the usual reason that long outputs are cut",
-    "Retry the same request with the same max_tokens, since structured outputs are guaranteed valid and the failure must have been a network glitch",
-    "Check the stop reason first and, if it is max_tokens, treat the output as incomplete and retry with a higher max_tokens before parsing it"
+    "Remove the schema from the request, because the schema is what makes the reply long enough to be cut off by the output limit in the first place",
+    "Retry with a higher max_tokens value to get the complete structured output"
    ],
-   "correct": 3,
-   "explain": "If a response is cut off at the max_tokens limit the output might be incomplete and not match the schema, and the documented fix is to retry with a higher max_tokens value. That is why stop_reason is checked before parsing.",
+   "correct": [
+    0,
+    3
+   ],
+   "explain": "If a response is cut off at the max_tokens limit the output might be incomplete and not match the schema, and the documented fix is to retry with a higher max_tokens value. That is why the stop reason is checked before parsing.",
    "constraint": "max_tokens stop with structured outputs",
    "breaks": [
+    null,
     "truncated output can be incomplete and not match the schema",
     "the schema is not what hit the output limit",
-    "the guarantee does not apply when the limit cuts the output off",
     null
    ],
    "facts": [
@@ -2469,21 +2491,24 @@
    "d": 2,
    "scenario": 0,
    "task": "7.3",
-   "q": "A company runs development, staging and production services that each call Claude with the same organisation-wide key, so one team's load test used up shared limits and a leaked staging key exposed production. Which setup follows the guidance on workspaces and keys?",
+   "q": "A company runs development, staging and production services that all call Claude with one organisation-wide key, so one team's load test used shared limits and a leaked staging key exposed production. Which TWO changes follow the guidance on workspaces and keys? Select TWO.",
    "options": [
-    "Keep one key but rename it per environment in the console, since the name of a key decides which workspace limits and permissions apply",
-    "Use an admin key in every environment, since an admin key is the standard credential for production calls and has the widest permissions across the whole organisation, which also keeps the number of keys to manage down to one",
-    "Put the three keys in a shared document so any engineer can pick the right one quickly when moving code from one environment to another",
-    "Create separate workspaces for each environment and issue API keys scoped to a single workspace, keeping admin keys for management and reporting only"
+    "Create a separate workspace for each environment, so projects and environments are separated under central billing",
+    "Issue API keys scoped to a single workspace for application traffic, and keep admin keys for managing and reporting on the organisation",
+    "Keep one shared key but rename it for each environment in the console, since the key's label decides which workspace limits apply to it",
+    "Use an admin key in every environment, since an admin key is the standard credential for production calls and has the widest permissions available"
    ],
-   "correct": 3,
+   "correct": [
+    0,
+    1
+   ],
    "explain": "Workspaces separate projects, environments and teams under central billing, and API keys can be scoped to a single workspace. Admin API keys authenticate calls that manage and report on the organisation, not ordinary application traffic.",
    "constraint": "shared key across environments",
    "breaks": [
-    "a key's label does not scope its permissions or limits",
-    "an admin key is for managing and reporting on the organisation, not for application calls",
-    "spreads secrets widely and does not isolate the environments",
-    null
+    null,
+    null,
+    "a label does not scope permissions or limits",
+    "admin keys are for managing the organisation, not application calls"
    ],
    "facts": [
     "F-135",
@@ -2553,20 +2578,23 @@
    "d": 3,
    "scenario": 0,
    "task": "8.1",
-   "q": "A model returns two tool calls in one turn: create_ticket and add_comment_to_ticket, where the second needs the ticket id produced by the first. The harness runs them concurrently, and the comment call fails. What is the correct handling?",
+   "q": "A model returns two tool calls in one turn: create_ticket and add_comment_to_ticket, where the second needs the ticket id produced by the first. The harness ran them concurrently and the comment call failed. Which TWO statements are correct? Select TWO.",
    "options": [
-    "Run them concurrently anyway and retry the second until the first finishes, since the API requires parallel execution for parallel calls",
-    "Drop the second tool call without telling the model, since a tool_use block without a matching result is simply ignored by the API",
-    "Disable tools for the rest of the conversation after any failure, because a failed call cannot be recovered within the same assistant turn, so the harness should stop offering tools after the first failure it sees",
-    "Run the dependent calls in order, and for any call you skip because an earlier one failed, still return a tool_result with is_error and a brief explanation"
+    "Tools with side effects or ordering requirements might be better run sequentially, since the API does not prescribe an execution order",
+    "The API requires parallel tool calls to run concurrently, so the harness must retry the second call until the first one finishes in time",
+    "A tool_use block without a matching tool_result is ignored by the API, so a skipped call can simply be left out of the reply you send back",
+    "A call you choose not to run still needs a tool_result with is_error set to true and a brief explanation"
    ],
-   "correct": 3,
-   "explain": "The API doesn't prescribe an order; tools with side effects or ordering requirements might better run sequentially. A call you choose not to run still needs a tool_result with is_error true and a short explanation, so the model sees what happened.",
+   "correct": [
+    0,
+    3
+   ],
+   "explain": "The API doesn't prescribe an order; tools with side effects or ordering requirements might better run sequentially. A call you decide not to run still needs a tool_result with is_error true and a short explanation, so the model sees what happened.",
    "constraint": "second call depends on the first call's output",
    "breaks": [
-    "the API does not prescribe an execution order or require concurrency",
-    "every tool_use needs a tool_result, including skipped calls",
-    "a failure can be reported and recovered from",
+    null,
+    "the API does not require concurrency",
+    "every tool_use needs a result",
     null
    ],
    "facts": [
@@ -2719,20 +2747,23 @@
    "d": 2,
    "scenario": 0,
    "task": "8.3",
-   "q": "A team wants Claude to follow the company's quarterly-report format: section order, wording rules and a template file. There is no external system to query. The guidance should cost almost nothing in context until it is needed. Which mechanism fits?",
+   "q": "A team wants Claude to follow the company's quarterly-report format: section order, wording rules and a template file. There is no external system to query, and the guidance should cost almost nothing in context until it is needed. Which TWO statements about Skills support choosing one? Select TWO.",
    "options": [
-    "An MCP server exposing the template as a tool, because a tool is the only mechanism able to hold a file that Claude reads during the task",
-    "A longer system prompt on every request, since always-loaded text is the lightest way to carry a large template for a rare task",
-    "A fine-tuned model that has memorised the format, since fine-tuning is the supported way to teach a company's document templates",
-    "A Skill, which packages instructions and resources and keeps only its name and description in context until it is triggered, at low cost"
+    "A Skill packages instructions and resources that Claude uses when they are relevant, which suits procedure and templates",
+    "A Skill is the only mechanism able to hold a template file, so an MCP server is never able to expose one to Claude in any form at all",
+    "A Skill's full instructions are loaded into every request at startup, so the template is always present and its cost is paid on every call",
+    "Until a Skill is triggered, only its name and description occupy context, so many Skills can be installed without a context penalty"
    ],
-   "correct": 3,
-   "explain": "Skills package procedural guidance and resources for Claude to use when relevant; until one is triggered only its name and description occupy context. With no external system to reach, an MCP server is unnecessary.",
+   "correct": [
+    0,
+    3
+   ],
+   "explain": "Skills are reusable, filesystem-based resources that give Claude domain-specific expertise, and until a Skill is triggered only its name and description occupy context. With no external system to reach, an MCP server adds operation work without need.",
    "constraint": "procedure and template, no external system",
    "breaks": [
-    "no external capability is needed, and a server adds operation work",
-    "always-loaded text costs context on every request",
-    "disproportionate, and the template cannot be updated as a file",
+    null,
+    "MCP servers can expose resources too",
+    "only the name and description load until triggered",
     null
    ],
    "facts": [

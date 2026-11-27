@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CCAF Exam Simulator</title>
+<title>Claude Certification Exam Simulator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -536,6 +536,8 @@
   .pal-cell.right { background: var(--good); border-color: var(--good); color: #fff; }
   .pal-cell.wrong { background: var(--bad); border-color: var(--bad); color: #fff; }
   .pal-cell.current { outline: 2px solid var(--text); outline-offset: 1px; }
+  .qprog { font-size: 0.8rem; color: var(--text-dim); margin-left: 12px; }
+  .pal-hint { margin-top: 10px; font-size: 0.74rem; color: var(--text-dim); }
   .pal-cell.flagged::after { content: '★'; position: absolute; top: -6px; right: -4px; font-size: 0.7rem; color: var(--amber); }
   /* Instant-feedback answer + explanation */
   .fb-panel { margin-top: 12px; padding: 12px 14px; border-radius: 10px; background: var(--surface-2); border-left: 3px solid var(--good); font-size: 0.86rem; line-height: 1.55; }
@@ -1048,6 +1050,15 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     goToQuestion(state.current + (e.key === 'ArrowRight' ? 1 : -1));
   }
+  // N next, P previous, F flag for review. Plain keys only (no Ctrl/Cmd/Alt), never while typing,
+  // and not while a pause/confirm overlay is up. Works after an answer is locked by instant feedback.
+  if (state.screen === 'exam' && !e.ctrlKey && !e.metaKey && !e.altKey && !e.repeat
+      && !(e.target.closest && e.target.closest('input, textarea, select, [contenteditable]')) && !document.querySelector('.overlay')) {
+    const k = (e.key || '').toLowerCase();
+    if (k === 'n') { e.preventDefault(); goToQuestion(state.current + 1); }
+    else if (k === 'p') { e.preventDefault(); goToQuestion(state.current - 1); }
+    else if (k === 'f') { e.preventDefault(); state.flagged[state.current] = !state.flagged[state.current]; renderExam(); }
+  }
 });
 
 // ---- Level progression -------------------------------------------------
@@ -1213,7 +1224,7 @@ function renderNameGate(keepName = null) {
   boardEl.innerHTML = '';
   app.innerHTML = `
     <div class="gate">
-      <h1>CCAR-F <span>Exam Simulator</span></h1>
+      <h1>Claude Certification <span>Exam Simulator</span></h1>
       <p>Enter your name to start. Your latest score appears on the team leaderboard, and your full attempt history stays on your profile.</p>
       <input id="nameInput" type="text" placeholder="Your name" maxlength="40" autocomplete="name" value="${escapeHtml(keepName || '')}">
       <div class="err" id="nameErr"></div>
@@ -1549,13 +1560,13 @@ function renderStart() {
   app.innerHTML = `
     <div class="hero-row">
       <div>
-        <h1 class="hero-title">CCAR-F <span>Exam Simulator</span></h1>
+        <h1 class="hero-title">Claude Certification <span>Exam Simulator</span></h1>
         <div class="hero-chips">
-          <span class="chips-label">Real exam</span>
-          <span class="chip"><b>120 min</b> · 60 items</span>
-          <span class="chip"><b>4 of 6</b> scenarios</span>
+          <span class="chips-label">Real exams</span>
+          <span class="chip"><b>120 min</b> · 60-70 items</span>
           <span class="chip">Pass <b>720/1000</b></span>
           <span class="chip">Some items <b>select 2</b></span>
+          <span class="chip">Developer, Architect, Claude Code</span>
         </div>
       </div>
       ${RESOURCES ? `<button class="btn ghost prep-link" id="prepLink">📚 How to prepare</button>` : ''}
@@ -1616,7 +1627,7 @@ function renderPrepPage() {
   state.screen = 'prep';
   app.innerHTML = `
     <div class="topbar">
-      <div class="brand">CCAR-F <span>How to prepare</span></div>
+      <div class="brand">Claude Certification <span>How to prepare</span></div>
       <button class="icon-btn" id="prepBack">← Back to exams</button>
     </div>
     <div class="prep-page">${renderResources()}</div>`;
@@ -1645,7 +1656,22 @@ const DOMAIN_OF = {
   'Context Management & Reliability': 'context', 'Context Mgmt': 'context'
 };
 const BUILDER_SIZES = [10, 20, 30, 60];
-const builder = { domains: [], size: 20, mix: 'exam' }; // domains: [] = all
+const builder = { track: 'architect', domains: [], size: 20, mix: 'exam' }; // domains: [] = all; track: 'architect' = the Foundations-style banks
+
+// Domain list and questions for the chosen track. 'architect' pools every non-pool Architect-style
+// bank through DOMAIN_OF; a Developer track uses its own bank and its blueprint's eight domains.
+function builderTracks() {
+  return Object.entries(LEVELS).filter(([, lv]) => lv.courses && lv.blueprint && lv.blueprint.length);
+}
+function builderDefs() {
+  const lv = builder.track !== 'architect' && LEVELS[builder.track];
+  if (lv) {
+    const by = Object.fromEntries(lv.blueprint.map(b => [b.label, []]));
+    lv.questions.forEach(q => { if (by[q.domain]) by[q.domain].push(q); });
+    return { domains: lv.blueprint.map(b => ({ key: b.label, label: b.label, name: b.label, pct: b.pct })), by };
+  }
+  return { domains: OFFICIAL_DOMAINS, by: questionsByDomain() };
+}
 
 function questionsByDomain() {
   const by = Object.fromEntries(OFFICIAL_DOMAINS.map(d => [d.key, []]));
@@ -1658,8 +1684,8 @@ function questionsByDomain() {
 
 // Split `n` across the chosen domains — by exam weight or equally — never asking
 // a domain for more than it holds, then hand leftovers to domains with spares.
-function domainQuotas(keys, n, mix, by) {
-  const w = k => mix === 'equal' ? 1 : OFFICIAL_DOMAINS.find(d => d.key === k).pct;
+function domainQuotas(keys, n, mix, by, domains = OFFICIAL_DOMAINS) {
+  const w = k => mix === 'equal' ? 1 : domains.find(d => d.key === k).pct;
   const total = keys.reduce((a, k) => a + w(k), 0);
   const quota = Object.fromEntries(keys.map(k => [k, Math.min(by[k].length, Math.floor(n * w(k) / total))]));
   let left = n - Object.values(quota).reduce((a, b) => a + b, 0);
@@ -1672,8 +1698,9 @@ function domainQuotas(keys, n, mix, by) {
 }
 
 function renderBuilder() {
-  const by = questionsByDomain();
-  const keys = builder.domains.length ? builder.domains : OFFICIAL_DOMAINS.map(d => d.key);
+  if (builder.track !== 'architect' && !LEVELS[builder.track]) builder.track = 'architect';
+  const { domains: DOMS, by } = builderDefs();
+  const keys = builder.domains.length ? builder.domains : DOMS.map(d => d.key);
   const available = keys.reduce((a, k) => a + by[k].length, 0);
   const n = Math.min(builder.size, available);
   const chip = (attr, val, on, label, extra = '') =>
@@ -1684,11 +1711,18 @@ function renderBuilder() {
         <div class="bq-title">Build a custom quiz</div>
         <div class="bq-sub">Pick domains to focus on; ${state.instantFeedback ? 'instant feedback is on, so it works as a review session' : 'feedback is off, so results come at the end'}.</div>
       </div>
+      ${builderTracks().length ? `<div class="bq-row">
+        <div class="bq-label">Track</div>
+        <div class="bq-chips">
+          ${chip('data-bq-track', 'architect', builder.track === 'architect', 'Architect and Claude Code')}
+          ${builderTracks().map(([k, l]) => chip('data-bq-track', k, builder.track === k, l.name)).join('')}
+        </div>
+      </div>` : ''}
       <div class="bq-row">
         <div class="bq-label">Domains</div>
         <div class="bq-chips">
           ${chip('data-bq-domain', 'all', !builder.domains.length, 'All domains')}
-          ${OFFICIAL_DOMAINS.map(d => chip('data-bq-domain', d.key, builder.domains.includes(d.key), d.label, ` <span class="bq-n">${by[d.key].length}</span>`)).join('')}
+          ${DOMS.map(d => chip('data-bq-domain', d.key, builder.domains.includes(d.key), d.label, ` <span class="bq-n">${by[d.key].length}</span>`)).join('')}
         </div>
       </div>
       <div class="bq-row">
@@ -1705,7 +1739,7 @@ function renderBuilder() {
         </div>
       </div>
       <button class="btn bq-go" id="bqStart" ${n ? '' : 'disabled'}>Start quiz · ${n} Qs · ${Math.round(n * SECONDS_PER_QUESTION / 60)} min</button>
-      <div class="bq-foot">Drawn from all ${available} matching questions across both sections. Custom quizzes don't post to the leaderboard.</div>
+      <div class="bq-foot">Drawn from all ${available} matching questions${builder.track === 'architect' ? ' across both sections' : ' in this bank'}. Custom quizzes don't post to the leaderboard.</div>
     </div>`;
 }
 
@@ -1715,21 +1749,22 @@ function wireBuilder() {
     if (k === 'all') builder.domains = [];
     else if (builder.domains.includes(k)) builder.domains = builder.domains.filter(x => x !== k);
     else builder.domains = [...builder.domains, k];
-    if (builder.domains.length === OFFICIAL_DOMAINS.length) builder.domains = [];
+    if (builder.domains.length === builderDefs().domains.length) builder.domains = [];
     renderStart();
   }));
+  app.querySelectorAll('[data-bq-track]').forEach(b => b.addEventListener('click', () => { builder.track = b.dataset.bqTrack; builder.domains = []; renderStart(); }));
   app.querySelectorAll('[data-bq-mix]').forEach(b => b.addEventListener('click', () => { builder.mix = b.dataset.bqMix; renderStart(); }));
   app.querySelectorAll('[data-bq-size]').forEach(b => b.addEventListener('click', () => { builder.size = Number(b.dataset.bqSize); renderStart(); }));
   document.getElementById('bqStart')?.addEventListener('click', startCustomQuiz);
 }
 
 function startCustomQuiz() {
-  const by = questionsByDomain();
-  const keys = builder.domains.length ? builder.domains : OFFICIAL_DOMAINS.map(d => d.key);
-  const quota = domainQuotas(keys, builder.size, builder.mix, by);
+  const { domains: DOMS, by } = builderDefs();
+  const keys = builder.domains.length ? builder.domains : DOMS.map(d => d.key);
+  const quota = domainQuotas(keys, builder.size, builder.mix, by, DOMS);
   // Relabel with the official domain name so the results breakdown has one row per domain.
   const picked = keys.flatMap(k => shuffle(by[k]).slice(0, quota[k])
-    .map(q => ({ ...q, domain: OFFICIAL_DOMAINS.find(d => d.key === k).name })));
+    .map(q => ({ ...q, domain: DOMS.find(d => d.key === k).name })));
   startPaper('custom', prepQuestions(buildRampedPaper(picked, picked.length), { keepOrder: true }), false);
 }
 
@@ -1986,6 +2021,7 @@ function renderExam() {
 
     <div class="qmeta">
       <span class="qcount">Question ${state.current + 1} / ${state.questions.length}</span>
+      <span class="qprog" id="qprog">${answeredCount} of ${state.questions.length} complete${state.flagged.some(Boolean) ? ` \u00b7 ${state.flagged.filter(Boolean).length} flagged` : ''}</span>
       <span class="domain-tag">${q.domain}</span>
     </div>
     <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
@@ -2122,6 +2158,8 @@ function renderPalette() {
   const answered = qs.length - unansweredCount();
   let stats = `<div class="pal-stat"><span>Question</span><b>${state.current + 1} / ${qs.length}</b></div>
     <div class="pal-stat"><span>Answered</span><b>${answered} / ${qs.length}</b></div>`;
+  const flaggedN = state.flagged.filter(Boolean).length;
+  if (flaggedN) stats += `<div class="pal-stat"><span style="color:var(--amber)">\u2605 Flagged</span><b>${flaggedN}</b></div>`;
   if (fbOn) {
     const acc = answered ? Math.round(correct / answered * 100) : 0;
     const onTrack = acc >= 72; // 720/1000 pass mark
@@ -2135,7 +2173,8 @@ function renderPalette() {
   }
   return `<div class="section-label">Progress</div>
     <div class="pal-card">${stats}</div>
-    <div class="pal-grid">${cells}</div>`;
+    <div class="pal-grid">${cells}</div>
+    <div class="pal-hint" id="kbdHint">Keyboard: N next, P previous, F flag.</div>`;
 }
 
 // Move to question `i` and bring its top into view: after a long explanation

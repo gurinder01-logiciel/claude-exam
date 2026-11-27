@@ -470,6 +470,12 @@ breakdown groups by each question's own `domain`, so it is unchanged.
 A level with a `blueprint` that doesn't match falls back to the plain draw and logs a
 `console.warn` naming the unmatched labels/domains once per page load.
 
+### Keyboard and flagging
+During an exam: **N** next, **P** previous, **F** flag for review (plus the existing arrow keys). Plain keys only: ignored
+with Ctrl, Cmd or Alt held, while typing in an input, textarea or select, and while a pause or confirm overlay is up. They work
+after instant feedback has locked an answer. The header shows "X of N complete · Y flagged", the question grid marks flagged
+cells with a star, the progress card counts them, and a hint line sits under the grid.
+
 ### Chapter drill
 Below the custom quiz builder, **Study by course chapter** lists every level that has a `courses` header
 (Developer, Developer Professional): pick the exam, a course, optionally one chapter, and 10/20/30 questions.
@@ -478,6 +484,9 @@ per chapter, and, like the custom quiz, neither unlocks levels nor posts to the 
 chapter lists, with the course page URLs, are in `BLUEPRINT-DEV.md` and `BLUEPRINT-DEV-PRO.md`.
 
 ### Custom quiz builder
+A **Track** row switches the builder between the Architect and Claude Code banks (the five official domains below)
+and the Developer or Developer Professional bank, whose domains come from that bank's `blueprint`.
+
 Sits at the top of the Mock Exam Bank section. Pick one or more official domains
 (or all), exam weighting (27/18/20/20/15) or an equal split, and 10/20/30/60
 questions. It draws from every non-pool level in both sections. The older banks
