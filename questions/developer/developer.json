@@ -1291,7 +1291,7 @@
   },
   {
    "domain": "Eval, Testing, and Debugging",
-   "d": 1,
+   "d": 2,
    "scenario": 0,
    "task": "4.1",
    "q": "A team is building a golden set to evaluate a ticket-summarisation prompt. Which TWO practices make it a useful starting point? Select TWO.",
