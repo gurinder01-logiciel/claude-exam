@@ -21,7 +21,12 @@ exam: 60 scenario questions in 120 minutes, with a shared team leaderboard.
   context banner
 - **Levels unlock in order** — Claude Code Foundations first, then Scenario Practice, then
   the Full Mock Exam, so nobody skips the fundamentals
-- **Architect Scenarios** — always open: a random 60 from a 100-question bank of
+- **Developer** and **Developer Professional** — always open, shown first: a random 60 from a
+  100-question bank each, for the official **CCDVF** and **CCDVP** exams, domain-weighted to
+  their eight-domain blueprints (`BLUEPRINT-DEV.md`, `BLUEPRINT-DEV-PRO.md`). Every product
+  fact behind the questions is quoted from the docs in `questions/FACTS-DEV.md`. Length switch:
+  60 (2 min each) or the real 70 items in 120 minutes.
+- **Architect Foundations** — always open: a random 60 from a 100-question bank of
   scenario-based items covering all 30 task statements
 - **Architect Professional** — always open: a random 60 from a 100-question bank
   for the **CCAR-P** (Professional) exam — architecture trade-offs, integration,

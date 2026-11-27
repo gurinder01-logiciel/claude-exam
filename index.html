@@ -290,6 +290,14 @@
   .fb-toggle.compact { padding: 9px 14px; margin-top: 12px; }
   .fb-toggle.compact .fb-d { display: inline; margin: 0; }
   .levels.path { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  /* Wide screens: the seven exam-path tracks sit in one row */
+  @media (min-width: 1180px) {
+    .levels.path { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+    .levels.path .level-card { padding: 10px 9px; }
+    .levels.path .lc-title { font-size: 0.88rem; }
+    .levels.path .lc-badge { font-size: 0.58rem; padding: 2px 6px; }
+    .levels.path .lc-desc { -webkit-line-clamp: 3; font-size: 0.7rem; }
+  }
   .levels.bank { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); margin-bottom: 12px; }
   .levels .level-card { padding: 12px 14px; gap: 6px; border-radius: 12px; }
   .levels .lc-top { gap: 8px; }
@@ -481,6 +489,9 @@
   .fb-tools { margin-top: 10px; }
   .len-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 12px; font-size: 0.82rem; color: var(--text-dim); }
   .len-row .lbl { font-weight: 600; }
+  .len-grid { gap: 8px 22px; }
+  .len-grp { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .len-grp .filter-btn { padding: 4px 11px; }
   .tag-mini { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 12px; }
   /* Prep resources — right-hand panel on the start screen, stacked below on narrow screens */
   .prep {
@@ -663,6 +674,9 @@ const PASS_SCORE = 720; // out of 1000
 // items in 120 minutes (not 2 min/question), so a "real" length carries its own
 // time limit; any other length keeps the 2 min/question pace.
 const LENGTH_CHOICES = {
+  // CCDVF and CCDVP are 70 items (60 scored + 10 unscored) in 120 minutes per their exam guides.
+  developer: { options: [60, 70], real: 70, realSeconds: 120 * 60, label: 'Developer' },
+  developerPro: { options: [60, 70], real: 70, realSeconds: 120 * 60, label: 'Developer Professional' },
   architectPro: { options: [60, 63], real: 63, realSeconds: 120 * 60, label: 'Architect Professional' }
 };
 const LENGTH_KEY = 'ccap_length';
@@ -1548,17 +1562,17 @@ function renderStart() {
         <span class="fb-d">${state.instantFeedback
           ? ' — answers are marked straight away with the correct answer and explanation; first pick is final.'
           : ' — real exam conditions; results only at the end.'}</span>
-        <span class="fb-note">Exams run at 2 min per question (the 63-item Architect Professional sitting gets the real 120 min), and the timer can be paused.</span></span>
+        <span class="fb-note">Exams run at 2 min per question (the real-length Professional and Developer sittings (63 or 70 items) get the real 120 min), and the timer can be paused.</span></span>
       <span class="switch ${state.instantFeedback ? 'on' : ''}"></span>
     </button>
     <div class="sec-head">
       <div class="sec-title">Exam Path</div>
       <div class="sec-sub">Warm up, practise by scenario, then sit the full mock — each level unlocks the next.</div>
     </div>
-    ${Object.entries(LENGTH_CHOICES).filter(([k]) => LEVELS[k] && LEVELS[k].ready).map(([k, c]) => `
-    <div class="len-row"><span class="lbl">${c.label} exam length:</span>
-      ${c.options.map(n => `<button class="filter-btn${chosenLength(k) === n ? ' active' : ''}" data-len-level="${k}" data-len="${n}">${n}${n === c.real ? ' (real)' : ''}</button>`).join('')}
-      <span>${c.real} items · ${c.realSeconds / 60} min is the real sitting</span></div>`).join('')}
+    <div class="len-row len-grid">${Object.entries(LENGTH_CHOICES).filter(([k]) => LEVELS[k] && LEVELS[k].ready).map(([k, c]) => `
+      <span class="len-grp"><span class="lbl">${c.label}:</span>
+      ${c.options.map(n => `<button class="filter-btn${chosenLength(k) === n ? ' active' : ''}" data-len-level="${k}" data-len="${n}" title="${n === c.real ? c.real + ' items in ' + c.realSeconds / 60 + ' min is the real sitting' : n + ' items, 2 min each'}">${n}${n === c.real ? ' (real)' : ''}</button>`).join('')}</span>`).join('')}
+    </div>
     <div class="levels path">${pathCards}</div>
     ${bankCards ? `
     <div class="sec-head">
@@ -1740,14 +1754,24 @@ function startPaper(levelKey, questions, grouped, totalSeconds) {
 
 // ---- Trap review + tutor prompt ----
 const LETTERS = ['A','B','C','D','E','F'];
-// Header code for the sitting: the Professional level is CCAR-P, the rest CCAR-F.
-function examBrand() { return /^architectPro/.test(state.level || '') ? 'CCAR-P' : 'CCAR-F'; }
+// Header code and exam name for the sitting. Developer levels are CCDVF / CCDVP, Architect Professional is
+// CCAR-P, everything else is CCAR-F.
+const EXAM_INFO = [
+  { re: /^developerPro/, code: 'CCDVP', name: 'Claude Certified Developer \u2013 Professional' },
+  { re: /^developer/, code: 'CCDVF', name: 'Claude Certified Developer \u2013 Foundations' },
+  { re: /^architectPro/, code: 'CCAR-P', name: 'Claude Certified Architect \u2013 Professional' }
+];
+function examInfo() {
+  const lv = state.level || '';
+  return EXAM_INFO.find(x => x.re.test(lv)) || { code: 'CCAR-F', name: 'Claude Certified Architect \u2013 Foundations' };
+}
+function examBrand() { return examInfo().code; }
 function plain(s) { return String(s == null ? '' : s).replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim(); }
 
 function tutorPrompt(q, ans) {
   const picked = Array.isArray(ans) && ans.length ? ans : [];
   const fmt = idxs => idxs.map(i => `${LETTERS[i]}. ${plain(q.options[i])}`).join('\n');
-  return 'You are my tutor for the Claude Certified Architect \u2013 Professional exam. ' +
+  return 'You are my tutor for the ' + examInfo().name + ' exam. ' +
     'Here is a scenario question, the option I picked, and the correct answer. ' +
     'Do not just tell me the answer again. Ask me one question at a time to get me to find ' +
     '(a) the deciding constraint in the scenario and (b) which constraint my pick breaks. ' +

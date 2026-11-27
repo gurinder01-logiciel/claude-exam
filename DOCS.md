@@ -72,7 +72,9 @@ for the rewrite and verification history.
 |---|---|---|---|---|---|
 | 1 | **Basic** | 60 | 60 | 31 / 18 / 11 | — (always open) |
 | 2 | **Scenario Practice** | 78 | 60 | 9 / 51 / 18 | finishing Basic |
-| 3 | **Architect Scenarios** | 100 | 60 | 15 / 20 / 25 | — (always open) |
+| 3 | **Architect Foundations** (was Architect Scenarios) | 100 | 60 | 15 / 20 / 25 | — (always open) |
+| 0a | **Developer** (CCDVF) | 100 | 60 (or 70 real) | domain-weighted | — (always open) |
+| 0b | **Developer Professional** (CCDVP) | 100 | 60 (or 70 real) | domain-weighted | — (always open) |
 | 3b | **Architect Professional** (CCAR-P) | 100 | 60 | 15 / 20 / 25 | — (always open) |
 | 4 | **Full Mock Exam** | 138 (all banks) | 60 | 15 / 20 / 25 | finishing Scenario Practice |
 
@@ -233,6 +235,17 @@ stem, lettered options, your pick and the correct answer(s). It uses
 `navigator.clipboard`, falling back to a hidden textarea and `execCommand('copy')`,
 and the button reads "Copied" for a moment.
 
+### Exam length (Developer, Developer Professional)
+Same chip row as Architect Professional, with **60** or **70 (real)**: the official CCDVF and CCDVP
+sittings are 70 items (60 scored, 10 unscored) in 120 minutes, so 70 gets the real limit. The
+three chips sit in one row (`LENGTH_CHOICES` in `index.html`). Banks: `developer.json` and
+`developer-pro.json`; scope in `BLUEPRINT-DEV.md` / `BLUEPRINT-DEV-PRO.md`; verified facts in
+`questions/FACTS-DEV.md` (re-check with `python3 .claude/skills/bank-audit/verify-facts.py questions/FACTS-DEV.md`);
+length bias with `node .claude/skills/bank-audit/longest.mjs questions/developer.json`. The Exam
+Path lists the tracks in the order of `questions/index.json` (Developer, Developer Professional,
+Architect Foundations, Architect Professional, Claude Code Foundations, Scenario Practice, Full
+Mock Exam) and shows all seven in one row from 1180px up; below that it wraps to 3 columns, then 1.
+
 ### Exam length (Architect Professional)
 A chip row above the Exam Path picks **60** or **63 (real)** items. 63 gets the
 real 120-minute limit (not 2 min/question); 60 keeps the 2 min/question pace. The
@@ -338,7 +351,10 @@ questions/
   mock.json        pool config (no questions of its own)
   basic.json       49 questions (Claude Code Foundations)
   scenario.json    94 questions (Scenario Practice)
-  architect.json   100 questions (Architect Scenarios; 60 drawn per sitting)
+  developer.json   100 questions (Developer, CCDVF; 60 drawn)
+  developer-pro.json  100 questions (Developer Professional, CCDVP; 60 drawn)
+  FACTS-DEV.md     verified doc quotes behind both Developer banks
+  architect.json   100 questions (Architect Foundations; 60 drawn per sitting)
   architect-pro.json  100 questions (Architect Professional, CCAR-P; 60 drawn)
   core.json        48 questions (Core Concepts Drill)      ┐ "Mock Exam Bank"
   mock1-6.json     60/58/56/54/51/55 (Mock Exam 1-6)       │ section
@@ -438,7 +454,7 @@ draws per domain by the blueprint percentages (`drawByBlueprint`): largest-remai
 rounding to the paper length. A domain with fewer questions than its quota gives
 all it has and the shortfall is spread over the other domains in proportion to
 their percentages. The drawn set is then ordered by the difficulty ramp. Today
-only Architect Professional qualifies; other levels have loose bank labels or use
+Architect Professional, Developer and Developer Professional qualify; other levels have loose bank labels or use
 scenario/pool draws, and keep the plain ramped draw. The results-by-domain
 breakdown groups by each question's own `domain`, so it is unchanged.
 A level with a `blueprint` that doesn't match falls back to the plain draw and logs a
