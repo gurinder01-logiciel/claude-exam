@@ -61,7 +61,9 @@
     null,
     "all steps collapse into one call, so auditors cannot replay or inspect any individual step"
    ],
-   "facts": []
+   "facts": [],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Production agents: workflow vs agent, wiring and human checkpoints"
   },
   {
    "domain": "Agents and Workflows",
@@ -84,7 +86,9 @@
     "runs every lookup for every case, wasting cost and context on irrelevant data",
     "a fixed chain cannot skip or add steps when a case does not need them"
    ],
-   "facts": []
+   "facts": [],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Production agents: workflow vs agent, wiring and human checkpoints"
   },
   {
    "domain": "Agents and Workflows",
@@ -111,7 +115,9 @@
     "F-09",
     "F-10",
     "F-11"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Production agents: workflow vs agent, wiring and human checkpoints"
   },
   {
    "domain": "Agents and Workflows",
@@ -137,7 +143,9 @@
    "facts": [
     "F-54",
     "F-12"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Production agents: workflow vs agent, wiring and human checkpoints"
   },
   {
    "domain": "Agents and Workflows",
@@ -160,7 +168,9 @@
     "the branch is a fixed label lookup, not run-time task decomposition",
     "only one specialised prompt runs per ticket; there is no comparison across prompts"
    ],
-   "facts": []
+   "facts": [],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Production agents: workflow vs agent, wiring and human checkpoints"
   },
   {
    "domain": "Agents and Workflows",
@@ -186,7 +196,9 @@
    "facts": [
     "F-01",
     "F-02"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Production agents: workflow vs agent, wiring and human checkpoints"
   },
   {
    "domain": "Agents and Workflows",
@@ -212,7 +224,9 @@
    "facts": [
     "F-02",
     "F-55"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Production agents: workflow vs agent, wiring and human checkpoints"
   },
   {
    "domain": "Agents and Workflows",
@@ -238,7 +252,9 @@
    "facts": [
     "F-04",
     "F-05"
-   ]
+   ],
+   "course": "Claude Code in Action",
+   "chapter": "Hooks"
   },
   {
    "domain": "Agents and Workflows",
@@ -263,7 +279,9 @@
    ],
    "facts": [
     "F-06"
-   ]
+   ],
+   "course": "Claude Code in Action",
+   "chapter": "Hooks"
   },
   {
    "domain": "Agents and Workflows",
@@ -288,7 +306,9 @@
    ],
    "facts": [
     "F-07"
-   ]
+   ],
+   "course": "Claude Code in Action",
+   "chapter": "Hooks"
   },
   {
    "domain": "Agents and Workflows",
@@ -313,7 +333,9 @@
    ],
    "facts": [
     "F-08"
-   ]
+   ],
+   "course": "Claude Code in Action",
+   "chapter": "Hooks"
   },
   {
    "domain": "Agents and Workflows",
@@ -338,7 +360,9 @@
    ],
    "facts": [
     "F-56"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Production agents: workflow vs agent, wiring and human checkpoints"
   },
   {
    "domain": "Agents and Workflows",
@@ -363,7 +387,9 @@
    ],
    "facts": [
     "F-13"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Tool schemas, the tool-use loop and parallel calls"
   },
   {
    "domain": "Agents and Workflows",
@@ -388,7 +414,9 @@
    ],
    "facts": [
     "F-48"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Tool schemas, the tool-use loop and parallel calls"
   },
   {
    "domain": "Agents and Workflows",
@@ -414,7 +442,9 @@
    "facts": [
     "F-57",
     "F-58"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Agent memory across sessions"
   },
   {
    "domain": "Agents and Workflows",
@@ -441,7 +471,9 @@
     "F-59",
     "F-60",
     "F-61"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Agent memory across sessions"
   },
   {
    "domain": "Agents and Workflows",
@@ -466,7 +498,9 @@
    ],
    "facts": [
     "F-62"
-   ]
+   ],
+   "course": "Introduction to Subagents",
+   "chapter": "Using subagents effectively"
   },
   {
    "domain": "Applications and Integration",
@@ -491,7 +525,9 @@
    ],
    "facts": [
     "F-19"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Streamed responses and interrupted streams"
   },
   {
    "domain": "Applications and Integration",
@@ -517,7 +553,9 @@
    "facts": [
     "F-20",
     "F-63"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Streamed responses and interrupted streams"
   },
   {
    "domain": "Applications and Integration",
@@ -544,7 +582,9 @@
     "F-23",
     "F-25",
     "F-26"
-   ]
+   ],
+   "course": "Building with the Claude API",
+   "chapter": "Rules of prompt caching"
   },
   {
    "domain": "Applications and Integration",
@@ -570,7 +610,9 @@
    "facts": [
     "F-27",
     "F-28"
-   ]
+   ],
+   "course": "Building with the Claude API",
+   "chapter": "Rules of prompt caching"
   },
   {
    "domain": "Applications and Integration",
@@ -596,7 +638,9 @@
    "facts": [
     "F-36",
     "F-33"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Images, PDFs, the Files API and Message Batches"
   },
   {
    "domain": "Applications and Integration",
@@ -621,7 +665,9 @@
    ],
    "facts": [
     "F-47"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Tool schemas, the tool-use loop and parallel calls"
   },
   {
    "domain": "Applications and Integration",
@@ -647,7 +693,9 @@
    "facts": [
     "F-16",
     "F-14"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Streamed responses and interrupted streams"
   },
   {
    "domain": "Applications and Integration",
@@ -674,7 +722,9 @@
     "F-52",
     "F-53",
     "F-70"
-   ]
+   ],
+   "course": "Building with the Claude API",
+   "chapter": "Code execution and the Files API"
   },
   {
    "domain": "Applications and Integration",
@@ -700,7 +750,9 @@
    "facts": [
     "F-64",
     "F-65"
-   ]
+   ],
+   "course": "Claude Code, MCP & Integration",
+   "chapter": "Durable project context: CLAUDE.md, rules, hooks and subagents"
   },
   {
    "domain": "Applications and Integration",
@@ -725,7 +777,9 @@
    ],
    "facts": [
     "F-72"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Context engineering: window, compaction, clearing and subagent handoffs"
   },
   {
    "domain": "Applications and Integration",
@@ -748,7 +802,9 @@
     "a keyword filter misses paraphrases and blocks legitimate text",
     "a notice is not a control; the text still reaches the system prompt"
    ],
-   "facts": []
+   "facts": [],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Security: injection, untrusted input, scoped identity and secrets"
   },
   {
    "domain": "Applications and Integration",
@@ -773,7 +829,9 @@
    ],
    "facts": [
     "F-66"
-   ]
+   ],
+   "course": "Accelerators & IP Contribution",
+   "chapter": "Platform choice and versioning what ships"
   },
   {
    "domain": "Applications and Integration",
@@ -798,7 +856,9 @@
    ],
    "facts": [
     "F-67"
-   ]
+   ],
+   "course": "Claude Code, MCP & Integration",
+   "chapter": "Durable project context: CLAUDE.md, rules, hooks and subagents"
   },
   {
    "domain": "Applications and Integration",
@@ -823,7 +883,9 @@
    ],
    "facts": [
     "F-68"
-   ]
+   ],
+   "course": "Claude Code, MCP & Integration",
+   "chapter": "Skills, custom commands and plugins"
   },
   {
    "domain": "Applications and Integration",
@@ -850,7 +912,9 @@
     "F-40",
     "F-39",
     "F-38"
-   ]
+   ],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Resilience: retriable vs terminal errors"
   },
   {
    "domain": "Applications and Integration",
@@ -875,7 +939,9 @@
    ],
    "facts": [
     "F-69"
-   ]
+   ],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Resilience: retriable vs terminal errors"
   },
   {
    "domain": "Applications and Integration",
@@ -901,7 +967,9 @@
    "facts": [
     "F-21",
     "F-44"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Streamed responses and interrupted streams"
   },
   {
    "domain": "Applications and Integration",
@@ -927,7 +995,9 @@
    "facts": [
     "F-42",
     "F-43"
-   ]
+   ],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Resilience: retriable vs terminal errors"
   },
   {
    "domain": "Applications and Integration",
@@ -952,7 +1022,9 @@
    ],
    "facts": [
     "F-45"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Streamed responses and interrupted streams"
   },
   {
    "domain": "Applications and Integration",
@@ -979,7 +1051,9 @@
     "F-70",
     "F-71",
     "F-53"
-   ]
+   ],
+   "course": "Building with the Claude API",
+   "chapter": "Code execution and the Files API"
   },
   {
    "domain": "Claude Code",
@@ -1004,7 +1078,9 @@
    ],
    "facts": [
     "F-74"
-   ]
+   ],
+   "course": "Claude Code, MCP & Integration",
+   "chapter": "Durable project context: CLAUDE.md, rules, hooks and subagents"
   },
   {
    "domain": "Claude Code",
@@ -1030,7 +1106,9 @@
    "facts": [
     "F-75",
     "F-76"
-   ]
+   ],
+   "course": "Claude Code in Action",
+   "chapter": "Steering Long Sessions"
   },
   {
    "domain": "Claude Code",
@@ -1057,7 +1135,9 @@
     "F-77",
     "F-78",
     "F-79"
-   ]
+   ],
+   "course": "Claude Code, MCP & Integration",
+   "chapter": "Durable project context: CLAUDE.md, rules, hooks and subagents"
   },
   {
    "domain": "Claude Code",
@@ -1083,7 +1163,9 @@
    "facts": [
     "F-80",
     "F-81"
-   ]
+   ],
+   "course": "Claude Code, MCP & Integration",
+   "chapter": "Explore-plan-code loop and permission modes"
   },
   {
    "domain": "Claude Code",
@@ -1108,7 +1190,9 @@
    ],
    "facts": [
     "F-82"
-   ]
+   ],
+   "course": "Introduction to Agent Skills",
+   "chapter": "Skills vs. other Claude Code features"
   },
   {
    "domain": "Claude Code",
@@ -1133,7 +1217,9 @@
    ],
    "facts": [
     "F-83"
-   ]
+   ],
+   "course": "Claude Code, MCP & Integration",
+   "chapter": "Skills, custom commands and plugins"
   },
   {
    "domain": "Claude Code",
@@ -1159,7 +1245,9 @@
    "facts": [
     "F-84",
     "F-85"
-   ]
+   ],
+   "course": "Introduction to Subagents",
+   "chapter": "Using subagents effectively"
   },
   {
    "domain": "Claude Code",
@@ -1184,7 +1272,9 @@
    ],
    "facts": [
     "F-86"
-   ]
+   ],
+   "course": "Claude Code, MCP & Integration",
+   "chapter": "Skills, custom commands and plugins"
   },
   {
    "domain": "Eval, Testing, and Debugging",
@@ -1207,7 +1297,9 @@
     "a handful of memorable cases is too small and biased",
     "excluding failures hides the very cases a change should improve"
    ],
-   "facts": []
+   "facts": [],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Eval suites, grading methods and calibrating an LLM judge"
   },
   {
    "domain": "Eval, Testing, and Debugging",
@@ -1230,7 +1322,9 @@
     null,
     "averaging reduces noise but not a systematic mismatch with human judgement"
    ],
-   "facts": []
+   "facts": [],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Eval suites, grading methods and calibrating an LLM judge"
   },
   {
    "domain": "Eval, Testing, and Debugging",
@@ -1253,7 +1347,9 @@
     "single runs can mislead when the difference of interest is small",
     "there is no fixed ten-point threshold; the variance should be measured"
    ],
-   "facts": []
+   "facts": [],
+   "course": "MSO Foundations",
+   "chapter": "Tokens, the context window and non-determinism"
   },
   {
    "domain": "Eval, Testing, and Debugging",
@@ -1276,7 +1372,9 @@
     null,
     "complaints arrive late and cover only a fraction of errors"
    ],
-   "facts": []
+   "facts": [],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Eval suites, grading methods and calibrating an LLM judge"
   },
   {
    "domain": "Eval, Testing, and Debugging",
@@ -1299,7 +1397,9 @@
     "rewriting the test to pass defeats its purpose",
     "temperature does not repair a systematic policy regression"
    ],
-   "facts": []
+   "facts": [],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Eval suites, grading methods and calibrating an LLM judge"
   },
   {
    "domain": "Eval, Testing, and Debugging",
@@ -1322,7 +1422,9 @@
     "model size does not guarantee grounding without instructions to stay within the documents",
     null
    ],
-   "facts": []
+   "facts": [],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Test and tracing layers"
   },
   {
    "domain": "Eval, Testing, and Debugging",
@@ -1347,7 +1449,9 @@
    ],
    "facts": [
     "F-15"
-   ]
+   ],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Resilience: retriable vs terminal errors"
   },
   {
    "domain": "Eval, Testing, and Debugging",
@@ -1372,7 +1476,9 @@
    ],
    "facts": [
     "F-46"
-   ]
+   ],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Test and tracing layers"
   },
   {
    "domain": "Eval, Testing, and Debugging",
@@ -1397,7 +1503,9 @@
    ],
    "facts": [
     "F-76"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Context engineering: window, compaction, clearing and subagent handoffs"
   },
   {
    "domain": "Eval, Testing, and Debugging",
@@ -1420,7 +1528,9 @@
     "repeating does not create the missing call",
     "removes automation instead of verifying actions"
    ],
-   "facts": []
+   "facts": [],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Test and tracing layers"
   },
   {
    "domain": "Model Selection and Optimization",
@@ -1446,7 +1556,9 @@
    "facts": [
     "F-87",
     "F-88"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Extended thinking, budgets and thinking blocks"
   },
   {
    "domain": "Model Selection and Optimization",
@@ -1473,7 +1585,9 @@
     "F-89",
     "F-90",
     "F-95"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Extended thinking, budgets and thinking blocks"
   },
   {
    "domain": "Model Selection and Optimization",
@@ -1499,7 +1613,9 @@
    "facts": [
     "F-91",
     "F-95"
-   ]
+   ],
+   "course": "MSO Foundations",
+   "chapter": "Tokens, the context window and non-determinism"
   },
   {
    "domain": "Model Selection and Optimization",
@@ -1525,7 +1641,9 @@
    "facts": [
     "F-96",
     "F-97"
-   ]
+   ],
+   "course": "MSO Foundations",
+   "chapter": "Tokens, the context window and non-determinism"
   },
   {
    "domain": "Model Selection and Optimization",
@@ -1551,7 +1669,9 @@
    "facts": [
     "F-94",
     "F-95"
-   ]
+   ],
+   "course": "MSO Foundations",
+   "chapter": "Model family, tiers and reasoning modes"
   },
   {
    "domain": "Model Selection and Optimization",
@@ -1576,7 +1696,9 @@
    ],
    "facts": [
     "F-98"
-   ]
+   ],
+   "course": "MSO Foundations",
+   "chapter": "Model family, tiers and reasoning modes"
   },
   {
    "domain": "Model Selection and Optimization",
@@ -1601,7 +1723,9 @@
    ],
    "facts": [
     "F-100"
-   ]
+   ],
+   "course": "MSO Foundations",
+   "chapter": "Model family, tiers and reasoning modes"
   },
   {
    "domain": "Model Selection and Optimization",
@@ -1627,7 +1751,9 @@
    "facts": [
     "F-99",
     "F-107"
-   ]
+   ],
+   "course": "MSO Foundations",
+   "chapter": "Model family, tiers and reasoning modes"
   },
   {
    "domain": "Model Selection and Optimization",
@@ -1654,7 +1780,9 @@
     "F-102",
     "F-101",
     "F-29"
-   ]
+   ],
+   "course": "Building with the Claude API",
+   "chapter": "Prompt caching in action"
   },
   {
    "domain": "Model Selection and Optimization",
@@ -1681,7 +1809,9 @@
     "F-24",
     "F-103",
     "F-104"
-   ]
+   ],
+   "course": "Building with the Claude API",
+   "chapter": "Rules of prompt caching"
   },
   {
    "domain": "Model Selection and Optimization",
@@ -1707,7 +1837,9 @@
    "facts": [
     "F-32",
     "F-106"
-   ]
+   ],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Cost, latency and reliability budgets"
   },
   {
    "domain": "Model Selection and Optimization",
@@ -1732,7 +1864,9 @@
    ],
    "facts": [
     "F-107"
-   ]
+   ],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Cost, latency and reliability budgets"
   },
   {
    "domain": "Prompt and Context Engineering",
@@ -1757,7 +1891,9 @@
    ],
    "facts": [
     "F-110"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Context engineering: window, compaction, clearing and subagent handoffs"
   },
   {
    "domain": "Prompt and Context Engineering",
@@ -1783,7 +1919,9 @@
    "facts": [
     "F-111",
     "F-112"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Context engineering: window, compaction, clearing and subagent handoffs"
   },
   {
    "domain": "Prompt and Context Engineering",
@@ -1808,7 +1946,9 @@
    ],
    "facts": [
     "F-108"
-   ]
+   ],
+   "course": "Claude Code in Action",
+   "chapter": "Steering Long Sessions"
   },
   {
    "domain": "Prompt and Context Engineering",
@@ -1833,7 +1973,9 @@
    ],
    "facts": [
     "F-109"
-   ]
+   ],
+   "course": "Claude Code in Action",
+   "chapter": "Steering Long Sessions"
   },
   {
    "domain": "Prompt and Context Engineering",
@@ -1859,7 +2001,9 @@
    "facts": [
     "F-114",
     "F-115"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Production-ready prompts and diagnosing underperformance"
   },
   {
    "domain": "Prompt and Context Engineering",
@@ -1885,7 +2029,9 @@
    "facts": [
     "F-116",
     "F-117"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Production-ready prompts and diagnosing underperformance"
   },
   {
    "domain": "Prompt and Context Engineering",
@@ -1910,7 +2056,9 @@
    ],
    "facts": [
     "F-113"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Production-ready prompts and diagnosing underperformance"
   },
   {
    "domain": "Prompt and Context Engineering",
@@ -1936,7 +2084,9 @@
    "facts": [
     "F-121",
     "F-122"
-   ]
+   ],
+   "course": "Building with the Claude API",
+   "chapter": "Structured data"
   },
   {
    "domain": "Prompt and Context Engineering",
@@ -1962,7 +2112,9 @@
    "facts": [
     "F-123",
     "F-120"
-   ]
+   ],
+   "course": "Building with the Claude API",
+   "chapter": "Structured data"
   },
   {
    "domain": "Prompt and Context Engineering",
@@ -1987,7 +2139,9 @@
    ],
    "facts": [
     "F-124"
-   ]
+   ],
+   "course": "Building with the Claude API",
+   "chapter": "Structured data"
   },
   {
    "domain": "Prompt and Context Engineering",
@@ -2013,7 +2167,9 @@
    "facts": [
     "F-125",
     "F-126"
-   ]
+   ],
+   "course": "Building with the Claude API",
+   "chapter": "Structured data"
   },
   {
    "domain": "Prompt and Context Engineering",
@@ -2038,7 +2194,9 @@
    ],
    "facts": [
     "F-127"
-   ]
+   ],
+   "course": "Building with the Claude API",
+   "chapter": "Citations"
   },
   {
    "domain": "Prompt and Context Engineering",
@@ -2063,7 +2221,9 @@
    ],
    "facts": [
     "F-128"
-   ]
+   ],
+   "course": "Building with the Claude API",
+   "chapter": "Citations"
   },
   {
    "domain": "Prompt and Context Engineering",
@@ -2090,7 +2250,9 @@
     "F-96",
     "F-97",
     "F-23"
-   ]
+   ],
+   "course": "Building with the Claude API",
+   "chapter": "The full RAG flow"
   },
   {
    "domain": "Prompt and Context Engineering",
@@ -2115,7 +2277,9 @@
    ],
    "facts": [
     "F-118"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Production-ready prompts and diagnosing underperformance"
   },
   {
    "domain": "Security and Safety",
@@ -2141,7 +2305,9 @@
    "facts": [
     "F-129",
     "F-130"
-   ]
+   ],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Security: injection, untrusted input, scoped identity and secrets"
   },
   {
    "domain": "Security and Safety",
@@ -2167,7 +2333,9 @@
    "facts": [
     "F-131",
     "F-132"
-   ]
+   ],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Security: injection, untrusted input, scoped identity and secrets"
   },
   {
    "domain": "Security and Safety",
@@ -2190,7 +2358,9 @@
     null,
     "removes the policy and every guardrail it provides"
    ],
-   "facts": []
+   "facts": [],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Security: injection, untrusted input, scoped identity and secrets"
   },
   {
    "domain": "Security and Safety",
@@ -2215,7 +2385,9 @@
    ],
    "facts": [
     "F-133"
-   ]
+   ],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Security: injection, untrusted input, scoped identity and secrets"
   },
   {
    "domain": "Security and Safety",
@@ -2238,7 +2410,9 @@
     "still grants full rights and gives stale data",
     null
    ],
-   "facts": []
+   "facts": [],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Security: injection, untrusted input, scoped identity and secrets"
   },
   {
    "domain": "Security and Safety",
@@ -2261,7 +2435,9 @@
     "models can decode base64",
     "no such expiry exists, and the secret should be rotated now"
    ],
-   "facts": []
+   "facts": [],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Security: injection, untrusted input, scoped identity and secrets"
   },
   {
    "domain": "Security and Safety",
@@ -2284,7 +2460,9 @@
     "a key on the device remains within reach of anyone who controls it",
     "distributing keys to users spreads the exposure and cannot be revoked in one place"
    ],
-   "facts": []
+   "facts": [],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Security: injection, untrusted input, scoped identity and secrets"
   },
   {
    "domain": "Security and Safety",
@@ -2311,7 +2489,9 @@
     "F-135",
     "F-136",
     "F-134"
-   ]
+   ],
+   "course": "Production Engineering, Evals & Security",
+   "chapter": "Security: injection, untrusted input, scoped identity and secrets"
   },
   {
    "domain": "Tools and MCP",
@@ -2337,7 +2517,9 @@
    "facts": [
     "F-137",
     "F-49"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Tool schemas, the tool-use loop and parallel calls"
   },
   {
    "domain": "Tools and MCP",
@@ -2362,7 +2544,9 @@
    ],
    "facts": [
     "F-51"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Tool schemas, the tool-use loop and parallel calls"
   },
   {
    "domain": "Tools and MCP",
@@ -2388,7 +2572,9 @@
    "facts": [
     "F-138",
     "F-139"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Tool schemas, the tool-use loop and parallel calls"
   },
   {
    "domain": "Tools and MCP",
@@ -2414,7 +2600,9 @@
    "facts": [
     "F-51",
     "F-56"
-   ]
+   ],
+   "course": "Production-Grade Prompting, Agents & Tool Use",
+   "chapter": "Production agents: workflow vs agent, wiring and human checkpoints"
   },
   {
    "domain": "Tools and MCP",
@@ -2440,7 +2628,9 @@
    "facts": [
     "F-140",
     "F-147"
-   ]
+   ],
+   "course": "Model Context Protocol: Advanced Topics",
+   "chapter": "The StreamableHTTP transport"
   },
   {
    "domain": "Tools and MCP",
@@ -2466,7 +2656,9 @@
    "facts": [
     "F-143",
     "F-144"
-   ]
+   ],
+   "course": "Claude Code, MCP & Integration",
+   "chapter": "MCP servers: tools, resources, prompts, transport and scope"
   },
   {
    "domain": "Tools and MCP",
@@ -2491,7 +2683,9 @@
    ],
    "facts": [
     "F-141"
-   ]
+   ],
+   "course": "Introduction to Model Context Protocol",
+   "chapter": "Defining resources"
   },
   {
    "domain": "Tools and MCP",
@@ -2516,7 +2710,9 @@
    ],
    "facts": [
     "F-142"
-   ]
+   ],
+   "course": "Claude Code, MCP & Integration",
+   "chapter": "MCP servers: tools, resources, prompts, transport and scope"
   },
   {
    "domain": "Tools and MCP",
@@ -2542,7 +2738,9 @@
    "facts": [
     "F-145",
     "F-146"
-   ]
+   ],
+   "course": "Introduction to Agent Skills",
+   "chapter": "What are skills?"
   },
   {
    "domain": "Tools and MCP",
@@ -2568,6 +2766,118 @@
    "facts": [
     "F-147",
     "F-146"
+   ],
+   "course": "Introduction to Model Context Protocol",
+   "chapter": "Introducing MCP"
+  }
+ ],
+ "courses": [
+  {
+   "name": "MSO Foundations",
+   "url": "https://anthropic-partners.skilljar.com/path/claude-certified-developer-foundations/mso-foundations",
+   "chapters": [
+    "Tokens, the context window and non-determinism",
+    "Model family, tiers and reasoning modes",
+    "Zero-, one- and multi-shot prompting",
+    "SDK vs REST, streaming and async access"
+   ]
+  },
+  {
+   "name": "Production-Grade Prompting, Agents & Tool Use",
+   "url": "https://anthropic-partners.skilljar.com/path/claude-certified-developer-foundations/production-grade-prompting-agents-tool-use",
+   "chapters": [
+    "Production-ready prompts and diagnosing underperformance",
+    "Extended thinking, budgets and thinking blocks",
+    "Tool schemas, the tool-use loop and parallel calls",
+    "Streamed responses and interrupted streams",
+    "Context engineering: window, compaction, clearing and subagent handoffs",
+    "Production agents: workflow vs agent, wiring and human checkpoints",
+    "Agent memory across sessions",
+    "Images, PDFs, the Files API and Message Batches"
+   ]
+  },
+  {
+   "name": "Claude Code, MCP & Integration",
+   "url": "https://anthropic-partners.skilljar.com/path/claude-certified-developer-foundations/claude-code-mcp-integration",
+   "chapters": [
+    "Explore-plan-code loop and permission modes",
+    "Reviewing AI-generated code and review gates",
+    "Durable project context: CLAUDE.md, rules, hooks and subagents",
+    "Skills, custom commands and plugins",
+    "MCP servers: tools, resources, prompts, transport and scope",
+    "Enterprise connections and authentication"
+   ]
+  },
+  {
+   "name": "Production Engineering, Evals & Security",
+   "url": "https://anthropic-partners.skilljar.com/path/claude-certified-developer-foundations/production-engineering-evals-security",
+   "chapters": [
+    "Eval suites, grading methods and calibrating an LLM judge",
+    "Test and tracing layers",
+    "Resilience: retriable vs terminal errors",
+    "Cost, latency and reliability budgets",
+    "Security: injection, untrusted input, scoped identity and secrets"
+   ]
+  },
+  {
+   "name": "Accelerators & IP Contribution",
+   "url": "https://anthropic-partners.skilljar.com/path/claude-certified-developer-foundations/accelerators-ip-contribution",
+   "chapters": [
+    "Packaging a build as a reusable accelerator",
+    "Contributing assets back",
+    "Platform choice and versioning what ships",
+    "Comparing platforms on latency, compliance and cost",
+    "Coordinating several deployments under a review"
+   ]
+  },
+  {
+   "name": "Building with the Claude API",
+   "url": "https://anthropic-partners.skilljar.com/claude-with-the-anthropic-api",
+   "chapters": [
+    "Structured data",
+    "Rules of prompt caching",
+    "Prompt caching in action",
+    "Citations",
+    "The full RAG flow",
+    "Code execution and the Files API"
+   ]
+  },
+  {
+   "name": "Introduction to Model Context Protocol",
+   "url": "https://anthropic-partners.skilljar.com/introduction-to-model-context-protocol",
+   "chapters": [
+    "Introducing MCP",
+    "Defining resources"
+   ]
+  },
+  {
+   "name": "Model Context Protocol: Advanced Topics",
+   "url": "https://anthropic-partners.skilljar.com/model-context-protocol-advanced-topics",
+   "chapters": [
+    "The StreamableHTTP transport"
+   ]
+  },
+  {
+   "name": "Claude Code in Action",
+   "url": "https://anthropic-partners.skilljar.com/claude-code-in-action",
+   "chapters": [
+    "Steering Long Sessions",
+    "Hooks"
+   ]
+  },
+  {
+   "name": "Introduction to Agent Skills",
+   "url": "https://anthropic-partners.skilljar.com/introduction-to-agent-skills",
+   "chapters": [
+    "What are skills?",
+    "Skills vs. other Claude Code features"
+   ]
+  },
+  {
+   "name": "Introduction to Subagents",
+   "url": "https://anthropic-partners.skilljar.com/introduction-to-subagents",
+   "chapters": [
+    "Using subagents effectively"
    ]
   }
  ]

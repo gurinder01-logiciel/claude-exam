@@ -120,6 +120,109 @@ Read the terminal event and stop reason, not the first block end; cache the stab
 layer breakpoints by how often content changes; fix tool misuse where the model reads it (the
 description and schema) and return errors the model can act on.
 
+## Prep courses and chapters (study and drill by chapter)
+
+Gurinder's instruction: prepare from the courses the guide points to, chapter by chapter. The guide's
+"How to Prepare" section names no single course, so the courses are those on Anthropic's
+[Developer – Foundations prep path](https://anthropic-partners.skilljar.com/path/claude-certified-developer-foundations)
+(five modules) plus the prerequisite courses that path recommends. Read on 27 Nov 2026.
+
+What could and could not be read: the course pages are public and show each course's description,
+learning objectives and (for the prerequisite courses) lesson list. The lesson bodies of the five modules
+sit behind the free Partner Academy sign-in, which was not used, so **chapters for the five modules are the
+learning objectives, paraphrased here**, and no lesson text was read or copied. Prerequisite courses use their
+public lesson titles. Questions were still written from the live docs (`questions/FACTS-DEV.md`); the course
+tag says which chapter a question is closest to, not that the lesson teaches that exact fact.
+
+Each question carries `course` and `chapter`. The home screen's "Study by course chapter" panel drills them.
+The number after each chapter is how many of the 100 questions carry that tag.
+
+### MSO Foundations - 57 min (7 questions)
+<https://anthropic-partners.skilljar.com/path/claude-certified-developer-foundations/mso-foundations>
+
+- Tokens, the context window and non-determinism (3)
+- Model family, tiers and reasoning modes (4)
+- Zero-, one- and multi-shot prompting (0)
+- SDK vs REST, streaming and async access (0)
+
+### Production-Grade Prompting, Agents & Tool Use - 209 min (33 questions)
+<https://anthropic-partners.skilljar.com/path/claude-certified-developer-foundations/production-grade-prompting-agents-tool-use>
+
+- Production-ready prompts and diagnosing underperformance (4)
+- Extended thinking, budgets and thinking blocks (2)
+- Tool schemas, the tool-use loop and parallel calls (6)
+- Streamed responses and interrupted streams (5)
+- Context engineering: window, compaction, clearing and subagent handoffs (4)
+- Production agents: workflow vs agent, wiring and human checkpoints (9)
+- Agent memory across sessions (2)
+- Images, PDFs, the Files API and Message Batches (1)
+
+### Claude Code, MCP & Integration - 142 min (10 questions)
+<https://anthropic-partners.skilljar.com/path/claude-certified-developer-foundations/claude-code-mcp-integration>
+
+- Explore-plan-code loop and permission modes (1)
+- Reviewing AI-generated code and review gates (0)
+- Durable project context: CLAUDE.md, rules, hooks and subagents (4)
+- Skills, custom commands and plugins (3)
+- MCP servers: tools, resources, prompts, transport and scope (2)
+- Enterprise connections and authentication (0)
+
+### Production Engineering, Evals & Security - 211 min (22 questions)
+<https://anthropic-partners.skilljar.com/path/claude-certified-developer-foundations/production-engineering-evals-security>
+
+- Eval suites, grading methods and calibrating an LLM judge (4)
+- Test and tracing layers (3)
+- Resilience: retriable vs terminal errors (4)
+- Cost, latency and reliability budgets (2)
+- Security: injection, untrusted input, scoped identity and secrets (9)
+
+### Accelerators & IP Contribution - 155 min (1 questions)
+<https://anthropic-partners.skilljar.com/path/claude-certified-developer-foundations/accelerators-ip-contribution>
+
+- Packaging a build as a reusable accelerator (0)
+- Contributing assets back (0)
+- Platform choice and versioning what ships (1)
+- Comparing platforms on latency, compliance and cost (0)
+- Coordinating several deployments under a review (0)
+
+### Building with the Claude API - recommended prerequisite (13 questions)
+<https://anthropic-partners.skilljar.com/claude-with-the-anthropic-api>
+
+- Structured data (4)
+- Rules of prompt caching (3)
+- Prompt caching in action (1)
+- Citations (2)
+- The full RAG flow (1)
+- Code execution and the Files API (2)
+
+### Introduction to Model Context Protocol - recommended prerequisite (2 questions)
+<https://anthropic-partners.skilljar.com/introduction-to-model-context-protocol>
+
+- Introducing MCP (1)
+- Defining resources (1)
+
+### Model Context Protocol: Advanced Topics - recommended prerequisite (1 questions)
+<https://anthropic-partners.skilljar.com/model-context-protocol-advanced-topics>
+
+- The StreamableHTTP transport (1)
+
+### Claude Code in Action - recommended prerequisite (7 questions)
+<https://anthropic-partners.skilljar.com/claude-code-in-action>
+
+- Steering Long Sessions (3)
+- Hooks (4)
+
+### Introduction to Agent Skills - recommended prerequisite (2 questions)
+<https://anthropic-partners.skilljar.com/introduction-to-agent-skills>
+
+- What are skills? (1)
+- Skills vs. other Claude Code features (1)
+
+### Introduction to Subagents - recommended prerequisite (2 questions)
+<https://anthropic-partners.skilljar.com/introduction-to-subagents>
+
+- Using subagents effectively (2)
+
 ## Out of scope [Inferred]
 
 - Exam administration (fees, retakes, Pearson logistics).

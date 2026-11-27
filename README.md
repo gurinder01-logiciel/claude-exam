@@ -25,7 +25,9 @@ exam: 60 scenario questions in 120 minutes, with a shared team leaderboard.
   100-question bank each, for the official **CCDVF** and **CCDVP** exams, domain-weighted to
   their eight-domain blueprints (`BLUEPRINT-DEV.md`, `BLUEPRINT-DEV-PRO.md`). Every product
   fact behind the questions is quoted from the docs in `questions/FACTS-DEV.md`. Length switch:
-  60 (2 min each) or the real 70 items in 120 minutes.
+  60 (2 min each) or the real 70 items in 120 minutes. Every question is tagged with the official
+  prep course and chapter it is closest to, and **Study by course chapter** on the home screen drills one
+  chapter at a time.
 - **Architect Foundations** — always open: a random 60 from a 100-question bank of
   scenario-based items covering all 30 task statements
 - **Architect Professional** — always open: a random 60 from a 100-question bank

@@ -412,6 +412,7 @@ const SCENARIOS = { 1: …, 6: … };  // the six official exam scenarios
 | `correct` | Index into `options` **as written**. No need to vary the position by hand. An array of indices (e.g. `[0, 2]`) makes it a **multiple-response** item: the candidate is told to "Select N", it counts as answered only once N options are chosen, and it scores only if every pick is correct — no partial credit, as on the real exam |
 | `constraint` | Optional. The one deciding detail in the stem that settles the question (e.g. "the filing cannot be undone"). Shown in instant feedback and the Review traps cards |
 | `breaks` | Optional array, same length as `options`, indexed as authored: for each option a short string naming the stated constraint it violates, or `null` for a correct option. Remapped through the runtime shuffle. Ignored if the length differs |
+| `course`, `chapter` | Optional (Developer and Developer Professional banks). The official prep course and the chapter inside it that the question is closest to; both must appear in the level header's `courses` list. Drive the home screen's **Study by course chapter** drill and the results breakdown for a drill |
 | `explain` | Shown in the review. Explain why distractors fail, not just why the answer is right — that's where the exam's difficulty lives |
 
 ### Level file schema
@@ -447,6 +448,9 @@ const SCENARIOS = { 1: …, 6: … };  // the six official exam scenarios
 - `inPool: false` — keep this bank out of pool levels, so Full Mock Exam stays
   built from the Exam Path banks only. Every bank level sets it.
 
+- `courses` — optional list `[{ "name", "url", "chapters": [..] }]` for banks whose questions carry
+  `course` / `chapter`. Sets the order and link of the courses in the chapter drill.
+
 ### Domain-weighted draw
 If a level has a `blueprint` and its labels match the domains used by its
 questions exactly (and it has no `scenarioPick` and is not a pool), each sitting
@@ -459,6 +463,13 @@ scenario/pool draws, and keep the plain ramped draw. The results-by-domain
 breakdown groups by each question's own `domain`, so it is unchanged.
 A level with a `blueprint` that doesn't match falls back to the plain draw and logs a
 `console.warn` naming the unmatched labels/domains once per page load.
+
+### Chapter drill
+Below the custom quiz builder, **Study by course chapter** lists every level that has a `courses` header
+(Developer, Developer Professional): pick the exam, a course, optionally one chapter, and 10/20/30 questions.
+It draws only that chapter's questions, relabels `domain` with the chapter name so the results breakdown is
+per chapter, and, like the custom quiz, neither unlocks levels nor posts to the leaderboard. The course and
+chapter lists, with the course page URLs, are in `BLUEPRINT-DEV.md` and `BLUEPRINT-DEV-PRO.md`.
 
 ### Custom quiz builder
 Sits at the top of the Mock Exam Bank section. Pick one or more official domains

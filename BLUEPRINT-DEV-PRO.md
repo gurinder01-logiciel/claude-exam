@@ -103,6 +103,118 @@ Classify the failure before applying a remedy; control a measurement instrument 
 trusting it; enforce policy outside the model for irreversible or exfiltrating actions; detection is
 not prevention.
 
+## Prep courses and chapters (study and drill by chapter)
+
+Gurinder's instruction: prepare from the courses the guide points to, chapter by chapter. The Developer –
+Professional guide names no single course; Anthropic's
+[Developer – Professional prep path](https://anthropic-partners.skilljar.com/path/claude-certified-developer-professional)
+has **one free course per exam domain** (eight courses), a "Prepare by Course / Exam domain" table, and for each domain a
+list of study items grouped under a question ("How do you ...?"). Read on 27 Nov 2026.
+
+What could and could not be read: each course page publicly lists its curriculum (lesson titles and minutes); the lesson
+bodies need the free Partner Academy sign-in, which was not used, so no lesson text was read or copied. A **chapter** here is
+one of the path page's own study headings for that domain (each groups lessons, docs, articles and cookbook items). Where
+the guide tests a skill that no listed lesson or doc covers, the chapter is called "No listed lesson: ... (study the docs)".
+The tag says which chapter a question is closest to; the facts behind each answer are in `questions/FACTS-DEV.md`.
+
+Each question carries `course` (the domain's course) and `chapter`. The home screen's "Study by course chapter" panel
+drills them. The number after each chapter is how many of the 100 questions carry that tag.
+
+### Production Integration, Reliability, and Knowledge Grounding - 13 min (20 questions)
+<https://anthropic-partners.skilljar.com/path/claude-certified-developer-professional/production-integration-reliability-and-knowledge-grounding>
+
+Lessons listed on the course page: Web search: Answers from the sites you trust; CI/CD integration and deployment.
+
+- Why can you get a 429 when you're under your limit? (10)
+- How do you recover from an interrupted stream? (1)
+- How do you stream a tool call? (0)
+- How do you improve retrieval in a RAG system? (2)
+- How do you get Claude to cite your own content? (2)
+- No listed lesson: MCP connector, migrations and prompt versioning (study the docs) (5)
+
+### Advanced Agent Architecture and Orchestration - 109 min (17 questions)
+<https://anthropic-partners.skilljar.com/path/claude-certified-developer-professional/advanced-agent-architecture-and-orchestration>
+
+Lessons listed on the course page: What are subagents?; Designing effective subagents; Using subagents effectively; What is tool use?; What are managed agents?; Building your first managed agent; Context management; How context affects Claude's performance and cost; Sharing skills; Validating skills for plugins; Skills as institutional knowledge; Plugins.
+
+- How does a lead agent delegate to other agents? (3)
+- How does an agent keep working across context windows? (9)
+- What are Managed Agents, and how do you build one? (3)
+- How do you share a skill across a team? (0)
+- When should you use a subagent? (0)
+- How does Claude use tools, MCP and web search? (2)
+- How do you get Claude to pick the right tool? (0)
+- How do you check a skill before you share it? (0)
+
+### Observability and Production Monitoring - 29 min (12 questions)
+<https://anthropic-partners.skilljar.com/path/claude-certified-developer-professional/observability-and-production-monitoring>
+
+Lessons listed on the course page: Visibility: what you can measure; Closing the loop on metrics; Managing spend.
+
+- How do you trace requests and agent runs? (7)
+- How do you monitor Claude Code usage? (0)
+- What records can a Claude Enterprise admin keep? (0)
+- How do you use production metrics to decide what to work on next? (5)
+
+### Advanced Debugging and Incident Response - 40 min (10 questions)
+<https://anthropic-partners.skilljar.com/path/claude-certified-developer-professional/advanced-debugging-and-incident-response>
+
+Lessons listed on the course page: Triage on-call alerts and diagnose incidents; Triage escalations automatically and alert a person only for a P1; Draft the incident postmortem; Support incident postmortem.
+
+- How do you find the root cause of a quality problem? (5)
+- How do you use Claude to triage alerts? (2)
+- How do you write an incident postmortem? (2)
+- How do you troubleshoot a tool call? (1)
+
+### Evaluation Engineering and Quality Assurance - 14 min (12 questions)
+<https://anthropic-partners.skilljar.com/path/claude-certified-developer-professional/evaluation-engineering-and-quality-assurance>
+
+Lessons listed on the course page: Continuous evals in CI; Creating tools that Claude picks.
+
+- How do you catch drift in production? (3)
+- How do you run evals in CI? (1)
+- How do you evaluate an agent whose results vary between runs? (1)
+- How do you evaluate an agent's tools? (0)
+- No listed lesson: judge calibration and online metrics (study the docs) (7)
+
+### Cost and Latency Optimization at Scale - 58 min (8 questions)
+<https://anthropic-partners.skilljar.com/path/claude-certified-developer-professional/cost-and-latency-optimization-at-scale>
+
+Lessons listed on the course page: Choosing the right model; Choosing the right effort level in Claude Code; What is thinking?; Cut the cost of tool-heavy workflows; Parallel tool calling: Cut the latency; Streaming tool calls: No more frozen spinners.
+
+- How do you cut costs in a tool-heavy app? (0)
+- How do you reduce latency with parallel tool calls? (1)
+- How do you raise the cache hit rate? (2)
+- When should you use batch processing? (1)
+- How do you cap and track spend? (1)
+- How do you choose a model and effort level? (2)
+- How does context affect performance and cost? (0)
+- No listed lesson: time to first token vs total latency (study the docs) (1)
+
+### Runtime Guardrails and Production Security - 79 min (11 questions)
+<https://anthropic-partners.skilljar.com/path/claude-certified-developer-professional/runtime-guardrails-and-production-security>
+
+Lessons listed on the course page: Hooks (Claude Code 101); Hooks; Hooks as approval gates; Permission modes; Trust it: Verifying unsupervised runs; MCP; Connectors; Claude Tag admin guide; How is a multiplayer agent different from traditional AI tools?.
+
+- How do you isolate an agent in production? (2)
+- How do you protect an agent from prompt injection? (3)
+- How do you require a person's approval before an action? (2)
+- How do you control connectors, skills and plugins across an organization? (1)
+- What changes when an agent has its own identity and access? (3)
+
+### Agent Fleet Operations for Software Delivery - 52 min (10 questions)
+<https://anthropic-partners.skilljar.com/path/claude-certified-developer-professional/agent-fleet-operations-for-software-delivery>
+
+Lessons listed on the course page: Parallel sessions and subagents; Give Claude a feedback loop; AI in the PR review loop; GitHub Actions and Code Review; Scheduled tasks and headless; Steering long sessions; Governing customizations; Put recurring work on a schedule.
+
+- How do you run several coding agents at once? (3)
+- How do you use agents in code review and deployment? (3)
+- How do you verify an unsupervised run? (1)
+- Where should you run long or scheduled tasks? (1)
+- How does a team share plugins and skills? (0)
+- How do you steer a long Claude Code session? (0)
+- No listed lesson: managed settings, MCP allowlists and gateway routing (study the docs) (2)
+
 ## Out of scope [Inferred]
 
 - Exam administration (fees, retakes, Pearson logistics).

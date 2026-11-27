@@ -251,6 +251,8 @@
   .bank-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: stretch; }
   .bank-split .levels.bank { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 0; align-content: start; }
   .bank-split .builder { margin-bottom: 0; align-content: start; }
+  .bq-stack { display: grid; gap: 14px; align-content: start; }
+  .drill .bq-foot a { color: var(--lime); font-weight: 600; text-decoration: none; }
   @media (max-width: 900px) { .bank-split { grid-template-columns: 1fr; } }
   .bq-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); padding-top: 8px; }
   .bq-chips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -642,6 +644,7 @@ async function loadLevels() {
       scenarioPick: lv.scenarioPick || null,
       scenarioWeights: lv.scenarioWeights || null,
       blueprint: lv.blueprint,
+      courses: Array.isArray(lv.courses) ? lv.courses : null,
       questions: Array.isArray(lv.questions) ? lv.questions : []
     };
   });
@@ -1581,7 +1584,7 @@ function renderStart() {
     </div>
     <div class="bank-split">
       <div class="levels bank">${bankCards}</div>
-      ${renderBuilder()}
+      <div class="bq-stack">${renderBuilder()}${renderChapterDrill()}</div>
     </div>` : ''}
     <p class="start-foot">Taking this as <b>${escapeHtml(user.name || '—')}</b> · <a href="#" id="changeName">change name</a></p>
   `;
@@ -1590,6 +1593,7 @@ function renderStart() {
     btn.addEventListener('click', () => beginExam(btn.dataset.level));
   });
   wireBuilder();
+  wireChapterDrill();
   app.querySelectorAll('[data-len-level]').forEach(b => b.addEventListener('click', () => {
     setLength(b.dataset.lenLevel, Number(b.dataset.len));
     renderStart();
@@ -1726,6 +1730,87 @@ function startCustomQuiz() {
   // Relabel with the official domain name so the results breakdown has one row per domain.
   const picked = keys.flatMap(k => shuffle(by[k]).slice(0, quota[k])
     .map(q => ({ ...q, domain: OFFICIAL_DOMAINS.find(d => d.key === k).name })));
+  startPaper('custom', prepQuestions(buildRampedPaper(picked, picked.length), { keepOrder: true }), false);
+}
+
+// ===================== CHAPTER DRILL =====================
+// Study one prep-course chapter at a time. Banks that carry `course` / `chapter` on their
+// questions (Developer, Developer Professional) and a `courses` list in the level header
+// appear here. Like the custom quiz, a drill never unlocks a level or posts a score.
+const DRILL_SIZES = [10, 20, 30];
+const drill = { track: null, course: null, chapter: null, size: 10 };
+
+function drillTracks() {
+  return Object.entries(LEVELS).filter(([, lv]) => lv.courses && lv.questions.some(q => q.course && q.chapter));
+}
+function drillQuestions(lv) {
+  return lv.questions.filter(q => q.course && q.chapter
+    && (!drill.course || q.course === drill.course)
+    && (!drill.chapter || q.chapter === drill.chapter));
+}
+
+function renderChapterDrill() {
+  const tracks = drillTracks();
+  if (!tracks.length) return '';
+  if (!tracks.some(([k]) => k === drill.track)) { drill.track = tracks[0][0]; drill.course = null; drill.chapter = null; }
+  const lv = LEVELS[drill.track];
+  const tagged = lv.questions.filter(q => q.course && q.chapter);
+  const count = (f) => tagged.filter(f).length;
+  const courses = lv.courses.filter(c => count(q => q.course === c.name));
+  if (drill.course && !courses.some(c => c.name === drill.course)) { drill.course = null; drill.chapter = null; }
+  const course = courses.find(c => c.name === drill.course);
+  const chapters = course ? course.chapters.filter(ch => count(q => q.course === course.name && q.chapter === ch)) : [];
+  const n = Math.min(drill.size, drillQuestions(lv).length);
+  const chip = (attr, val, on, label, extra = '') =>
+    `<button class="bq-chip${on ? ' on' : ''}" ${attr}="${escapeHtml(String(val))}">${escapeHtml(label)}${extra}</button>`;
+  const num = k => ` <span class="bq-n">${k}</span>`;
+  return `
+    <div class="builder drill">
+      <div class="bq-head">
+        <div class="bq-title">Study by course chapter</div>
+        <div class="bq-sub">Pick the official prep course and chapter to drill; ${state.instantFeedback ? 'answers are marked as you go' : 'feedback is off, so results come at the end'}. Results are grouped by chapter.</div>
+      </div>
+      <div class="bq-row">
+        <div class="bq-label">Exam</div>
+        <div class="bq-chips">${tracks.map(([k, l]) => chip('data-dr-track', k, drill.track === k, l.name)).join('')}</div>
+      </div>
+      <div class="bq-row">
+        <div class="bq-label">Course</div>
+        <div class="bq-chips">
+          ${chip('data-dr-course', '', !drill.course, 'All courses', num(tagged.length))}
+          ${courses.map(c => chip('data-dr-course', c.name, drill.course === c.name, c.name, num(count(q => q.course === c.name)))).join('')}
+        </div>
+      </div>
+      ${course ? `<div class="bq-row">
+        <div class="bq-label">Chapter</div>
+        <div class="bq-chips">
+          ${chip('data-dr-chapter', '', !drill.chapter, 'All chapters')}
+          ${chapters.map(ch => chip('data-dr-chapter', ch, drill.chapter === ch, ch, num(count(q => q.course === course.name && q.chapter === ch)))).join('')}
+        </div>
+      </div>` : ''}
+      <div class="bq-row">
+        <div class="bq-label">Questions</div>
+        <div class="bq-chips">${DRILL_SIZES.map(s => chip('data-dr-size', s, drill.size === s, s)).join('')}</div>
+      </div>
+      <button class="btn bq-go" id="drStart" ${n ? '' : 'disabled'}>Start drill · ${n} Qs · ${Math.round(n * SECONDS_PER_QUESTION / 60)} min</button>
+      <div class="bq-foot">${course ? `<a href="${escapeHtml(course.url)}" target="_blank" rel="noopener">Open this course on the Partner Academy</a> (free sign-in). ` : ''}Drills don't post to the leaderboard.</div>
+    </div>`;
+}
+
+function wireChapterDrill() {
+  const pick = (attr, fn) => app.querySelectorAll(`[${attr}]`).forEach(b => b.addEventListener('click', () => { fn(b.getAttribute(attr)); renderStart(); }));
+  pick('data-dr-track', v => { drill.track = v; drill.course = null; drill.chapter = null; });
+  pick('data-dr-course', v => { drill.course = v || null; drill.chapter = null; });
+  pick('data-dr-chapter', v => { drill.chapter = v || null; });
+  pick('data-dr-size', v => { drill.size = Number(v); });
+  document.getElementById('drStart')?.addEventListener('click', startDrill);
+}
+
+function startDrill() {
+  const lv = LEVELS[drill.track];
+  if (!lv) return;
+  const picked = shuffle(drillQuestions(lv)).slice(0, drill.size).map(q => ({ ...q, domain: q.chapter }));
+  if (!picked.length) return;
   startPaper('custom', prepQuestions(buildRampedPaper(picked, picked.length), { keepOrder: true }), false);
 }
 
