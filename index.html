@@ -63,6 +63,11 @@
   .up-view { position: fixed; inset: 0; z-index: 150; background: var(--bg); overflow-y: auto; padding: 20px 16px 60px; }
   .up-view[hidden] { display: none; }
   .up-view .up-wrap { max-width: 780px; margin: 0 auto; }
+  /* Reading surface: the post sits on a card, and the sticky header masks the strip above it so text never shows behind it. */
+  .up-view .topbar, .lb-view .topbar { top: 0; box-shadow: 0 -20px 0 20px var(--bg), 0 2px 12px rgba(46,46,46,0.06); }
+  .up-post { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px 28px; box-shadow: 0 2px 14px rgba(46,46,46,0.05); line-height: 1.6; }
+  .up-post h2, .up-post h3 { margin-top: 22px; }
+  @media (max-width: 560px) { .up-post { padding: 16px; } }
   body.up-open { overflow: hidden; }
   body.up-open .board-toggle { display: none !important; }
   .up-post-link { display: block; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; font-family: inherit; color: var(--text); }
@@ -1921,7 +1926,7 @@ async function renderVideoTab() {
       <button class="btn ghost prep-link" data-updates>📰 Updates <span class="new-badge">NEW</span></button>
     </div>
     ${tabBarHtml('video')}`;
-  const foot = `<p class="start-foot">Taking this as <b>${escapeHtml(user.name || '—')}</b> · <a href="#" id="changeName">change name</a></p>`;
+  const foot = '';  // name and sign-out live in the avatar menu (top right)
   const finish = () => {
     wireTabs();
     document.getElementById('changeName')?.addEventListener('click', e => { e.preventDefault(); renderNameGate(user.name); });
@@ -2083,7 +2088,6 @@ function renderStart() {
     </div>
     <div class="levels bank bank-full">${bankCards}</div>
     <div class="bank-split practice-split">${renderBuilder()}${renderChapterDrill()}</div>` : ''}
-    <p class="start-foot">Taking this as <b>${escapeHtml(user.name || '—')}</b> · <a href="#" id="changeName">change name</a></p>
   `;
 
   app.querySelectorAll('.level-card:not(:disabled)').forEach(btn => {
