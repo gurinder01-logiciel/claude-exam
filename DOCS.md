@@ -351,6 +351,21 @@ Anyone can submit any name and score. Fine for internal team practice; **not
 suitable as a source of truth for manager reporting or compliance**. If you need
 that, the leaderboard needs real auth.
 
+### Attempt badges on the start screen
+
+Every exam card (Exam Path and Mock Exam Bank) shows whether the signed-in user
+has sat it, from their own rows in the score board (`boardCache`: `/api/scores`
+rows whose name matches via `normName`, or the in-memory fallback offline),
+grouped by `currentExamName(level)` so renamed exams count. Custom quizzes,
+chapter drills and video practice never post scores, so they are never counted.
+`attemptStats()` computes attempts, best and last-attempt time; `paintAttemptBadges()`
+fills the card's `.lc-att` line. Best below 720: amber "Attempted ×N · best 640".
+Best 720 or more: green "✓ Passed ×N · best 780" plus a green left border
+(`.att-pass`). No attempts: no badge. The tooltip shows the last attempt date.
+Badges repaint on every `renderStart()` and again whenever `refreshBoard()`
+finishes (so they update after an exam is submitted). Cards are never locked by
+this; any exam can be re-sat.
+
 ---
 
 ## 6. Architecture

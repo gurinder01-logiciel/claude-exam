@@ -330,6 +330,11 @@
   .levels .lc-meta { font-size: 0.72rem; color: var(--text-dim); }
   .levels .lc-meta b { color: var(--text); }
   .levels .lc-badge { font-size: 0.64rem; padding: 3px 8px; border-radius: 20px; font-weight: 700; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.04em; }
+  .levels .lc-att { font-size: 0.7rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .levels .lc-att[hidden] { display: none; }
+  .levels .lc-att.tried { color: var(--amber); }
+  .levels .lc-att.pass { color: var(--good); }
+  .level-card.att-pass { border-left: 3px solid var(--good); }
   .levels .bp-bar { height: 5px; margin-top: 2px; }
   .start-foot { color: var(--text-dim); font-size: 0.8rem; text-align: center; margin: 18px 0 8px; }
   .start-foot b { color: var(--text); }
@@ -1342,6 +1347,39 @@ function escapeHtml(s) {
 async function refreshBoard() {
   const { scores, live } = await fetchBoard();
   renderBoard(scores, live);
+  paintAttemptBadges();
+}
+
+// "Have I sat this?" badges on the start-screen exam cards. Source: this
+// user's own rows in the score board (server rows, or the in-memory fallback
+// when offline), keyed by the current exam name so renamed exams still count.
+// Custom quizzes, chapter drills and video practice never post a score.
+function attemptStats() {
+  const me = normName(user.name), out = {};
+  if (!me) return out;
+  boardCache.forEach(s => {
+    if (!s || normName(s.name) !== me || !s.level) return;
+    const k = currentExamName(s.level), a = out[k] || (out[k] = { n: 0, best: 0, last: 0 });
+    a.n++; a.best = Math.max(a.best, Number(s.score) || 0); a.last = Math.max(a.last, Number(s.at) || 0);
+  });
+  return out;
+}
+function paintAttemptBadges() {
+  if (state.screen !== 'start') return;
+  const stats = attemptStats();
+  app.querySelectorAll('.level-card[data-level]').forEach(card => {
+    const lv = LEVELS[card.dataset.level], el = card.querySelector('.lc-att');
+    if (!lv || !el) return;
+    const a = stats[currentExamName(lv.name)];
+    card.classList.remove('att-pass');
+    if (!a) { el.hidden = true; el.textContent = ''; el.className = 'lc-att'; return; }
+    const pass = a.best >= PASS_SCORE;
+    el.hidden = false;
+    el.className = 'lc-att ' + (pass ? 'pass' : 'tried');
+    el.textContent = `${pass ? '✓ Passed' : 'Attempted'} ×${a.n} · best ${a.best}`;
+    el.title = a.last ? 'Last attempt: ' + new Date(a.last).toLocaleString() : '';
+    if (pass) card.classList.add('att-pass');
+  });
 }
 
 // ---- Leaderboard view (#leaderboard) ----
@@ -1967,6 +2005,7 @@ function renderStart() {
       ${lv.section !== 'bank' ? `<div class="lc-desc">${lv.desc}</div>` : ''}
       ${meta ? `<div class="lc-meta">${meta}</div>` : ''}
       ${bpBar}
+      <div class="lc-att" hidden></div>
     </button>`;
   };
   const entries = Object.entries(LEVELS);
@@ -2042,6 +2081,7 @@ function renderStart() {
     renderNameGate(user.name);
   });
   syncUserMenu();
+  paintAttemptBadges();
 }
 
 // How to prepare: its own screen (it used to be a right-hand panel on the start
