@@ -613,6 +613,7 @@
   .dec7-btn { background: var(--amber); color: #2e2e2e; border: none; border-radius: 10px; padding: 9px 16px; font: 800 0.88rem var(--font-display); cursor: pointer; box-shadow: 0 4px 14px rgba(240,168,40,0.3); }
   .dec7-btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
   .dec7-btn.small { padding: 5px 12px; font-size: 0.76rem; box-shadow: none; }
+  .new-badge { background: var(--amber); color: #2e2e2e; font: 800 0.62rem var(--font-display); letter-spacing: 0.04em; padding: 2px 6px; border-radius: 6px; margin-left: 4px; vertical-align: middle; }
   .vc-cards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
   .vc-note { font-size: 0.82rem; color: var(--text-dim); margin: 6px 0 12px; }
   .vc-err { color: var(--bad); font-size: 0.9rem; padding: 12px 0; }
@@ -636,6 +637,9 @@
   .vc-table th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); padding: 6px 8px; border-bottom: 2px solid var(--border); }
   .vc-table td { vertical-align: top; padding: 8px; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
   .vc-table td:first-child { font-weight: 700; }
+  .vc-table th { white-space: nowrap; }
+  .vc-table td { overflow-wrap: break-word; }
+  .vc-exam { display: inline-block; white-space: nowrap; font: 700 0.72rem var(--font-mono, monospace); padding: 2px 7px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--border); }
   @media (max-width: 600px) {
     .vc-table thead { display: none; }
     .vc-table, .vc-table tbody, .vc-table tr, .vc-table td { display: block; width: 100%; }
@@ -1448,8 +1452,9 @@ function upTags(exams) {
 function upTableHtml(items, filter) {
   const rows = items.filter(i => !filter || i.exam === filter);
   return `<div class="vc-table-wrap"><table class="vc-table">
-    <thead><tr><th>Exam</th><th>Area</th><th>Before</th><th>After</th><th>What it means for the exam</th></tr></thead>
-    <tbody>${rows.map(i => `<tr><td data-h="Exam">${escapeHtml(i.exam || '')}</td><td data-h="Area">${escapeHtml(i.area || '')}</td><td data-h="Before">${escapeHtml(i.before || '')}</td><td data-h="After">${escapeHtml(i.after || '')}</td><td data-h="What it means">${escapeHtml(i.examImpact || '')}</td></tr>`).join('')}</tbody>
+    <colgroup><col style="width:90px"><col style="width:17%"><col style="width:20%"><col style="width:25%"><col></colgroup>
+    <thead><tr><th>Exam</th><th>Area</th><th>Before</th><th>After</th><th>What it means</th></tr></thead>
+    <tbody>${rows.map(i => `<tr><td data-h="Exam"><span class="vc-exam">${escapeHtml(i.exam || '')}</span></td><td data-h="Area">${escapeHtml(i.area || '')}</td><td data-h="Before">${escapeHtml(i.before || '')}</td><td data-h="After">${escapeHtml(i.after || '')}</td><td data-h="What it means">${escapeHtml(i.examImpact || '')}</td></tr>`).join('')}</tbody>
   </table></div>`;
 }
 async function mountUpTable(host, source) {
@@ -1871,6 +1876,7 @@ function wireTabs() {
     setTab(b.dataset.tab); vc.courseId = null; renderStart();
   }));
   app.querySelectorAll('[data-dec7]').forEach(b => b.addEventListener('click', () => openUpdates('dec-7-exam-changes')));
+  app.querySelectorAll('[data-updates]').forEach(b => b.addEventListener('click', () => openUpdates()));
 }
 
 function startVideoPractice(questions, title, episodes) {
@@ -1890,7 +1896,7 @@ async function renderVideoTab() {
         <div class="hero-chips"><span class="chips-label">Watch, then practise</span>
           <span class="chip">Practice only</span><span class="chip">Not posted to the leaderboard</span></div>
       </div>
-      <button class="dec7-btn" data-dec7 title="What changes in the exams after Dec 7">⚡ What changes after Dec 7</button>
+      <button class="btn ghost prep-link" data-updates>📰 Updates <span class="new-badge">NEW</span></button>
     </div>
     ${tabBarHtml('video')}`;
   const foot = `<p class="start-foot">Taking this as <b>${escapeHtml(user.name || '—')}</b> · <a href="#" id="changeName">change name</a></p>`;
@@ -2025,8 +2031,7 @@ function renderStart() {
         </div>
       </div>
       <div class="hero-actions">
-        <button class="dec7-btn small" data-dec7 title="What changes in the exams after Dec 7">⚡ What changes after Dec 7</button>
-        <button class="btn ghost prep-link" id="updatesLink">📰 Updates</button>
+        <button class="btn ghost prep-link" id="updatesLink">📰 Updates <span class="new-badge">NEW</span></button>
         <button class="btn ghost prep-link" id="boardLink">🏆 Team leaderboard</button>
         ${RESOURCES ? `<button class="btn ghost prep-link" id="prepLink">📚 How to prepare</button>` : ''}
       </div>
