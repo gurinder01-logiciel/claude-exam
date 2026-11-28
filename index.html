@@ -1752,6 +1752,7 @@ async function renderVideoTab() {
   let body;
   if (!course) {
     body = `<div class="sec-head"><div class="sec-title">Courses</div><div class="sec-sub">Pick a course to see its episodes and practise questions.</div></div>
+      ${data.courses.length ? '' : '<p class="bq-sub">Courses from the three YouTube playlists (Architect, Architect Professional, Developer) are being prepared. Until then, see what changes after Dec 7 above.</p>'}
       <div class="levels vc-cards">${data.courses.map(c => {
         const secs = (c.episodes || []).reduce((a, e) => a + (Number(e.seconds) || 0), 0);
         return `<button class="level-card" data-vc-course="${escapeHtml(c.id)}">
