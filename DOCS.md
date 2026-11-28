@@ -624,3 +624,21 @@ Dated posts about exam changes. Hero button **📰 Updates** (next to How to pre
 **Routing.** Same overlay pattern as the leaderboard (`#upView`, fixed, z-index 150, Back button, Esc). `#updates` lists posts newest first (date, title, summary, exam tags); `#updates/<slug>` shows one post. In-app opens push a history entry with `state.up`, so Back and the browser Back step back (post, list, closed); a deep link has no such entry, so Back rewrites the hash (post to list, list to cleared). Cold loads work after the name gate (`syncUpdatesFromHash`, run at boot and after the gate). Exam keyboard shortcuts are paused while the view is open. At 600px and below the table stacks rows as cards.
 
 **Adding a post.** Add an object to `posts`; nothing else to wire. The first post is `dec-7-exam-changes` (2026-11-28), written only from `dec7.json` (Anthropic guides) and the aicertguides video; where they disagree the guide wins (CCDV-P is a new exam, not a 7 Dec change, 120 minutes).
+
+## How to prepare (study guide)
+`renderPrepPage()` renders a per-exam study guide, then the resources. Sections: **Pick your exam** chips
+(Developer, Developer Professional, Architect Foundations, Architect Professional; choice kept in
+`localStorage` key `ccaf_prep_exam`, read and written inside try/catch); a **5-step plan** (format, learn,
+drill, full mock, review); **Traps that cost marks**; **Exam day**; **Resources** (`renderResources({ noPlan: true,
+label: 'Resources' })`, every link from `resources.json`; its old `plan` list is no longer shown).
+
+- Numbers come only from app data: `LENGTH_CHOICES` (items, 120 min), each bank's `blueprint` / `blueprintV10`
+  (Architect Professional shows 63 items until 6 Dec and 70 from 7 Dec), `PASS_SCORE`. Pace is `secs / items`.
+  Architect Foundations has no `LENGTH_CHOICES`, so it uses `count` x 2 min. The 7 Dec notes per exam are in `PREP_EXAMS`.
+- Each step button calls `prepGo(action, key)`: it opens the Updates post, the Video Courses tab (Architect
+  Professional only, the one live course), the custom quiz (instant feedback on, track preset), Study by course
+  chapter (Developer and Developer Professional only), or the exam card (feedback off, real length). Then it
+  scrolls to the target and outlines it (`.card-ping`).
+- `builderTracks()` now also lists Architect Professional, so its quiz can use its seven domains.
+- Not stated in the BLUEPRINT files, so left out: any guessing penalty or "answer every item" advice.
+- "Answer per the guide" rests on the "Current docs" notes in explanations plus the guide-wins rule used for the Updates post.

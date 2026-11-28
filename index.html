@@ -590,6 +590,28 @@
       order: 3; margin-top: 34px; padding-top: 0;
     }
   }
+  /* How to prepare: study guide */
+  .pg-sec { margin-top: 26px; }
+  .pg-sec > h2 { font-family: var(--font-display); font-size: 1.05rem; margin: 0 0 4px; }
+  .pg-sub { color: var(--text-dim); font-size: 0.84rem; margin: 0 0 12px; }
+  .pg-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pg-step { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; box-shadow: 0 2px 12px rgba(46,46,46,0.05); }
+  .pg-step h3 { margin: 0 0 6px; font-family: var(--font-display); font-size: 0.92rem; display: flex; gap: 10px; align-items: center; }
+  .pg-num { flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--lime-dim); color: var(--lime-dark); font-size: 0.78rem; display: inline-flex; align-items: center; justify-content: center; }
+  .pg-step p, .pg-step li { font-size: 0.86rem; line-height: 1.55; margin: 0 0 6px; overflow-wrap: anywhere; }
+  .pg-step ul { margin: 0 0 8px; padding-left: 18px; }
+  .pg-acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .pg-acts .btn { padding: 8px 14px; font-size: 0.82rem; }
+  .pg-w { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 8px; }
+  .pg-w span { background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; font-size: 0.76rem; overflow-wrap: anywhere; }
+  .pg-w b { color: var(--lime-dark); }
+  .pg-note { color: var(--text-dim); font-size: 0.8rem; }
+  .pg-box { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--amber); border-radius: 14px; padding: 14px 16px; }
+  .pg-box ul { margin: 0; padding-left: 18px; }
+  .pg-box li { font-size: 0.86rem; line-height: 1.55; margin-bottom: 6px; overflow-wrap: anywhere; }
+  .pg-check { list-style: none; padding-left: 0 !important; }
+  .pg-check li::before { content: '\2610  '; color: var(--lime-dark); }
+  .card-ping { outline: 3px solid var(--lime); outline-offset: 2px; }
   .res-plan { margin: 0 0 20px 0; padding-left: 20px; color: var(--text-dim); font-size: 0.86rem; line-height: 1.65; }
   .res-plan li { margin-bottom: 5px; }
   .res-wrap { display: grid; gap: 14px; }
@@ -1795,7 +1817,7 @@ function renderProfile() {
   syncUserMenu();
 }
 
-function renderResources() {
+function renderResources(opts = {}) {
   const chr39 = String.fromCharCode(39);
   if (!RESOURCES || !Array.isArray(RESOURCES.groups)) return '';
   const groups = RESOURCES.groups.map(g => {
@@ -1808,10 +1830,10 @@ function renderResources() {
     return '<div class=' + chr39 + 'res-group' + chr39 + '><div class=' + chr39 + 'res-title' + chr39 + '>' +
       escapeHtml(g.title || '') + '</div>' + items + '</div>';
   }).join('');
-  const plan = Array.isArray(RESOURCES.plan) && RESOURCES.plan.length
+  const plan = opts.noPlan ? '' : Array.isArray(RESOURCES.plan) && RESOURCES.plan.length
     ? '<ol class=' + chr39 + 'res-plan' + chr39 + '>' + RESOURCES.plan.map(x => '<li>' + escapeHtml(x) + '</li>').join('') + '</ol>'
     : '';
-  return '<div class=' + chr39 + 'section-label' + chr39 + '>How to prepare</div>' +
+  return '<div class=' + chr39 + 'section-label' + chr39 + '>' + (opts.label || 'How to prepare') + '</div>' +
     plan + '<div class=' + chr39 + 'res-wrap' + chr39 + '>' + groups + '</div>';
 }
 
@@ -2091,15 +2113,150 @@ function renderStart() {
 
 // How to prepare: its own screen (it used to be a right-hand panel on the start
 // screen), reached from the button next to the title.
+// ---- How to prepare: a per-exam study guide ----
+// Every number comes from the app's own data: LENGTH_CHOICES, each bank's blueprint /
+// blueprintV10 and PASS_SCORE. Buttons open the matching start-screen feature.
+const PREP_EXAMS = [
+  { key: 'developer', label: 'Developer', dec7: 'Changes on 7 Dec: new guide, scenario-based items.', video: false, chapters: true },
+  { key: 'developerPro', label: 'Developer Professional', dec7: 'Not a 7 Dec change: its guide is the same before and after.', video: false, chapters: true },
+  { key: 'architect', label: 'Architect Foundations', dec7: 'Unchanged on 7 Dec.', video: false, chapters: false },
+  { key: 'architectPro', label: 'Architect Professional', dec7: 'Changes on 7 Dec: 63 items until 6 Dec, 70 from 7 Dec.', video: true, chapters: false }
+];
+const PREP_KEY = 'ccaf_prep_exam';
+function prepExam() {
+  let k = null;
+  try { k = localStorage.getItem(PREP_KEY); } catch {}
+  return PREP_EXAMS.find(e => e.key === k) || PREP_EXAMS[0];
+}
+function prepFormat(key) {
+  const lv = LEVELS[key];
+  if (!lv) return null;
+  const c = LENGTH_CHOICES[key];
+  const fmt = (n, secs, bp, tag) => ({ n, secs, bp: bp || [], tag, per: Math.round(secs / n) });
+  const per = s => Math.floor(s / 60) + 'm' + String(s % 60).padStart(2, '0') + 's';
+  let rows;
+  if (c && c.realAlso) {
+    const early = c.realAlso[0];
+    rows = [fmt(early, c.realSeconds, blueprintFor(lv, early), 'until 6 Dec'), fmt(c.real, c.realSeconds, blueprintFor(lv, c.real), 'from 7 Dec')];
+  } else if (c) {
+    rows = [fmt(c.real, c.realSeconds, lv.blueprint)];
+  } else {
+    const n = lv.count || lv.questions.length;
+    rows = [fmt(n, n * SECONDS_PER_QUESTION, lv.blueprint)];
+  }
+  rows.forEach(r => { r.perText = per(r.per); r.mins = Math.round(r.secs / 60); });
+  return { lv, c, rows };
+}
+function prepWeights(bp) {
+  return `<div class="pg-w">${bp.map(b => `<span>${escapeHtml(b.label)} <b>${b.pct}%</b></span>`).join('')}</div>`;
+}
+// Open a start-screen feature from the guide, then scroll to it.
+function prepGo(action, key, keepFeedback) {
+  setTab('exams'); vc.courseId = null;
+  if (action === 'video') { setTab('video'); renderStart(); window.scrollTo({ top: 0 }); return; }
+  if (action === 'updates') { openUpdates('dec-7-exam-changes'); return; }
+  let sel = '.builder:not(.drill)';
+  if (action === 'quiz') {
+    state.instantFeedback = true;
+    builder.track = key === 'architect' ? 'architect' : key; builder.domains = [];
+  } else if (action === 'chapters') {
+    drill.track = key; drill.course = null; drill.chapter = null;
+    sel = '.builder.drill';
+  } else if (action === 'card') {
+    if (!keepFeedback) state.instantFeedback = false;
+    const c = LENGTH_CHOICES[key];
+    if (c) setLength(key, c.def ? (typeof c.def === 'function' ? c.def() : c.def) : c.real);
+    sel = `.level-card[data-level="${key}"]`;
+  }
+  renderStart();
+  const el = document.querySelector(sel);
+  if (el) {
+    el.scrollIntoView({ block: 'center' });
+    el.classList.add('card-ping');
+    setTimeout(() => el.classList.remove('card-ping'), 2500);
+  }
+}
+
 function renderPrepPage() {
   state.screen = 'prep';
+  const ex = prepExam();
+  const f = prepFormat(ex.key);
+  const btn = (act, label, cls = '') => `<button class="btn ${cls}" data-pg="${act}" data-pgkey="${ex.key}">${label}</button>`;
+  const fmtBlock = f ? f.rows.map(r => `
+      <p><b>${r.n} items${r.tag ? ' (' + r.tag + ')' : ''}</b> in ${r.mins} min. Pass ${PASS_SCORE} of 1000. About ${r.perText} per item.</p>
+      ${prepWeights(r.bp)}`).join('') : '<p>This exam is not loaded yet.</p>';
+  const learn = [];
+  if (ex.video) learn.push(btn('video', 'Open Video Courses'));
+  if (ex.chapters) learn.push(btn('chapters', 'Study by course chapter'));
+  const learnText = ex.video
+    ? 'Watch the Architect Professional course in Video Courses. It is live. Other exam courses are not yet.'
+    : ex.chapters
+      ? 'No video course for this exam yet. Study one official course chapter at a time.'
+      : 'No video course or chapter drill for this exam yet. Read the official guide and courses under Resources below.';
+  if (!learn.length) learn.push(`<button class="btn ghost" data-pg="res">See resources</button>`);
   app.innerHTML = `
     <div class="topbar">
       <div class="brand">Claude Certification <span>How to prepare</span></div>
       <button class="icon-btn" id="prepBack">← Back to exams</button>
     </div>
-    <div class="prep-page">${renderResources()}</div>`;
+    <div class="prep-page">
+      <div class="pg-sec" style="margin-top:0">
+        <h2>Pick your exam</h2>
+        <div class="pg-chips">${PREP_EXAMS.map(e => `<button class="bq-chip${e.key === ex.key ? ' on' : ''}" data-pgexam="${e.key}">${e.label}</button>`).join('')}</div>
+      </div>
+      <div class="pg-sec" id="pgPlan">
+        <h2>Your plan: ${escapeHtml(ex.label)}</h2>
+        <p class="pg-sub">Five steps. Each button opens the feature.</p>
+        <div class="pg-step"><h3><span class="pg-num">1</span>Know the format</h3>
+          ${fmtBlock}
+          <p class="pg-note">${escapeHtml(ex.dec7)}</p>
+          <div class="pg-acts">${btn('updates', 'Read the 7 Dec post', 'ghost')}</div></div>
+        <div class="pg-step"><h3><span class="pg-num">2</span>Learn</h3>
+          <p>${learnText}</p>
+          <div class="pg-acts">${learn.join('')}</div></div>
+        <div class="pg-step"><h3><span class="pg-num">3</span>Drill weak areas</h3>
+          <p>Pick 1 or 2 domains you scored lowest in. Turn instant feedback on. Do 10 to 20 items.</p>
+          <div class="pg-acts">${btn('quiz', 'Build a custom quiz')}</div></div>
+        <div class="pg-step"><h3><span class="pg-num">4</span>Full mock under real conditions</h3>
+          <p>Sit the ${escapeHtml(ex.label)} card at full length. Feedback off. No pausing. One go.</p>
+          <div class="pg-acts">${btn('card', 'Open the exam card')}</div></div>
+        <div class="pg-step"><h3><span class="pg-num">5</span>Review</h3>
+          <p>Go through every wrong answer and read the explanation. Press <b>F</b> to flag items you guessed. Re-sit. Keep going until the card's attempt badge turns green at ${PASS_SCORE}.</p>
+          <div class="pg-acts">${btn('badge', 'See my attempt badge', 'ghost')}</div></div>
+      </div>
+      <div class="pg-sec">
+        <h2>Traps that cost marks</h2>
+        <div class="pg-box"><ul>
+          <li>Fix the problem at the source. Prompt-only or clean-up-later answers are the tempting near-miss.</li>
+          <li>For a must-never rule, use hooks or permissions. A prompt instruction is only probable.</li>
+          <li>Retry fixes a model error. It cannot supply input that was never there.</li>
+          <li>End an agent loop on <code>stop_reason</code>, not on text you parse.</li>
+          <li>If a tool is misrouted, fix its description first.</li>
+          <li>When the exam guide and the docs differ, answer per the guide. Explanations mark these with "Current docs".</li>
+        </ul></div>
+      </div>
+      <div class="pg-sec">
+        <h2>Exam day</h2>
+        <div class="pg-box"><ul class="pg-check">
+          <li>Stop practising an hour before.</li>
+          <li>Check in 30 minutes early (online proctored).</li>
+          <li>Close other apps.</li>
+          <li>Pace yourself: about 2 minutes per item${f && f.rows.some(r => r.n === 70) ? ' (' + f.rows.find(r => r.n === 70).perText + ' on a 70-item sitting)' : ''}.</li>
+          <li>Flag hard items with <b>F</b>. Move on with <b>N</b>. Come back with <b>P</b>.</li>
+        </ul></div>
+      </div>
+      <div class="pg-sec" id="pgRes">${renderResources({ noPlan: true, label: 'Resources' })}</div>
+    </div>`;
   document.getElementById('prepBack').addEventListener('click', () => { renderStart(); window.scrollTo({ top: 0 }); });
+  app.querySelectorAll('[data-pgexam]').forEach(b => b.addEventListener('click', () => {
+    try { localStorage.setItem(PREP_KEY, b.dataset.pgexam); } catch {}
+    renderPrepPage();
+  }));
+  app.querySelectorAll('[data-pg]').forEach(b => b.addEventListener('click', () => {
+    const a = b.dataset.pg;
+    if (a === 'res') { document.getElementById('pgRes').scrollIntoView({ block: 'start' }); return; }
+    prepGo(a === 'badge' ? 'card' : a, b.dataset.pgkey, a === 'badge');
+  }));
   syncUserMenu();
   window.scrollTo({ top: 0 });
 }
@@ -2129,7 +2286,7 @@ const builder = { track: 'architect', domains: [], size: 20, mix: 'exam' }; // d
 // Domain list and questions for the chosen track. 'architect' pools every non-pool Architect-style
 // bank through DOMAIN_OF; a Developer track uses its own bank and its blueprint's eight domains.
 function builderTracks() {
-  return Object.entries(LEVELS).filter(([, lv]) => lv.courses && lv.blueprint && lv.blueprint.length);
+  return Object.entries(LEVELS).filter(([k, lv]) => (lv.courses || k === 'architectPro') && lv.blueprint && lv.blueprint.length);
 }
 function builderDefs() {
   const lv = builder.track !== 'architect' && LEVELS[builder.track];
