@@ -1,5 +1,8 @@
 # CCAR-P official blueprint (reference)
 
+Two guide versions are tracked: **v1.1, effective 7 Dec 2026** (next section) and
+**v1.0, valid until 6 Dec 2026** (everything after it). The app offers both lengths.
+
 Scope authority for `questions/architect-pro.json` (level **Architect Professional**).
 Every fact below is tagged with where it came from:
 
@@ -21,6 +24,47 @@ Every fact below is tagged with where it came from:
 The registration page for the exam
 (`/claude-certified-architect-professional-certification`) holds nothing beyond a
 register button and a link to the certifications page.
+
+## From 7 Dec 2026 (guide v1.1)
+
+Source: *Claude Certified Architect – Professional Exam Guide*, Version 1.1, effective
+December 7, 2026 (read 28 Nov 2026), §4 and §5.
+
+**Exam facts:** 70 items, of which 60 are scored and 10 are unscored (unscored items are
+not identified). Scenario-based multiple choice; each item states how many to select.
+120 minutes, scaled pass 720 on 100-1,000, $175. In the app: `LENGTH_CHOICES.architectPro`
+offers 60, 63 (until 6 Dec) and 70 (from 7 Dec, default).
+
+| # | Domain | v1.1 weight | v1.0 (until 6 Dec) |
+| --- | --- | --- | --- |
+| 1 | Solution Design and Architecture | 18% | 17% |
+| 2 | Claude Models, Prompting, and Context Engineering | 13% | 13% |
+| 3 | Integration | 21% | 19% |
+| 4 | Evaluation, Testing, and Optimization | 17% | 16% |
+| 5 | Governance, Safety, and Risk Management | 16% | 14% |
+| 6 | Stakeholder Communication and Lifecycle Management | 7% | 14% |
+| 7 | Developer Productivity and Operational Enablement | 8% | 7% |
+
+The v1.1 outline names skills rather than numbered task statements. New or changed ones
+(quoted from the guide):
+
+- **Task Delegation Between Claude and Humans (D1):** "Determining which components of a described business process should be delegated to Claude, retained by humans, or handled collaboratively, and justifying each assignment against reversibility, stakes, and accountability."
+- **Deployment Surface and Agent Runtime Selection (D1):** "Selecting a deployment surface (Anthropic API, Amazon Bedrock, Google Vertex AI, Microsoft Foundry) and an agent runtime (Messages API loop, self-hosted Agent SDK or headless Claude Code, Claude Managed Agents) under data residency, compliance, model-availability, and operational-ownership constraints..."
+- **Architectural Pattern Selection (D1, changed):** adds Skills-based patterns to workflow, agentic and augmented-LLM, and "the delegation boundary the selected pattern establishes".
+- **Reasoning Effort and Context Lifecycle (D2, new):** "context editing, memory tool, compaction" for long-running agents; **Prompting Technique Selection** now includes "prompted reasoning versus native thinking".
+- **Production Reliability Controls (D3):** "rate-limit handling, retry and backoff, idempotency for side-effecting tools, or fallback routing ... without introducing duplicate effects."
+- **Retrieval Architecture Selection (D3, changed):** pre-built RAG vs agentic search vs full-corpus context, plus "contextual-retrieval and fallback configuration".
+- **LLM-as-Judge Design and Bias (D4):** correct "the responsible bias (position, verbosity, self-preference, judge drift)".
+- **Experimental Design for Configuration Comparison (D4):** "number of trials per case needed to separate the configuration effect from run-to-run variance."
+- **Model Version Migration (D4):** "pin, re-tune prompts, re-baseline evaluations, or defer" from a deprecation timeline and regression results.
+- **Prompt Injection Surface and Controls (D5):** retrieved documents, tool results, MCP server responses, "third-party Skills".
+- **Architectural Controls for Compliance Obligations (D5):** residency and deployment surface, retention and zero-data-retention, PII redaction, audit logging, tenant isolation.
+- **Bias Source Identification and Mitigation (D5):** data bias vs prompt-framing vs evaluation-design bias.
+- **Packaging and Distributing Claude Code Workflows (D7)** and **Agent SDK and Claude Code Configuration (D7):** plugins, marketplace, managed settings; permission modes default, acceptEdits, plan, auto, dontAsk, bypassPermissions.
+- **Accountability for AI-Generated Code (D7):** "the control that preserves human ownership of AI-generated code."
+- D6 shrinks to three skills: unsupportable commitments in requirements and SLAs, architecture decision records, operational handoff completeness.
+
+## v1.0 (valid until 6 Dec 2026)
 
 ## Exam facts
 

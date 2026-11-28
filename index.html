@@ -767,13 +767,14 @@ const LENGTH_CHOICES = {
   // CCDVF and CCDVP are 70 items (60 scored + 10 unscored) in 120 minutes per their exam guides.
   developer: { options: [60, 70], real: 70, realSeconds: 120 * 60, label: 'Developer' },
   developerPro: { options: [60, 70], real: 70, realSeconds: 120 * 60, label: 'Developer Professional' },
-  architectPro: { options: [60, 63], real: 63, realSeconds: 120 * 60, label: 'Architect Professional' }
+  // CCAR-P guide v1.1: 70 items (60 scored + 10 unscored) from 7 Dec 2026; v1.0 was 63 items until 6 Dec.
+  architectPro: { options: [60, 63, 70], def: 70, real: 70, realAlso: [63], realSeconds: 120 * 60, label: 'Architect Professional', chipLabels: { 63: '63 (until 6 Dec)', 70: '70 (from 7 Dec)' } }
 };
 const LENGTH_KEY = 'ccap_length';
 function chosenLength(key) {
   const c = LENGTH_CHOICES[key];
   if (!c) return null;
-  let v = c.options[0];
+  let v = c.def || c.options[0];
   try { const s = Number(localStorage.getItem(LENGTH_KEY + ':' + key)); if (c.options.includes(s)) v = s; } catch {}
   return v;
 }
@@ -785,7 +786,7 @@ function paperSize(key, level) {
   const bankN = level.count || level.questions.length;
   const c = LENGTH_CHOICES[key];
   const n = c ? Math.min(chosenLength(key), level.questions.length) : bankN;
-  const seconds = c && n === c.real ? c.realSeconds : n * SECONDS_PER_QUESTION;
+  const seconds = c && (n === c.real || (c.realAlso || []).includes(n)) ? c.realSeconds : n * SECONDS_PER_QUESTION;
   return { n, seconds };
 }
 
@@ -1991,7 +1992,7 @@ function renderStart() {
         <span class="fb-d">${state.instantFeedback
           ? ' — answers are marked straight away with the correct answer and explanation; first pick is final.'
           : ' — real exam conditions; results only at the end.'}</span>
-        <span class="fb-note">Exams run at 2 min per question (the real-length Professional and Developer sittings (63 or 70 items) get the real 120 min), and the timer can be paused.</span></span>
+        <span class="fb-note">Exams run at 2 min per question (the real-length Professional and Developer sittings (70 items, or 63 for Architect Professional until 6 Dec) get the real 120 min), and the timer can be paused.</span></span>
       <span class="switch ${state.instantFeedback ? 'on' : ''}"></span>
     </button>
     <div class="sec-head">
@@ -2000,7 +2001,7 @@ function renderStart() {
     </div>
     <div class="len-row len-grid">${Object.entries(LENGTH_CHOICES).filter(([k]) => LEVELS[k] && LEVELS[k].ready).map(([k, c]) => `
       <span class="len-grp"><span class="lbl">${c.label}:</span>
-      ${c.options.map(n => `<button class="filter-btn${chosenLength(k) === n ? ' active' : ''}" data-len-level="${k}" data-len="${n}" title="${n === c.real ? c.real + ' items in ' + c.realSeconds / 60 + ' min is the real sitting' : n + ' items, 2 min each'}">${n}${n === c.real ? ' (real)' : ''}</button>`).join('')}</span>`).join('')}
+      ${c.options.map(n => `<button class="filter-btn${chosenLength(k) === n ? ' active' : ''}" data-len-level="${k}" data-len="${n}" title="${n === c.real || (c.realAlso || []).includes(n) ? n + ' items in ' + c.realSeconds / 60 + ' min is the real sitting' : n + ' items, 2 min each'}">${(c.chipLabels && c.chipLabels[n]) || (n + (n === c.real ? ' (real)' : ''))}</button>`).join('')}</span>`).join('')}
     </div>
     <div class="levels path">${pathCards}</div>
     ${bankCards ? `

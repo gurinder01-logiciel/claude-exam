@@ -34,7 +34,7 @@ exam: 60 scenario questions in 120 minutes, with a shared team leaderboard.
   for the **CCAR-P** (Professional) exam — architecture trade-offs, integration,
   evals, governance and stakeholder decisions across six Professional practice
   scenarios, weighted to its seven-domain blueprint ([BLUEPRINT-PRO.md](BLUEPRINT-PRO.md)).
-  Choose a 60-question sitting or the real **63 items / 120 minutes**. After a
+  Choose a 60-question sitting or the real **70 items / 120 minutes** (63 items until 6 Dec 2026). After a
   sitting, **Review traps** shows the deciding detail of each missed question and
   what your pick broke, with a **Copy tutor prompt** button for coaching in Claude
 

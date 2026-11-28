@@ -1,30 +1,26 @@
 {
   "key": "architectPro",
   "name": "Architect Professional",
-  "desc": "60 random questions from a 100-question CCAR-P bank: constraint-driven architecture trade-offs (multiple-choice and select-N), integration, evals, governance and stakeholder decisions across six Professional scenarios, weighted to the exam's seven-domain blueprint.",
+  "desc": "70 random questions from a 100-question CCAR-P bank: constraint-driven architecture trade-offs (multiple-choice and select-N), integration, evals, governance and stakeholder decisions across six Professional scenarios, weighted to the exam's seven-domain blueprint.",
   "ready": true,
   "inPool": false,
   "count": 60,
   "blueprint": [
     {
       "label": "Integration",
-      "pct": 19
+      "pct": 21
     },
     {
       "label": "Solution Design & Architecture",
-      "pct": 17
+      "pct": 18
     },
     {
       "label": "Evaluation, Testing & Optimization",
-      "pct": 16
+      "pct": 17
     },
     {
       "label": "Governance, Safety & Risk Management",
-      "pct": 14
-    },
-    {
-      "label": "Stakeholder Communication & Lifecycle Management",
-      "pct": 14
+      "pct": 16
     },
     {
       "label": "Claude Models, Prompting & Context Engineering",
@@ -32,6 +28,10 @@
     },
     {
       "label": "Developer Productivity & Operational Enablement",
+      "pct": 8
+    },
+    {
+      "label": "Stakeholder Communication & Lifecycle Management",
       "pct": 7
     }
   ],

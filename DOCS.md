@@ -119,8 +119,8 @@ It's configured in the level JSON, not in code:
 - **Architect Professional** is the CCAR-P (Professional) level: a fresh,
   ungrouped 60 from its own 100-question bank (90 framed in six Professional
   practice scenarios, ids 11–16, plus 10 standalone; 10 multiple-response),
-  weighted to the seven CCAR-P domains 17/13/19/16/14/14/7. The real CCAR-P has
-  63 items and publishes no scenario bank, so the scenarios are our own — see
+  weighted to the seven CCAR-P domains 18/13/21/17/16/7/8 (guide v1.1; 17/13/19/16/14/14/7 until 6 Dec). The real CCAR-P has
+  63 items until 6 Dec 2026 (70 from 7 Dec, guide v1.1) and publishes no scenario bank, so the scenarios are our own — see
   `BLUEPRINT-PRO.md`. `inPool: false`, so the Full Mock Exam is unchanged.
 
 ### Scenario blocks
@@ -158,7 +158,7 @@ never sits in a fixed slot.
 ## 4. Features
 
 ### Timer
-120 minutes for a 60-question paper (2 min/question on every level; the 63-item Architect Professional sitting also gets 120 minutes). **Pause**
+120 minutes for a 60-question paper (2 min/question on every level; the 70-item Architect Professional sitting, and the 63-item one until 6 Dec, also get 120 minutes). **Pause**
 stops the clock entirely — for real breaks. Amber under 15 minutes, red and
 blinking under 5.
 
@@ -247,7 +247,7 @@ Architect Foundations, Architect Professional, Claude Code Foundations, Scenario
 Mock Exam) and shows all seven in one row from 1180px up; below that it wraps to 3 columns, then 1.
 
 ### Exam length (Architect Professional)
-A chip row above the Exam Path picks **60** or **63 (real)** items. 63 gets the
+A chip row above the Exam Path picks **60**, **63 (until 6 Dec)** or **70 (from 7 Dec)** items; 70 is the default. 63 and 70 get the
 real 120-minute limit (not 2 min/question); 60 keeps the 2 min/question pace. The
 choice is remembered in `localStorage` (`ccap_length:<level>`). Both draw through
 the same domain-weighted draw and difficulty ramp (see below), scaled to the length; the choices
