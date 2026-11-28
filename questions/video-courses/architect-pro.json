@@ -1,0 +1,92 @@
+{
+ "id": "architect-pro",
+ "title": "Architect Pro course (placeholder)",
+ "channel": "PLACEHOLDER channel",
+ "playlistUrl": "https://www.youtube.com/",
+ "episodes": [
+  {
+   "n": 1,
+   "title": "PLACEHOLDER episode 1",
+   "videoId": "dQw4w9WgXcQ",
+   "seconds": 600,
+   "summary": "PLACEHOLDER summary.",
+   "keyPoints": [
+    "PLACEHOLDER key point"
+   ],
+   "traps": [
+    "PLACEHOLDER trap"
+   ]
+  },
+  {
+   "n": 2,
+   "title": "PLACEHOLDER episode 2",
+   "videoId": "dQw4w9WgXcQ",
+   "seconds": 1200,
+   "summary": "PLACEHOLDER summary.",
+   "keyPoints": [
+    "PLACEHOLDER key point"
+   ],
+   "traps": [
+    "PLACEHOLDER trap"
+   ]
+  }
+ ],
+ "questions": [
+  {
+   "q": "PLACEHOLDER question 0 for episode 1?",
+   "options": [
+    "Option A",
+    "Option B",
+    "Option C",
+    "Option D"
+   ],
+   "correct": 0,
+   "explain": "PLACEHOLDER explanation.",
+   "d": 2,
+   "domain": "Placeholder domain",
+   "episode": 1
+  },
+  {
+   "q": "PLACEHOLDER question 1 for episode 1?",
+   "options": [
+    "Option A",
+    "Option B",
+    "Option C",
+    "Option D"
+   ],
+   "correct": 1,
+   "explain": "PLACEHOLDER explanation.",
+   "d": 2,
+   "domain": "Placeholder domain",
+   "episode": 1
+  },
+  {
+   "q": "PLACEHOLDER question 0 for episode 2?",
+   "options": [
+    "Option A",
+    "Option B",
+    "Option C",
+    "Option D"
+   ],
+   "correct": 0,
+   "explain": "PLACEHOLDER explanation.",
+   "d": 2,
+   "domain": "Placeholder domain",
+   "episode": 2
+  },
+  {
+   "q": "PLACEHOLDER question 1 for episode 2?",
+   "options": [
+    "Option A",
+    "Option B",
+    "Option C",
+    "Option D"
+   ],
+   "correct": 1,
+   "explain": "PLACEHOLDER explanation.",
+   "d": 2,
+   "domain": "Placeholder domain",
+   "episode": 2
+  }
+ ]
+}

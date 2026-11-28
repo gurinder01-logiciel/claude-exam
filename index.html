@@ -294,6 +294,7 @@
   .chips-label { align-self: center; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); }
   .fb-note { display: block; font-size: 0.72rem; color: var(--text-dim); margin-top: 2px; }
   .prep-link { white-space: nowrap; }
+  .hero-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .fb-toggle.compact { padding: 9px 14px; margin-top: 12px; }
   .fb-toggle.compact .fb-d { display: inline; margin: 0; }
   /* Exam path: the four certification exams on row 1, the three practice tracks on row 2 */
@@ -567,6 +568,49 @@
   .filter-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
   .filter-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); border-radius: 20px; padding: 6px 14px; font-size: 0.82rem; cursor: pointer; font-family: inherit; font-weight: 600; }
   .filter-btn.active { background: var(--lime-dim); color: var(--lime); border-color: var(--lime); }
+
+  /* ===== Video Courses tab (separate from the exams) ===== */
+  .tab-switch { display: flex; gap: 6px; margin: 14px 0 4px; border-bottom: 1px solid var(--border); }
+  .tab-btn { background: none; border: none; border-bottom: 3px solid transparent; color: var(--text-dim); font: 700 0.92rem var(--font-display); padding: 9px 16px; cursor: pointer; margin-bottom: -1px; }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.on { color: var(--lime); border-bottom-color: var(--lime); }
+  .dec7-btn { background: var(--amber); color: #2e2e2e; border: none; border-radius: 10px; padding: 9px 16px; font: 800 0.88rem var(--font-display); cursor: pointer; box-shadow: 0 4px 14px rgba(240,168,40,0.3); }
+  .dec7-btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
+  .dec7-btn.small { padding: 5px 12px; font-size: 0.76rem; box-shadow: none; }
+  .vc-cards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
+  .vc-note { font-size: 0.82rem; color: var(--text-dim); margin: 6px 0 12px; }
+  .vc-err { color: var(--bad); font-size: 0.9rem; padding: 12px 0; }
+  .vc-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 10px 0 14px; }
+  .vc-ep { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+  .vc-ep-head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .vc-ep-num { font-family: var(--font-mono); font-weight: 700; color: var(--lime); }
+  .vc-ep-title { font-weight: 700; flex: 1 1 180px; min-width: 0; overflow-wrap: anywhere; }
+  .vc-ep-dur { font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim); }
+  .vc-ep-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
+  .vc-link { color: var(--lime); font-weight: 700; font-size: 0.85rem; text-decoration: none; }
+  .vc-link:hover { text-decoration: underline; }
+  .vc-mini { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); border-radius: 999px; padding: 5px 12px; font: 600 0.78rem inherit; font-family: inherit; cursor: pointer; }
+  .vc-mini:hover { border-color: var(--lime); color: var(--lime); }
+  .vc-panel { margin-top: 10px; font-size: 0.86rem; display: grid; gap: 8px; overflow-wrap: anywhere; }
+  .vc-panel[hidden] { display: none; }
+  .vc-panel h4 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin-bottom: 2px; }
+  .vc-panel ul { padding-left: 18px; }
+  .vc-modal { position: fixed; inset: 0; background: rgba(20,24,28,0.55); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .vc-modal-card { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 16px; width: min(900px, 100%); max-height: 88vh; overflow: auto; padding: 18px 20px; }
+  .vc-modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+  .vc-modal-head h2 { font-family: var(--font-display); font-size: 1.2rem; }
+  .vc-table-wrap { overflow-x: auto; }
+  .vc-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+  .vc-table th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); padding: 6px 8px; border-bottom: 2px solid var(--border); }
+  .vc-table td { vertical-align: top; padding: 8px; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+  .vc-table td:first-child { font-weight: 700; }
+  @media (max-width: 600px) {
+    .vc-table thead { display: none; }
+    .vc-table, .vc-table tbody, .vc-table tr, .vc-table td { display: block; width: 100%; }
+    .vc-table tr { border: 1px solid var(--border); border-radius: 10px; padding: 6px 8px; margin-bottom: 8px; }
+    .vc-table td { border: none; padding: 3px 0; }
+    .vc-table td[data-h]::before { content: attr(data-h) ": "; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); font-weight: 700; }
+  }
 </style>
 </head>
 <body>
@@ -1548,9 +1592,162 @@ function syncPrep() {
   if (side && state.screen !== 'exam' && state.screen !== 'paused') { side.innerHTML = ''; side.hidden = true; }
 }
 
+// ===================== VIDEO COURSES (separate from the exams) =====================
+// Loaded only when the tab is opened. These questions never enter LEVELS, the
+// Full Mock pool, the builder, the chapter drill or the leaderboard.
+const TAB_KEY = 'ccaf_start_tab';
+const VC_BASE = './questions/video-courses/';
+const vc = { loaded: null, error: null, courseId: null, open: new Set() };
+function getTab() { try { return localStorage.getItem(TAB_KEY) === 'video' ? 'video' : 'exams'; } catch { return 'exams'; } }
+function setTab(t) { try { localStorage.setItem(TAB_KEY, t); } catch {} }
+
+async function loadVideoCourses() {
+  if (vc.loaded) return vc.loaded;
+  const get = async f => { const r = await fetch(VC_BASE + f + '.json', { cache: 'no-store' }); if (!r.ok) throw new Error(f + ' ' + r.status); return r.json(); };
+  const idx = await get('index');
+  const courses = await Promise.all((idx.courses || []).map(get));
+  vc.loaded = { courses, dec7Name: idx.dec7 || 'dec7' };
+  return vc.loaded;
+}
+function fmtDur(sec) {
+  const m = Math.round((Number(sec) || 0) / 60);
+  return m >= 60 ? Math.floor(m / 60) + 'h ' + String(m % 60).padStart(2, '0') + 'm' : m + ' min';
+}
+function tabBarHtml(active) {
+  return `<div class="tab-switch" role="tablist">
+    <button class="tab-btn${active === 'exams' ? ' on' : ''}" role="tab" data-tab="exams">Exams</button>
+    <button class="tab-btn${active === 'video' ? ' on' : ''}" role="tab" data-tab="video">Video Courses</button>
+  </div>`;
+}
+function wireTabs() {
+  app.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
+    setTab(b.dataset.tab); vc.courseId = null; renderStart();
+  }));
+  app.querySelectorAll('[data-dec7]').forEach(b => b.addEventListener('click', openDec7));
+}
+
+async function openDec7() {
+  document.getElementById('dec7Modal')?.remove();
+  const m = document.createElement('div');
+  m.className = 'vc-modal'; m.id = 'dec7Modal';
+  m.innerHTML = `<div class="vc-modal-card" role="dialog" aria-modal="true" aria-label="What changes after Dec 7"><div class="vc-note">Loading…</div></div>`;
+  document.body.appendChild(m);
+  const close = () => m.remove();
+  m.addEventListener('click', e => { if (e.target === m) close(); });
+  document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); } });
+  const card = m.firstElementChild;
+  try {
+    const { dec7Name } = await loadVideoCourses();
+    const r = await fetch(VC_BASE + dec7Name + '.json', { cache: 'no-store' });
+    if (!r.ok) throw new Error('dec7 ' + r.status);
+    const d = await r.json();
+    const url = /^https:\/\//.test(d.sourceUrl || '') ? d.sourceUrl : (d.sourceVideoId ? 'https://www.youtube.com/watch?v=' + encodeURIComponent(d.sourceVideoId) : '');
+    card.innerHTML = `
+      <div class="vc-modal-head"><h2>${escapeHtml(d.title || 'What changes after Dec 7')}</h2><button class="icon-btn" id="dec7Close">✕ Close</button></div>
+      ${url ? `<p class="vc-note">Source: <a class="vc-link" href="${escapeHtml(url)}" target="_blank" rel="noopener">Watch the source video</a></p>` : ''}
+      <div class="vc-table-wrap"><table class="vc-table">
+        <thead><tr><th>Area</th><th>Before</th><th>After</th><th>What it means for the exam</th></tr></thead>
+        <tbody>${(d.items || []).map(i => `<tr><td data-h="Area">${escapeHtml(i.area || '')}</td><td data-h="Before">${escapeHtml(i.before || '')}</td><td data-h="After">${escapeHtml(i.after || '')}</td><td data-h="What it means for the exam">${escapeHtml(i.examImpact || '')}</td></tr>`).join('')}</tbody>
+      </table></div>`;
+  } catch (err) {
+    card.innerHTML = `<div class="vc-modal-head"><h2>What changes after Dec 7</h2><button class="icon-btn" id="dec7Close">✕ Close</button></div><div class="vc-err">Could not load this panel (${escapeHtml(err.message)}).</div>`;
+  }
+  document.getElementById('dec7Close')?.addEventListener('click', close);
+}
+
+function startVideoPractice(questions, title) {
+  if (!questions.length) return;
+  const qs = questions.map(q => ({ ...q, domain: q.domain || title }));
+  state.instantFeedback = true;
+  startPaper('videoCourse', prepQuestions(qs), false);
+}
+
+async function renderVideoTab() {
+  const head = `
+    <div class="hero-row">
+      <div>
+        <h1 class="hero-title">Claude Certification <span>Video Courses</span></h1>
+        <div class="hero-chips"><span class="chips-label">Watch, then practise</span>
+          <span class="chip">Practice only</span><span class="chip">Not posted to the leaderboard</span></div>
+      </div>
+      <button class="dec7-btn" data-dec7 title="What changes in the exams after Dec 7">⚡ What changes after Dec 7</button>
+    </div>
+    ${tabBarHtml('video')}`;
+  const foot = `<p class="start-foot">Taking this as <b>${escapeHtml(user.name || '—')}</b> · <a href="#" id="changeName">change name</a></p>`;
+  const finish = () => {
+    wireTabs();
+    document.getElementById('changeName')?.addEventListener('click', e => { e.preventDefault(); renderNameGate(user.name); });
+    syncUserMenu();
+  };
+  app.innerHTML = head + `<p class="vc-note">Loading video courses…</p>` + foot;
+  finish();
+  let data;
+  try { data = await loadVideoCourses(); }
+  catch (err) {
+    if (state.screen !== 'start' || getTab() !== 'video') return;
+    app.innerHTML = head + `<div class="vc-err">Could not load the video courses (${escapeHtml(err.message)}).</div>` + foot;
+    return finish();
+  }
+  if (state.screen !== 'start' || getTab() !== 'video') return;
+  const course = data.courses.find(c => c.id === vc.courseId);
+  let body;
+  if (!course) {
+    body = `<div class="sec-head"><div class="sec-title">Courses</div><div class="sec-sub">Pick a course to see its episodes and practise questions.</div></div>
+      <div class="levels vc-cards">${data.courses.map(c => {
+        const secs = (c.episodes || []).reduce((a, e) => a + (Number(e.seconds) || 0), 0);
+        return `<button class="level-card" data-vc-course="${escapeHtml(c.id)}">
+          <div class="lc-top"><span class="lc-badge badge-ready">${(c.questions || []).length} Qs</span></div>
+          <div class="lc-title">${escapeHtml(c.title)}</div>
+          <div class="lc-desc">${escapeHtml(c.channel || '')}</div>
+          <div class="lc-meta">${(c.episodes || []).length} episodes · ${(secs / 3600).toFixed(1)} h</div>
+        </button>`; }).join('')}</div>`;
+  } else {
+    const qs = course.questions || [];
+    body = `<div class="sec-head"><div class="sec-title">${escapeHtml(course.title)}</div>
+        <div class="sec-sub">${escapeHtml(course.channel || '')}${/^https:\/\//.test(course.playlistUrl || '') ? ` · <a class="vc-link" href="${escapeHtml(course.playlistUrl)}" target="_blank" rel="noopener">Playlist</a>` : ''}</div></div>
+      <div class="vc-actions">
+        <button class="icon-btn" id="vcBack">← All courses</button>
+        <button class="btn" id="vcAll" ${qs.length ? '' : 'disabled'}>Practise whole course · ${qs.length} Qs</button>
+      </div>
+      ${(course.episodes || []).map(ep => {
+        const n = qs.filter(q => q.episode === ep.n).length;
+        const isOpen = vc.open.has(course.id + ':' + ep.n);
+        const list = (a, t) => (a && a.length) ? `<div><h4>${t}</h4><ul>${a.map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ul></div>` : '';
+        return `<div class="vc-ep">
+          <div class="vc-ep-head"><span class="vc-ep-num">${String(ep.n).padStart(2, '0')}</span><span class="vc-ep-title">${escapeHtml(ep.title)}</span><span class="vc-ep-dur">${fmtDur(ep.seconds)}</span></div>
+          <div class="vc-ep-row">
+            <a class="vc-link" href="https://www.youtube.com/watch?v=${encodeURIComponent(ep.videoId)}" target="_blank" rel="noopener">▶ Watch</a>
+            <button class="vc-mini" data-vc-toggle="${ep.n}" aria-expanded="${isOpen}">${isOpen ? 'Hide' : 'Summary, key points and traps'}</button>
+            <button class="vc-mini" data-vc-ep="${ep.n}" ${n ? '' : 'disabled'}>Practise this episode · ${n} Qs</button>
+          </div>
+          <div class="vc-panel" ${isOpen ? '' : 'hidden'}>
+            ${ep.summary ? `<div><h4>Summary</h4>${escapeHtml(ep.summary)}</div>` : ''}
+            ${list(ep.keyPoints, 'Key points')}${list(ep.traps, 'Exam traps')}
+          </div></div>`; }).join('')}`;
+  }
+  app.innerHTML = head + body + foot;
+  finish();
+  app.querySelectorAll('[data-vc-course]').forEach(b => b.addEventListener('click', () => { vc.courseId = b.dataset.vcCourse; renderVideoTab(); window.scrollTo({ top: 0 }); }));
+  document.getElementById('vcBack')?.addEventListener('click', () => { vc.courseId = null; renderVideoTab(); });
+  if (course) {
+    document.getElementById('vcAll')?.addEventListener('click', () => startVideoPractice(course.questions || [], course.title));
+    app.querySelectorAll('[data-vc-ep]').forEach(b => b.addEventListener('click', () => {
+      const n = Number(b.dataset.vcEp);
+      startVideoPractice((course.questions || []).filter(q => q.episode === n), course.title);
+    }));
+    app.querySelectorAll('[data-vc-toggle]').forEach(b => b.addEventListener('click', () => {
+      const k = course.id + ':' + b.dataset.vcToggle, panel = b.closest('.vc-ep').querySelector('.vc-panel');
+      const open = panel.hidden; panel.hidden = !open;
+      open ? vc.open.add(k) : vc.open.delete(k);
+      b.setAttribute('aria-expanded', open); b.textContent = open ? 'Hide' : 'Summary, key points and traps';
+    }));
+  }
+}
+
 function renderStart() {
   stopTimer();
   state.screen = 'start';
+  if (getTab() === 'video') { renderVideoTab(); return; }
   const scenarioColors = ['#26d07c','#3b9ae1','#f0a828','#a678e2','#e0524d','#20c4b8','#d16ba5'];
   // Compact card: everything the picker needs in a few lines, so every exam fits
   // on one screen. The full description sits in the tooltip.
@@ -1605,8 +1802,12 @@ function renderStart() {
           <span class="chip">Developer, Architect, Claude Code</span>
         </div>
       </div>
-      ${RESOURCES ? `<button class="btn ghost prep-link" id="prepLink">📚 How to prepare</button>` : ''}
+      <div class="hero-actions">
+        <button class="dec7-btn small" data-dec7 title="What changes in the exams after Dec 7">⚡ What changes after Dec 7</button>
+        ${RESOURCES ? `<button class="btn ghost prep-link" id="prepLink">📚 How to prepare</button>` : ''}
+      </div>
     </div>
+    ${tabBarHtml('exams')}
     <button class="fb-toggle compact" id="fbToggle">
       <span><span class="fb-t">Instant feedback ${state.instantFeedback ? 'on' : 'off'}</span>
         <span class="fb-d">${state.instantFeedback
@@ -1639,6 +1840,7 @@ function renderStart() {
   });
   wireBuilder();
   wireChapterDrill();
+  wireTabs();
   app.querySelectorAll('[data-len-level]').forEach(b => b.addEventListener('click', () => {
     setLength(b.dataset.lenLevel, Number(b.dataset.len));
     renderStart();

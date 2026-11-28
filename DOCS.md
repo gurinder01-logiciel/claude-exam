@@ -568,3 +568,18 @@ Worth knowing before you change things:
 - **Every question mentions Claude explicitly.** Generic LLM-architecture
   questions were rewritten, not deleted — the concepts are examinable, but the
   framing should match what you'll actually see.
+
+---
+
+## 11. Video Courses tab
+
+The start screen has two tabs, **Exams** (everything else in this document) and **Video Courses**; the choice is remembered in `localStorage` (`ccaf_start_tab`). The tab is a separate, practice-only section: its files under `questions/video-courses/` are fetched only when the tab is opened, are never added to `LEVELS`, the Full Mock pool, the custom-quiz builder or the chapter drill, and a finished video quiz never posts to the leaderboard (it runs as `state.level = 'videoCourse'`, which is not a level). Quizzes use the normal engine with instant feedback on.
+
+A **What changes after Dec 7** button (Video Courses header, and a small one on the Exams hero) opens a modal table from `dec7.json`.
+
+Files in `questions/video-courses/`:
+
+- `index.json`: `{"courses": ["architect", "architect-pro", "developer"], "dec7": "dec7"}` (file names, without `.json`)
+- `<course>.json`: `{"id","title","channel","playlistUrl","episodes":[{"n","title","videoId","seconds","summary","keyPoints":[],"traps":[]}],"questions":[...]}`. Each question has the usual bank shape (`q`, `options`, `correct`, `explain`, `d`, `domain`) plus `"episode": <n>`.
+- `dec7.json`: `{"title","sourceVideoId","sourceUrl","items":[{"area","before","after","examImpact"}]}`
+
