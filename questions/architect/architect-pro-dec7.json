@@ -1,0 +1,492 @@
+{
+  "name": "Architect Professional (Dec 7 draft)",
+  "questions": [
+    {
+      "domain": "Integration",
+      "d": 2,
+      "scenario": 0,
+      "q": "A support agent calls a create_shipment tool. During a carrier slowdown the client wrapper times out after 30 seconds and retries with backoff. The next day the warehouse reports duplicate shipments, and the logs show each duplicate follows a timeout on a call that had already created the shipment. Which change resolves the cause?",
+      "options": [
+        "Raise the client timeout to 120 seconds and cut the retry count to two, so that fewer calls are retried during a carrier slowdown",
+        "Send a stable idempotency key with every create_shipment call so the service returns the first result when a retry repeats it",
+        "Tell the model in the system prompt to look up the existing shipment list before it ever calls create_shipment a second time",
+        "Stop retrying create_shipment altogether and report every timeout to the customer as a failed request that they must resubmit"
+      ],
+      "correct": 1,
+      "explain": "A timeout tells the client it stopped waiting, not that the tool did nothing, so each retry can replay an action that already completed. An idempotency key lets the service recognise the repeat and return the original result, which makes the retry safe. Longer timeouts and fewer retries are the near-miss: they make the race rarer but leave the mechanism in place. A prompt instruction depends on model behaviour, and the retry happens in the wrapper, where the model never sees the first call. Removing retries avoids duplicates but turns every transient failure into a lost request.",
+      "constraint": "retry after a client timeout replays a side-effecting call that already ran",
+      "breaks": [
+        "reduces how often the race happens but leaves the replay mechanism in place",
+        null,
+        "relies on model behaviour, and the retry happens in the wrapper where the model never sees the first call",
+        "avoids duplicates by turning every transient failure into a lost request"
+      ],
+      "facts": [
+        {
+          "url": "https://platform.claude.com/docs/en/api/errors",
+          "quote": "Otherwise, the SDK retries connection errors, timeouts, and the statuses 408, 409, 429, and 500 and above."
+        },
+        {
+          "url": "https://platform.claude.com/docs/en/api/errors",
+          "quote": "Without the SDK, follow `x-should-retry` and `retry-after` in your own code and use backoff and a retry limit."
+        }
+      ],
+      "since": "2026-12-07"
+    },
+    {
+      "domain": "Integration",
+      "d": 3,
+      "scenario": 0,
+      "q": "At month end every call to the claims-summary service starts returning 429. Each response says the organization has reached its monthly spend cap and carries no retry-after header. The client retries each call up to ten times with exponential backoff and jitter, and 40,000 items now wait in the job queue. What should the integration do?",
+      "options": [
+        "Raise the backoff ceiling and the retry count so that every call can still succeed once the limit window finally resets again",
+        "Add more jitter and spread the retries across a larger pool of worker processes so that the request bursts are flattened out",
+        "Treat this 429 as non-retryable: open a circuit breaker, hold the queue, and alert the owner to raise the cap",
+        "Fall back to a smaller model for each failed call so that the queue keeps draining at close to the same rate as before"
+      ],
+      "correct": 2,
+      "explain": "A spend-cap 429 is not a rate-window problem: it keeps failing until access resumes, so retries only burn time and add load. Treating it as non-retryable, opening a breaker, holding the queue for replay and alerting the owner stops the waste and loses no work. More backoff and a higher retry count is the near-miss: it is the right tool for a rate-limit 429 that carries retry-after, but here it only prolongs the failure. More jitter and workers address burst shape, which is not the cause, and a smaller model draws on the same organization cap.",
+      "constraint": "429 caused by a spend cap, no retry-after, 40,000 items queued",
+      "breaks": [
+        "correct tool for a windowed rate limit, but here it only prolongs a failure that lasts until access resumes",
+        "burst shape is not the cause, and more workers add load against a hard cap",
+        null,
+        "a smaller model draws on the same organization spend cap, so the calls still fail"
+      ],
+      "facts": [
+        {
+          "url": "https://platform.claude.com/docs/en/api/errors",
+          "quote": "A tier spend-cap 429 has no `retry-after` header and keeps failing until access resumes"
+        },
+        {
+          "url": "https://platform.claude.com/docs/en/api/errors",
+          "quote": "A spend-cap 429 keeps failing until access resumes, so limit your retries after a 429."
+        }
+      ],
+      "since": "2026-12-07"
+    },
+    {
+      "domain": "Integration",
+      "d": 3,
+      "scenario": 0,
+      "q": "An onboarding agent runs six steps: verify identity, create the account, charge the setup fee, provision access, send the welcome email and log the result. The model call that follows the charge returns a 529, and the team's fallback router restarts the whole run on a second model. Finance then finds customers charged twice. Which change fixes this without giving up fallback?",
+      "options": [
+        "Restart on the second model as now, but add a nightly reconciliation job that refunds any duplicate charge it can find in the ledger",
+        "Pass the second model a summary of what the first attempt completed and instruct it in the prompt to skip every step already done",
+        "Restart on the second model only when the 529 arrives before the charge step, and after the charge fail the run for manual handling",
+        "Record each completed step with an idempotency key and resume the fallback from the last committed step, reusing those keys"
+      ],
+      "correct": 3,
+      "explain": "Fallback should change where the next call runs, not repeat what already happened. Persisting each completed step with an idempotency key lets the second model continue from the failure point, and any step that is replayed returns its original result. Restart plus reconciliation is the near-miss: refunds can repair duplicates afterwards, but every failover still produces a bad effect first and a refund is itself a new side effect. A summary and a request to skip steps asks the model to enforce what code should, and failing runs after the charge gives up fallback exactly where the run is most exposed.",
+      "constraint": "529 mid-run after a charge; fallback must not repeat side effects",
+      "breaks": [
+        "clean-up-later: every failover still causes a duplicate charge first, and a refund is a new side effect",
+        "prompt-only: asks the model to enforce what code should enforce",
+        "gives up fallback after the charge, where the run is most exposed",
+        null
+      ],
+      "facts": [
+        {
+          "url": "https://platform.claude.com/docs/en/api/errors",
+          "quote": "529 - `overloaded_error`: The API is temporarily overloaded."
+        }
+      ],
+      "since": "2026-12-07"
+    },
+    {
+      "domain": "Evaluation, Testing & Optimization",
+      "d": 1,
+      "scenario": 0,
+      "q": "Production calls a dated model ID, and the provider has announced its retirement with a named replacement. The team's evaluation suite and stored baseline scores were built on the current model. What should the team do first?",
+      "options": [
+        "Run the current eval suite on the replacement and compare each slice with the stored baseline",
+        "Change the model ID to the recommended replacement now, since the provider has already validated it for general use across customers",
+        "Switch to an unpinned alias so that every future migration happens automatically with no code change or review by the team",
+        "Wait until the last week before retirement, because the replacement will have been tested by many more customers by then"
+      ],
+      "correct": 0,
+      "explain": "A retirement date is a deadline, not a reason to skip validation. The provider's recommendation says nothing about your prompts and data, so the team measures the replacement against its own baseline, slice by slice, while there is still time to fix regressions. Switching immediately is the near-miss: the replacement is the right destination, but doing it blind swaps in unmeasured behaviour. An unpinned alias hands the timing of future behaviour changes to someone else, and waiting leaves no room to react before requests to the retired model fail.",
+      "constraint": "deprecation notice with a named replacement; baseline built on the current model",
+      "breaks": [
+        null,
+        "right destination, but the swap is unmeasured against the team's own baseline",
+        "gives up version pinning, so behaviour can change without a review",
+        "leaves no time to fix regressions before the retired model starts failing"
+      ],
+      "facts": [
+        {
+          "url": "https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions",
+          "quote": "Each Claude model ID identifies a pinned version of the model."
+        },
+        {
+          "url": "https://platform.claude.com/docs/en/about-claude/model-deprecations",
+          "quote": "To help measure the performance of replacement models on your tasks, consider thorough testing of your applications with the new models well before the retirement date."
+        }
+      ],
+      "since": "2026-12-07"
+    },
+    {
+      "domain": "Evaluation, Testing & Optimization",
+      "d": 3,
+      "scenario": 0,
+      "q": "A model retires in ten weeks. On the team's held-out eval set the replacement is 3 points better overall but 6 points worse on date normalisation, a slice that matters to finance. A prompt change tried on the dev split recovers most of that gap. What is the best plan?",
+      "options": [
+        "Pin the current model right up to the retirement date and migrate only if the replacement beats it on every slice",
+        "Re-tune the prompt on the dev split, re-run the held-out set to set a new baseline, and cut over with margin",
+        "Switch now with the original prompt and accept the date regression, since the overall score went up by 3 points",
+        "Lower the date-normalisation acceptance threshold to the replacement's current score, then migrate straight away"
+      ],
+      "correct": 1,
+      "explain": "The choices are pin, re-tune, re-baseline or defer. A regression confined to one slice, with a prompt fix that works on the dev split, is a re-tune case; re-running the untouched held-out set then gives an honest new baseline, and cutting over with margin leaves time for surprises. Pinning is the near-miss: it is legitimate while the model is live, but it only postpones the work, and after retirement requests to the model fail. Shipping the original prompt hides a slice that matters behind an average, and lowering the threshold moves the ruler to fit the result.",
+      "constraint": "ten weeks to retirement; one slice regresses; a prompt fix works on the dev split",
+      "breaks": [
+        "only postpones the work, and requests fail once the model retires",
+        null,
+        "an overall average hides a slice that finance depends on",
+        "moves the ruler to fit the result instead of fixing the regression"
+      ],
+      "facts": [
+        {
+          "url": "https://platform.claude.com/docs/en/about-claude/model-deprecations",
+          "quote": "Once the model is retired, requests to it fail."
+        }
+      ],
+      "since": "2026-12-07"
+    },
+    {
+      "domain": "Evaluation, Testing & Optimization",
+      "d": 2,
+      "scenario": 0,
+      "q": "A bank runs Claude through Amazon Bedrock. Anthropic's deprecation page lists a model's retirement date for the Claude API, and the project plan uses that date as the migration deadline. The platform team asks whether that is safe. What is the right answer?",
+      "options": [
+        "Yes, because a model has one retirement date on every platform, so the date shown for the Claude API applies to Bedrock too",
+        "Yes, but cloud providers retire models earlier by design, so the plan should subtract one month from the Claude API date",
+        "No, because Bedrock sets its own schedule: plan from its model table and start the replacement evals now",
+        "No, so wait until Bedrock announces a date before any evaluation work, since results from other platforms will not transfer to it"
+      ],
+      "correct": 2,
+      "explain": "Partner-operated platforms set their own retirement schedules, so the date on a different surface can differ, and the deadline must come from the platform the bank actually calls. The evaluation work does not depend on that date, so starting it now costs nothing and protects the timeline. Reusing the Claude API date is the near-miss: it is the date most people see first, and it may be right, but nothing guarantees it. Subtracting a month is an invented rule, and waiting for an announcement wastes lead time on work that is needed whatever the date turns out to be.",
+      "constraint": "the platform is Amazon Bedrock; the plan uses a Claude API date",
+      "breaks": [
+        "the Claude API date is the one people see first, but Bedrock sets its own schedule",
+        "an invented rule; the platform's own date is what matters",
+        null,
+        "wastes lead time on evaluation work that is needed whatever the date is"
+      ],
+      "facts": [
+        {
+          "url": "https://platform.claude.com/docs/en/about-claude/model-deprecations",
+          "quote": "Partner-operated platforms, Claude Models on Google Cloud (Google managed) and Amazon Bedrock, set their own retirement schedules, so a model’s lifecycle status and dates can differ."
+        }
+      ],
+      "since": "2026-12-07"
+    },
+    {
+      "domain": "Evaluation, Testing & Optimization",
+      "d": 2,
+      "scenario": 0,
+      "q": "A pairwise judge compares the current prompt (A) with a candidate (B) and picks the better answer. The harness always lists the current prompt first. The candidate wins 38% of comparisons, yet a human panel that could not see the order prefers it in 55% of the same 150 pairs. What fix addresses the likely cause?",
+      "options": [
+        "Add a line to the judge prompt telling it to ignore the order in which the two answers are presented",
+        "Replace the judge with a larger model, since bigger judges are not affected by the order of presentation",
+        "Run each pair three times in the same order and take the majority verdict to cut random variation",
+        "Judge each pair in both orders and count a win only when the verdict survives the swap"
+      ],
+      "correct": 3,
+      "explain": "Always showing one answer first invites position bias, and the gap against order-blind human labels points to it. Judging both orders and counting only verdicts that survive the swap cancels the bias by design, and the share of flipped verdicts measures how bad it was. The prompt line is the near-miss: it costs nothing, but telling a model to ignore a bias does not remove it and you cannot tell whether it worked. Judge size does not guarantee order-neutrality, and repeating the same order gives a more confident version of the same bias.",
+      "constraint": "judge sees the current prompt first; humans with hidden order disagree",
+      "breaks": [
+        "asking the judge to ignore order does not remove the bias, and nothing shows whether it worked",
+        "judge size does not guarantee order-neutrality",
+        "repeats the same order, so the bias is kept and merely looks more certain",
+        null
+      ],
+      "facts": [],
+      "since": "2026-12-07"
+    },
+    {
+      "domain": "Evaluation, Testing & Optimization",
+      "d": 3,
+      "scenario": 0,
+      "q": "The new assistant's answers are about 40% longer than the old one's. A judge from the same model family as the assistant scores the new answers 0.7 points higher on a 5-point scale, yet a 200-item human-labelled sample shows no quality gain. Which response is best?",
+      "options": [
+        "Calibrate against the human labels, control for answer length, and add a judge from another model family",
+        "Keep the judge scores as the headline metric, since a consistent 0.7 gain across thousands of items cannot be noise",
+        "Have the judge write out its reasoning before it scores, which keeps it from favouring longer answers",
+        "Drop the human labels and trust the judge from now on, since labelling is costly and the judge scores are repeatable"
+      ],
+      "correct": 0,
+      "explain": "Longer answers and a same-family judge point to verbosity and self-preference bias, and the human sample says the gain is not real. Calibrating the judge on human labels, controlling for length (for example with length-matched pairs and a rubric that penalises padding), and cross-checking with a judge from another family attacks each suspected bias and measures the result. Trusting a consistent gain is the near-miss: consistency shows low noise, not low bias, since a biased judge is consistently biased. Reasoning before scoring does not remove a preference for length, and dropping the humans removes the only independent reference.",
+      "constraint": "longer answers, same-family judge, humans see no gain",
+      "breaks": [
+        null,
+        "consistency shows low noise, not low bias",
+        "a written rationale does not remove a preference for longer answers",
+        "removes the only independent reference to calibrate the judge against"
+      ],
+      "facts": [],
+      "since": "2026-12-07"
+    },
+    {
+      "domain": "Solution Design & Architecture",
+      "d": 1,
+      "scenario": 0,
+      "q": "A team wants nightly research agents that work for several hours, read and write files and run code. They want to operate no containers and write no agent loop, and the data may go to Anthropic's API with no special handling. Which agent runtime fits best?",
+      "options": [
+        "A Messages API loop that the team writes, run from its own job queue on a worker fleet that it operates",
+        "Claude Managed Agents with an Anthropic-managed cloud environment",
+        "The Agent SDK in a Kubernetes deployment, with session transcripts moved to a shared volume that the team manages",
+        "Headless Claude Code started from a cron job on an existing build server that the team already runs and patches"
+      ],
+      "correct": 1,
+      "explain": "The constraints are long-running work, no loop to write and nothing to host, with no data-handling limits to complicate it. Managed Agents provides the harness and runs tools in a sandbox that Anthropic operates. The Messages API loop is the near-miss: it gives the most control and works, but the team then owns the loop, the state and the workers, which is exactly what it wants to avoid. The Agent SDK and headless Claude Code both run a local process with state on disk that the team must host, persist and scale.",
+      "constraint": "hours-long agents; no loop to write; no containers to operate; no data-handling limits",
+      "breaks": [
+        "the team would own the loop, the state and the workers it wants to avoid",
+        null,
+        "a local subprocess with state on disk that the team must host, persist and scale",
+        "a local subprocess on a server the team still has to run and patch"
+      ],
+      "facts": [
+        {
+          "url": "https://platform.claude.com/docs/en/managed-agents/overview",
+          "quote": "Instead of building your own agent loop, tool execution, and runtime, you get a fully managed environment where Claude can read files, run commands, browse the web, and run code securely."
+        },
+        {
+          "url": "https://platform.claude.com/docs/en/managed-agents/overview",
+          "quote": "| **Best for** | Custom agent loops and fine-grained control | Long-running tasks and asynchronous work |"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/agent-sdk/hosting",
+          "quote": "Every running agent is a long-lived process tied to local state, which shapes how you allocate resources, persist sessions, and scale across tenants."
+        }
+      ],
+      "since": "2026-12-07"
+    },
+    {
+      "domain": "Solution Design & Architecture",
+      "d": 3,
+      "scenario": 0,
+      "q": "A health-data processor has a zero-data-retention arrangement with Anthropic and cannot change it. It wants Anthropic to run the agent loop so its team writes no loop and holds no session state, but it can run worker hosts for tool execution. Which design fits?",
+      "options": [
+        "Claude Managed Agents with an Anthropic cloud environment, deleting each session's transcript as soon as its task completes",
+        "The Agent SDK in the company's own container fleet, with session transcripts kept on encrypted local disks inside its network",
+        "Claude Managed Agents with a self-hosted sandbox, where the company's workers run the tool calls",
+        "A Messages API loop written by the team, with all conversation state held in the team's own database inside its network"
+      ],
+      "correct": 2,
+      "explain": "Two constraints decide this: zero data retention, and Anthropic running the loop. Managed Agents is not ZDR-eligible except for self-hosted Managed Agents, and with a self-hosted sandbox Claude still runs on Anthropic's side while the company's workers execute the tools. The cloud environment is the near-miss: it fits the hosted-loop wish and deleting transcripts looks like retention control, but sessions are stateful resources and the arrangement does not cover them, so deletion afterwards is clean-up-later. The Agent SDK and a Messages API loop both satisfy retention but make the team own the loop and session state.",
+      "constraint": "zero data retention must hold; Anthropic runs the loop; the company can run workers",
+      "breaks": [
+        "not ZDR-eligible; deleting transcripts afterwards is clean-up-later",
+        "the team would own the agent loop and session state it wants to avoid",
+        null,
+        "the team would own the agent loop and session state it wants to avoid"
+      ],
+      "facts": [
+        {
+          "url": "https://platform.claude.com/docs/en/managed-agents/overview",
+          "quote": "Not eligible for ZDR, except for self-hosted Managed Agents. Sessions are stateful resources; transcripts persist until you delete them."
+        },
+        {
+          "url": "https://platform.claude.com/docs/en/managed-agents/choosing-an-environment",
+          "quote": "Self-hosted sandbox: You run the sandbox on your own infrastructure. Claude still runs on Anthropic’s side and determines which tool to call next."
+        }
+      ],
+      "since": "2026-12-07"
+    },
+    {
+      "domain": "Solution Design & Architecture",
+      "d": 2,
+      "scenario": 0,
+      "q": "A prototype uses Claude Managed Agents on the first-party Claude API. The bank's risk team now requires that all model traffic stay on Amazon Bedrock, and the project lead says to just change the endpoint. What should the architect tell them?",
+      "options": [
+        "Managed Agents is not offered on Bedrock, so the team must own the agent loop and session state",
+        "Bedrock supports Managed Agents with the same features, so only the endpoint and credentials need to change at go-live",
+        "Moving the prototype to a self-hosted sandbox lets Managed Agents run inside the bank's own Bedrock account and keep its features",
+        "Keep Managed Agents on the Claude API for agent work and send it only non-sensitive prompts, so that Bedrock is not needed for it"
+      ],
+      "correct": 0,
+      "explain": "The residency-style requirement binds, and the runtime has to follow the surface. Bedrock does not offer Managed Agents, so the design changes to a loop the team owns (Messages API loop or Agent SDK) and the team must accept owning state and operations; this should be raised before commitments are made. A self-hosted sandbox is the near-miss: it moves tool execution onto your hosts, but Claude still runs on Anthropic's side and the sandbox is part of Managed Agents, so it does not exist on Bedrock. A change of endpoint ignores the gap, and splitting traffic breaks the requirement that all model traffic stays on Bedrock.",
+      "constraint": "all model traffic must stay on Amazon Bedrock; prototype depends on Managed Agents",
+      "breaks": [
+        null,
+        "Bedrock lists Managed Agents among unsupported features",
+        "a self-hosted sandbox is part of Managed Agents, and Claude still runs on Anthropic's side",
+        "sends model traffic off Bedrock, breaking the requirement"
+      ],
+      "facts": [
+        {
+          "url": "https://platform.claude.com/docs/en/build-with-claude/claude-in-amazon-bedrock",
+          "quote": "* Claude Managed Agents"
+        },
+        {
+          "url": "https://platform.claude.com/docs/en/managed-agents/overview",
+          "quote": "Claude Managed Agents is also available on Claude Models on Google Cloud (Anthropic managed) and Claude Platform on AWS"
+        },
+        {
+          "url": "https://platform.claude.com/docs/en/managed-agents/choosing-an-environment",
+          "quote": "Self-hosted sandbox: You run the sandbox on your own infrastructure. Claude still runs on Anthropic’s side and determines which tool to call next."
+        }
+      ],
+      "since": "2026-12-07"
+    },
+    {
+      "domain": "Governance, Safety & Risk Management",
+      "d": 2,
+      "scenario": 0,
+      "q": "A research agent uses a third-party MCP server that fetches web pages, and it also holds a send_email tool. One fetched page contains text telling the agent to email the customer list to an outside address. Which change best limits the damage from this kind of attack?",
+      "options": [
+        "Add a line to the system prompt telling the model to ignore any instructions that appear inside tool results",
+        "Filter tool results for the phrase 'ignore previous instructions' or close variants before they are passed to the model",
+        "Switch the agent to the largest available model, since larger models resist embedded instructions much better",
+        "Restrict send_email in code to approved recipients and route all others to a person, whatever the model asks"
+      ],
+      "correct": 3,
+      "explain": "Text from a tool result is untrusted input, and a model can be steered by it. The control that holds is one the model cannot talk its way past: tool code that allows only approved recipients and routes everything else to a person, so a successful injection still cannot exfiltrate the list. The system prompt line is the near-miss: telling the model to treat results as data is good practice, but it makes the prompt the security boundary, which injection is built to defeat. A phrase filter misses every rewording, and model size is not an authorisation control.",
+      "constraint": "untrusted MCP tool result can steer an agent that holds an outbound email tool",
+      "breaks": [
+        "makes the prompt the security boundary, which injection is designed to defeat",
+        "a phrase filter misses every rewording",
+        "model size is not an authorisation control",
+        null
+      ],
+      "facts": [
+        {
+          "url": "https://code.claude.com/docs/en/mcp",
+          "quote": "Servers that fetch external content can expose you to"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/security",
+          "quote": "Prompt injection is a technique where an attacker attempts to override or manipulate an AI assistant's instructions by inserting malicious text."
+        }
+      ],
+      "since": "2026-12-07"
+    },
+    {
+      "domain": "Governance, Safety & Risk Management",
+      "d": 3,
+      "scenario": 0,
+      "q": "Forty engineers will install a community Claude Code plugin that bundles three Skills, an MCP server and a hook, and their sessions hold production credentials. Which TWO controls best reduce the risk? Select TWO.",
+      "options": [
+        "Install it once each Skill's description matches what the plugin says it does, since a matching description shows the code is safe",
+        "Review every bundled file (SKILL.md, scripts, hooks, MCP configuration) before admitting it to an internal marketplace",
+        "Trust the bundled MCP server because Anthropic security-audits every server before it is listed, so it needs no review of its own",
+        "Pin the reviewed version and re-review on each change, because anything it fetches or depends on can change after approval"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explain": "A plugin runs with the installer's privileges, so the control is trust established by inspection and kept by versioning: review everything it bundles before admission, then pin the reviewed version and re-review on change, since even a trustworthy Skill can be compromised through dependencies that change later. Matching descriptions is the near-miss: a description states a purpose, but a malicious Skill can direct tools in ways that do not match it, so behaviour must be checked in the files. Anthropic does not security-audit or manage MCP servers, so the third option rests on a false premise.",
+      "constraint": "third-party plugin with Skills, MCP server and hook; production credentials in sessions",
+      "breaks": [
+        "a description states a purpose; a malicious Skill can act otherwise",
+        null,
+        "Anthropic does not security-audit or manage any MCP server",
+        null
+      ],
+      "facts": [
+        {
+          "url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
+          "quote": "Use Skills only from trusted sources: those you created yourself or obtained from Anthropic."
+        },
+        {
+          "url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
+          "quote": "Even trustworthy Skills can be compromised if their external dependencies change over time."
+        },
+        {
+          "url": "https://code.claude.com/docs/en/security",
+          "quote": "does not security-audit or manage any MCP server"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/plugins",
+          "quote": "Whatever the tier, a plugin you install can run code with your user privileges."
+        }
+      ],
+      "since": "2026-12-07"
+    },
+    {
+      "domain": "Solution Design & Architecture",
+      "d": 1,
+      "scenario": 0,
+      "q": "A claims team maps its denial-letter process: extract facts from the claim file, check them against policy wording, draft the denial rationale, decide whether to deny, and send the letter. A denial cuts a claimant's income and is hard to reverse once issued. Which assignment is best justified?",
+      "options": [
+        "Claude extracts, checks and drafts; the adjuster reviews, decides and owns each denial before the letter sends",
+        "Claude performs every step, and an adjuster audits a 5% sample of denials afterwards, since extraction accuracy is high",
+        "An adjuster performs every step by hand, since a denial is high stakes and Claude should take no part in any of it",
+        "Claude decides denials under a set dollar amount while adjusters decide the rest, because small denials carry little risk"
+      ],
+      "correct": 0,
+      "explain": "Assign by reversibility, stakes and accountability. Extraction, policy checks and drafting are checkable and reversible, so Claude can do them; the denial decision is hard to reverse, falls on the claimant, and needs an accountable person, so the adjuster retains it. Sampling afterwards is the near-miss: audit catches patterns but cannot undo a wrongful denial that has already been sent. Doing everything by hand discards work Claude does reliably under review, and splitting by dollar amount measures the insurer's exposure rather than the claimant's, so small denials still need an owner.",
+      "constraint": "denial is hard to reverse and a person must be accountable",
+      "breaks": [
+        null,
+        "an audit after the fact cannot undo a wrongful denial already sent",
+        "discards checkable work Claude can do reliably under review",
+        "dollar size measures the insurer's exposure, not the harm to the claimant, and leaves small denials without an owner"
+      ],
+      "facts": [],
+      "since": "2026-12-07"
+    },
+    {
+      "domain": "Developer Productivity & Operational Enablement",
+      "d": 2,
+      "scenario": 0,
+      "q": "A nightly Claude Code job opens dependency-upgrade pull requests, and a second Claude agent reviews and approves them. When CI passes they merge automatically. After an outage, no engineer can explain the change that caused it, and nobody was accountable for approving it. Which control best preserves human ownership of AI-written code?",
+      "options": [
+        "Label every pull request 'AI-generated' so that reviewers know which changes deserve a closer look from them",
+        "Require a named human's approval on branch protection for every merge, with that person on record as its owner",
+        "Raise the test-coverage threshold and add a second AI reviewer from a different model family before any merge happens",
+        "Make the nightly job's service account the code owner so that every change has one traceable author in the log"
+      ],
+      "correct": 1,
+      "explain": "Ownership means a named person understood the change and accepted responsibility for it. A required human approval enforced in branch protection puts a person on record for every merge, whoever or whatever wrote the code. The label is the near-miss: it adds information, but it does not require anyone to read or own the change. More AI review and stricter coverage improve checks, yet an AI reviewer cannot be accountable, and a service account as code owner records an author without any person who answers for the change.",
+      "constraint": "auto-merged AI changes, no accountable human, no one can explain the change",
+      "breaks": [
+        "informs reviewers but requires no one to read or own the change",
+        null,
+        "better checks, but an AI reviewer cannot be accountable for a change",
+        "a service account is an author, not a person who answers for the change"
+      ],
+      "facts": [],
+      "since": "2026-12-07"
+    },
+    {
+      "domain": "Governance, Safety & Risk Management",
+      "d": 2,
+      "scenario": 0,
+      "q": "A SaaS vendor runs the Agent SDK for 200 customers in shared containers. A contract requires that no customer's data or context can appear in another customer's session. By default the SDK loads settings and CLAUDE.md files from disk, and all sessions share one working directory. Which design meets the obligation?",
+      "options": [
+        "Keep the shared directory, prefix each customer's files with a tenant ID, and instruct the model not to read or open any other tenant's files in that directory",
+        "Keep the shared setup and delete each tenant's transcripts and memory files from disk in a nightly clean-up job",
+        "Give each tenant its own working and config directories, skip filesystem settings and auto memory, add per-tenant egress rules",
+        "Add a system prompt rule saying that information about one customer must not be revealed to a different customer"
+      ],
+      "correct": 2,
+      "explain": "Tenant isolation is a structural control: separate working and config directories, no shared settings or memory loaded from disk, and per-tenant egress rules, so one tenant's context cannot be reached rather than merely discouraged. Prefixed files plus an instruction is the near-miss: it names the boundary but leaves everything readable in one directory, so isolation rests on the model obeying. A nightly clean-up leaves the leak window open between runs, and a prompt rule is behaviour, not isolation, so none of the other options can be shown to an auditor as a control.",
+      "constraint": "contract forbids any cross-customer context; defaults share disk state",
+      "breaks": [
+        "isolation depends on the model obeying, while all files stay readable",
+        "clean-up-later: the leak window stays open between runs",
+        null,
+        "behaviour, not isolation; nothing enforces it"
+      ],
+      "facts": [
+        {
+          "url": "https://code.claude.com/docs/en/agent-sdk/hosting",
+          "quote": "In a shared container that serves multiple tenants, those files can leak one tenant's context into another tenant's session."
+        },
+        {
+          "url": "https://code.claude.com/docs/en/agent-sdk/hosting",
+          "quote": "Use a per-tenant working directory. Pass `cwd` explicitly on every `query()` call."
+        },
+        {
+          "url": "https://code.claude.com/docs/en/agent-sdk/hosting",
+          "quote": "Apply per-tenant egress rules at your proxy"
+        }
+      ],
+      "since": "2026-12-07"
+    }
+  ]
+}
