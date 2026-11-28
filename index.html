@@ -489,7 +489,17 @@
   .tutor-btn:hover { border-color: var(--lime); color: var(--lime); }
   .tutor-btn.copied { background: var(--lime-dim); border-color: var(--lime); color: var(--lime); }
   .fb-constraint { margin-bottom: 8px; padding: 6px 10px; border-left: 3px solid var(--amber); background: var(--surface); border-radius: 6px; }
-  .fb-tools { margin-top: 10px; }
+  .fb-tools { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+  /* Learn more panel (video-course questions only) */
+  .lm-wrap { margin-top: 10px; }
+  .lm-panel { margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); font-size: 0.86rem; line-height: 1.55; overflow-wrap: anywhere; }
+  .lm-panel[hidden] { display: none; }
+  .lm-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .lm-tab { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; font-weight: 600; font-family: inherit; cursor: pointer; min-height: 32px; }
+  .lm-tab[aria-selected="true"] { background: var(--lime-dim); color: var(--lime); border-color: var(--lime); }
+  .lm-text { color: var(--text); }
+  .lm-watch { display: inline-block; margin-top: 8px; color: var(--lime); font-weight: 700; font-size: 0.85rem; text-decoration: none; }
+  .lm-watch:hover { text-decoration: underline; }
   .len-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 12px; font-size: 0.82rem; color: var(--text-dim); }
   .len-row .lbl { font-weight: 600; }
   .len-grid { gap: 8px 22px; }
@@ -1655,9 +1665,11 @@ async function openDec7() {
   document.getElementById('dec7Close')?.addEventListener('click', close);
 }
 
-function startVideoPractice(questions, title) {
+function startVideoPractice(questions, title, episodes) {
   if (!questions.length) return;
-  const qs = questions.map(q => ({ ...q, domain: q.domain || title }));
+  const vid = {};
+  (episodes || []).forEach(e => { vid[e.n] = e.videoId; });
+  const qs = questions.map(q => ({ ...q, domain: q.domain || title, videoId: vid[q.episode] || null }));
   // Follows the user's Instant feedback toggle, like the chapter drill; never changes it.
   startPaper('videoCourse', prepQuestions(qs), false);
 }
@@ -1730,10 +1742,10 @@ async function renderVideoTab() {
   app.querySelectorAll('[data-vc-course]').forEach(b => b.addEventListener('click', () => { vc.courseId = b.dataset.vcCourse; renderVideoTab(); window.scrollTo({ top: 0 }); }));
   document.getElementById('vcBack')?.addEventListener('click', () => { vc.courseId = null; renderVideoTab(); });
   if (course) {
-    document.getElementById('vcAll')?.addEventListener('click', () => startVideoPractice(course.questions || [], course.title));
+    document.getElementById('vcAll')?.addEventListener('click', () => startVideoPractice(course.questions || [], course.title, course.episodes));
     app.querySelectorAll('[data-vc-ep]').forEach(b => b.addEventListener('click', () => {
       const n = Number(b.dataset.vcEp);
-      startVideoPractice((course.questions || []).filter(q => q.episode === n), course.title);
+      startVideoPractice((course.questions || []).filter(q => q.episode === n), course.title, course.episodes);
     }));
     app.querySelectorAll('[data-vc-toggle]').forEach(b => b.addEventListener('click', () => {
       const k = course.id + ':' + b.dataset.vcToggle, panel = b.closest('.vc-ep').querySelector('.vc-panel');
@@ -2169,6 +2181,52 @@ document.addEventListener('click', async (e) => {
   setTimeout(() => { b.textContent = old; b.classList.remove('copied'); }, 1600);
 });
 
+const LM_KEY = 'ccaf_learnmore_lang';
+const lmOpen = new WeakSet();
+function lmLang() { try { return localStorage.getItem(LM_KEY) === 'hi' ? 'hi' : 'en'; } catch { return 'en'; } }
+function lmSetLang(l) { try { localStorage.setItem(LM_KEY, l); } catch {} }
+
+// "Learn more" button + inline panel; empty for any question without learnMore.
+function learnMoreHtml(q, i) {
+  const lm = q && q.learnMore;
+  if (!lm || (!lm.en && !lm.hi)) return null;
+  const lang = lmLang();
+  const open = lmOpen.has(q);
+  const hasT = q.source && q.source.t != null && Number.isFinite(Number(q.source.t));
+  const watch = q.videoId && hasT
+    ? `<a class="lm-watch" href="https://www.youtube.com/watch?v=${encodeURIComponent(q.videoId)}&t=${Math.max(0, Math.floor(Number(q.source.t)))}s" target="_blank" rel="noopener">Watch this part</a>` : '';
+  const tab = (k, label) => `<button type="button" class="lm-tab" role="tab" data-lm-tab="${k}" aria-selected="${lang === k}">${label}</button>`;
+  return { btn: `<button type="button" class="tutor-btn lm-btn" data-lm="${i}" aria-expanded="${open}">Learn more</button>`,
+    panel: `<div class="lm-panel" data-lm-panel="${i}" ${open ? '' : 'hidden'}>
+      <div class="lm-tabs" role="tablist">${tab('en', 'English')}${tab('hi', 'Hinglish')}</div>
+      <div class="lm-text">${escapeHtml(lm[lang] || lm.en || lm.hi)}</div>${watch}</div>` };
+}
+function lmBtn(q, i) { const h = learnMoreHtml(q, i); return h ? h.btn : ''; }
+function lmPanel(q, i) { const h = learnMoreHtml(q, i); return h ? h.panel : ''; }
+
+document.addEventListener('click', (e) => {
+  const tb = e.target.closest('[data-lm-tab]');
+  const b = e.target.closest('[data-lm]');
+  if (!tb && !b) return;
+  if (b) {
+    const i = Number(b.dataset.lm), q = state.questions[i];
+    if (!q) return;
+    const open = !lmOpen.has(q);
+    if (open) lmOpen.add(q); else lmOpen.delete(q);
+    document.querySelectorAll('[data-lm="' + i + '"]').forEach(x => x.setAttribute('aria-expanded', open));
+    document.querySelectorAll('[data-lm-panel="' + i + '"]').forEach(x => { x.hidden = !open; });
+    return;
+  }
+  const lang = tb.dataset.lmTab;
+  lmSetLang(lang);
+  document.querySelectorAll('[data-lm-panel]').forEach(p => {
+    const pq = state.questions[Number(p.dataset.lmPanel)];
+    if (!pq || !pq.learnMore) return;
+    p.querySelector('.lm-text').textContent = pq.learnMore[lang] || pq.learnMore.en || pq.learnMore.hi;
+    p.querySelectorAll('[data-lm-tab]').forEach(t => t.setAttribute('aria-selected', t.dataset.lmTab === lang));
+  });
+});
+
 function tutorBtn(i) {
   return `<button type="button" class="tutor-btn" data-tutor="${i}" title="Copy a prompt that makes Claude coach you on this question">Copy tutor prompt</button>`;
 }
@@ -2200,7 +2258,8 @@ function trapCardHtml(q, i) {
       <div class="trap-row picked"><span class="tr-lbl">You picked</span>${pickedHtml}${breaksHtml}</div>
       <div class="trap-row correct"><span class="tr-lbl">Correct answer${q.correct.length > 1 ? 's' : ''}</span>${q.correct.map(o => `<div>${LETTERS[o]}. ${q.options[o]}</div>`).join('')}</div>
       <div class="review-explain"><b style="color:var(--lime)">Why:</b> ${q.explain}</div>
-      <div class="trap-actions">${tutorBtn(i)}</div>
+      <div class="trap-actions">${tutorBtn(i)}${lmBtn(q, i)}</div>
+      ${lmPanel(q, i)}
     </div>`;
 }
 
@@ -2230,7 +2289,8 @@ function renderExam() {
          ${q.constraint ? `<div class="fb-constraint"><b>Deciding detail:</b> ${escapeHtml(q.constraint)}</div>` : ''}
          ${breakLines}
          ${q.explain ? `<div class="fb-explain">${q.explain}</div>` : ''}
-         <div class="fb-tools">${tutorBtn(state.current)}</div>
+         <div class="fb-tools">${tutorBtn(state.current)}${lmBtn(q, state.current)}</div>
+         ${lmPanel(q, state.current)}
        </div>`;
   })() : '';
   const side = document.getElementById('explainSide');

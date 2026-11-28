@@ -44,7 +44,15 @@
    "explain": "PLACEHOLDER explanation.",
    "d": 2,
    "domain": "Placeholder domain",
-   "episode": 1
+   "episode": 1,
+   "learnMore": {
+    "en": "PLACEHOLDER simple explanation in English.",
+    "hi": "PLACEHOLDER simple explanation Hinglish mein, Hindi Latin script mein aur tech terms English mein."
+   },
+   "source": {
+    "episode": 1,
+    "t": 95
+   }
   },
   {
    "q": "PLACEHOLDER question 1 for episode 1?",
@@ -58,7 +66,15 @@
    "explain": "PLACEHOLDER explanation.",
    "d": 2,
    "domain": "Placeholder domain",
-   "episode": 1
+   "episode": 1,
+   "learnMore": {
+    "en": "PLACEHOLDER simple explanation in English.",
+    "hi": "PLACEHOLDER simple explanation Hinglish mein, Hindi Latin script mein aur tech terms English mein."
+   },
+   "source": {
+    "episode": 1,
+    "t": 95
+   }
   },
   {
    "q": "PLACEHOLDER question 0 for episode 2?",
