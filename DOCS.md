@@ -247,7 +247,7 @@ Architect Foundations, Architect Professional, Claude Code Foundations, Scenario
 Mock Exam) and shows all seven in one row from 1180px up; below that it wraps to 3 columns, then 1.
 
 ### Exam length (Architect Professional)
-A chip row above the Exam Path picks **60**, **63 (until 6 Dec)** or **70 (from 7 Dec)** items; 70 is the default. 63 and 70 get the
+A chip row above the Exam Path picks **60**, **63 (until 6 Dec)** or **70 (from 7 Dec)** items; the default is 63 until 7 Dec 2026 (local date), 70 after. The 63 paper is the v1.0 sitting and draws with `blueprintV10` (19/17/16/14/14/13/7); 60 and 70 use `blueprint` (v1.1 weights). The card's coloured bar follows the chosen length. 63 and 70 get the
 real 120-minute limit (not 2 min/question); 60 keeps the 2 min/question pace. The
 choice is remembered in `localStorage` (`ccap_length:<level>`). Both draw through
 the same domain-weighted draw and difficulty ramp (see below), scaled to the length; the choices
@@ -459,6 +459,8 @@ const SCENARIOS = { 1: …, 6: … };  // the six official exam scenarios
   string. Higher is likelier; unlisted scenarios default to 1.
 - `blueprint` — the scenario-mix bar on the level card. Percentages should total
   100.
+- `blueprintV10` — optional older weights, used instead of `blueprint` for a
+  63-item paper (Architect Professional guide v1.0, until 6 Dec 2026). Same labels.
 - `ready: false` — shows the level as "Soon" and disables it.
 - `section` — `"path"` (default: the gated Exam Path) or `"bank"` (Mock Exam
   Bank: always unlocked, compact cards without the blueprint bar).

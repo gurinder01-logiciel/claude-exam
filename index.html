@@ -731,6 +731,7 @@ async function loadLevels() {
       scenarioPick: lv.scenarioPick || null,
       scenarioWeights: lv.scenarioWeights || null,
       blueprint: lv.blueprint,
+      blueprintV10: lv.blueprintV10 || null,
       courses: Array.isArray(lv.courses) ? lv.courses : null,
       questions: Array.isArray(lv.questions) ? lv.questions : []
     };
@@ -744,7 +745,7 @@ async function loadLevels() {
 function warnBlueprintMismatch() {
   Object.entries(LEVELS).forEach(([key, lv]) => {
     if (!Array.isArray(lv.blueprint) || !lv.blueprint.length || lv.pool || lv.scenarioPick || !lv.questions.length) return;
-    if (blueprintApplies(lv, lv.questions)) return;
+    if (blueprintApplies(lv, lv.questions) && (!lv.blueprintV10 || blueprintApplies(lv, lv.questions, 63))) return;
     const labels = new Set(lv.blueprint.map(b => b.label));
     const domains = new Set(lv.questions.map(q => q.domain));
     const noQs = [...labels].filter(l => !domains.has(l));
@@ -768,13 +769,13 @@ const LENGTH_CHOICES = {
   developer: { options: [60, 70], real: 70, realSeconds: 120 * 60, label: 'Developer' },
   developerPro: { options: [60, 70], real: 70, realSeconds: 120 * 60, label: 'Developer Professional' },
   // CCAR-P guide v1.1: 70 items (60 scored + 10 unscored) from 7 Dec 2026; v1.0 was 63 items until 6 Dec.
-  architectPro: { options: [60, 63, 70], def: 70, real: 70, realAlso: [63], realSeconds: 120 * 60, label: 'Architect Professional', chipLabels: { 63: '63 (until 6 Dec)', 70: '70 (from 7 Dec)' } }
+  architectPro: { options: [60, 63, 70], def: () => (new Date() < new Date(2026, 11, 7) ? 63 : 70), real: 70, realAlso: [63], realSeconds: 120 * 60, label: 'Architect Professional', chipLabels: { 63: '63 (until 6 Dec)', 70: '70 (from 7 Dec)' } }
 };
 const LENGTH_KEY = 'ccap_length';
 function chosenLength(key) {
   const c = LENGTH_CHOICES[key];
   if (!c) return null;
-  let v = c.def || c.options[0];
+  let v = (typeof c.def === 'function' ? c.def() : c.def) || c.options[0];
   try { const s = Number(localStorage.getItem(LENGTH_KEY + ':' + key)); if (c.options.includes(s)) v = s; } catch {}
   return v;
 }
@@ -960,8 +961,13 @@ function buildScenarioPaper(bank, n, { pick, weights }) {
 // redistributed over the other domains in proportion to their pct. Levels whose
 // blueprint labels don't match question domains (older banks use loose labels)
 // are left to the plain ramped draw.
-function blueprintApplies(level, bank) {
-  const bp = level.blueprint;
+// The weights for a paper of n items: the 63-item sitting (CCAR-P guide v1.0, until 6 Dec)
+// uses `blueprintV10` when a level has one; every other length uses `blueprint`.
+function blueprintFor(level, n) {
+  return (n === 63 && Array.isArray(level.blueprintV10) && level.blueprintV10.length) ? level.blueprintV10 : level.blueprint;
+}
+function blueprintApplies(level, bank, n) {
+  const bp = blueprintFor(level, n);
   if (!Array.isArray(bp) || !bp.length || level.pool || level.scenarioPick) return false;
   const labels = new Set(bp.map(b => b.label));
   const domains = new Set(bank.map(q => q.domain));
@@ -994,7 +1000,7 @@ function drawByBlueprint(bank, n, blueprint) {
 }
 // Ramp-ordered paper of n questions, domain-weighted when the level allows it.
 function drawPaper(level, bank, n) {
-  const pool = blueprintApplies(level, bank) ? drawByBlueprint(bank, n, level.blueprint) : bank;
+  const pool = blueprintApplies(level, bank, n) ? drawByBlueprint(bank, n, blueprintFor(level, n)) : bank;
   return buildRampedPaper(pool, n);
 }
 
@@ -1947,7 +1953,7 @@ function renderStart() {
       const ramp = [c[1] && `${c[1]} easy`, c[2] && `${c[2]} medium`, c[3] && `${c[3]} hard`].filter(Boolean).join(' · ');
       meta = (bank.length > n ? `Fresh draw from ${bank.length} · ` : '') + ramp;
     }
-    const bp = lv.section !== 'bank' ? (lv.blueprint || []) : [];
+    const bp = lv.section !== 'bank' ? (blueprintFor(lv, LENGTH_CHOICES[key] ? paperSize(key, lv).n : null) || []) : [];
     const bpBar = bp.length ? `<div class="bp-bar" title="${bp.map(s => `${s.label} ${s.pct}%`).join(' · ')}">
         ${bp.map((s, si) => `<div class="bp-seg" style="width:${s.pct}%;background:${scenarioColors[si % scenarioColors.length]}"></div>`).join('')}
       </div>` : '';

@@ -35,6 +35,7 @@
       "pct": 7
     }
   ],
+  "blueprintV10": [{"label": "Integration", "pct": 19}, {"label": "Solution Design & Architecture", "pct": 17}, {"label": "Evaluation, Testing & Optimization", "pct": 16}, {"label": "Governance, Safety & Risk Management", "pct": 14}, {"label": "Stakeholder Communication & Lifecycle Management", "pct": 14}, {"label": "Claude Models, Prompting & Context Engineering", "pct": 13}, {"label": "Developer Productivity & Operational Enablement", "pct": 7}],
   "questions": [
     {
       "domain": "Solution Design & Architecture",
