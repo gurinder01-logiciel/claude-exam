@@ -1,0 +1,151 @@
+{
+ "posts": [
+  {
+   "slug": "dec-7-exam-changes",
+   "date": "2026-11-28",
+   "title": "What changes on 7 Dec 2026",
+   "summary": "CCDV-F and CCAR-P move to new guides on 7 Dec; CCAR-F does not change.\nNew format: 70 items (60 scored), scenario-based, same 120 minutes and 720 pass mark.\nBooked before 7 Dec: old guide. On or after: new guide plus the new topics.",
+   "exams": [
+    "CCDV-F",
+    "CCAR-P",
+    "CCAR-F",
+    "CCDV-P"
+   ],
+   "body": [
+    {
+     "type": "h",
+     "text": "Who is affected"
+    },
+    {
+     "type": "list",
+     "items": [
+      "CCAR-F (Architect Foundations): unchanged. The new guide version only touched registration and support wording.",
+      "CCDV-F (Developer Foundations): changes on 7 Dec. A new guide takes over.",
+      "CCAR-P (Architect Professional): changes on 7 Dec. A new guide takes over, and CCAR-F is the recommended preparation.",
+      "CCDV-P (Developer Professional): a new exam, but not a 7 Dec change. Its guide (v1.0) is the same before and after that date.",
+      "The video also says Associate Foundations changes that day. This app does not cover that exam."
+     ]
+    },
+    {
+     "type": "h",
+     "text": "Same vs changed (CCDV-F and CCAR-P)"
+    },
+    {
+     "type": "list",
+     "items": [
+      "Changed: 70 items, of which 60 are scored and 10 are unscored trial items you cannot spot. Before: 53 (CCDV-F) and 63 (CCAR-P), all scored.",
+      "Changed: items are scenario-based multiple choice, and each item says how many answers to pick.",
+      "Changed: domain weights move. CCDV-F Applications and Integration drops from 33.1% to 20%; Evaluation rises from 2.6% to 10%; Claude Code from 3.1% to 8%. CCAR-P Stakeholder Communication halves from 14% to 7%; Integration rises from 19% to 21%.",
+      "Same: 120 minutes, pass mark 720 out of 1000, fees ($125 CCDV-F, $175 CCAR-P).",
+      "Pacing: 70 items in 120 minutes is about 1 min 43 s per item. Answer every item, since the unscored ones look the same."
+     ]
+    },
+    {
+     "type": "h",
+     "text": "What to do"
+    },
+    {
+     "type": "list",
+     "items": [
+      "Sitting the exam before 7 Dec: keep preparing from the current guide (the one in force through 6 Dec). The new rules do not apply to you.",
+      "Sitting it on or after 7 Dec: prepare from the new guide. Your existing study still holds; add the new topics below.",
+      "Not booked yet: pick the date first, because the date decides which guide applies."
+     ]
+    },
+    {
+     "type": "h",
+     "text": "New topics for CCDV-F"
+    },
+    {
+     "type": "list",
+     "items": [
+      "Evaluation design: golden sets, regression tests, an LLM judge checked against human labels.",
+      "Integration resilience: streaming end events, error classes (rate-limit, overloaded, invalid, timeout), Files API.",
+      "Grounding and citation: answer from supplied documents, cite them, and say 'not found' when it is not there.",
+      "Claude Code extension: choose between a Skill, plugin, rules, hook, subagent or command, and package it.",
+      "Cost diagnosis: find the dominant cost driver, use layered or rolling cache breakpoints and batch."
+     ]
+    },
+    {
+     "type": "h",
+     "text": "New topics for CCAR-P"
+    },
+    {
+     "type": "list",
+     "items": [
+      "Deployment surface and agent runtime: API vs Bedrock, Vertex or Foundry; Messages loop, Agent SDK or Managed Agents.",
+      "Delegation: which steps go to Claude and which stay with people, by reversibility, stakes and accountability.",
+      "Reliability controls: rate limits, retry and backoff, idempotency for side effects, fallback routing.",
+      "Cache breakpoints, reasoning effort and context lifecycle (editing, memory tool, compaction).",
+      "Model version migration: pin, re-tune prompts, re-baseline evals or defer.",
+      "LLM-as-judge bias (position, verbosity, self-preference, drift) and trials per case.",
+      "Prompt injection surface: retrieved docs, tool results, MCP responses, third-party Skills.",
+      "Compliance as architecture (residency, retention, PII redaction, audit logs, tenant isolation) and keeping human ownership of AI-written code."
+     ]
+    },
+    {
+     "type": "h",
+     "text": "New topics for CCDV-P"
+    },
+    {
+     "type": "list",
+     "items": [
+      "Nothing to add for 7 Dec. It is a separate exam: 70 items (60 scored), 120 minutes, $175, pass 720, 8 domains. Developer Foundations is recommended first."
+     ]
+    },
+    {
+     "type": "h",
+     "text": "All 37 changes"
+    },
+    {
+     "type": "table",
+     "source": "video-courses/dec7.json"
+    },
+    {
+     "type": "h",
+     "text": "Sources"
+    },
+    {
+     "type": "link",
+     "label": "CCAR-P guide, from Dec 7 (v1.1, Dec 2026)",
+     "url": "https://cc.sj-cdn.net/instructor/6nizmqk8tpzpfjvt6qmmav7rh/public/1794946420/Claude_Certified_Architect_-_Professional_Exam_Guide_Updated_Dec_7.pdf"
+    },
+    {
+     "type": "link",
+     "label": "CCAR-P guide, through Dec 6 (v1.1, Nov 2026; v1.0 July 2026 content)",
+     "url": "https://cc.sj-cdn.net/instructor/6nizmqk8tpzpfjvt6qmmav7rh/public/1794946331/Claude_Certified_Architect_-_Professional_Exam_Guide.pdf"
+    },
+    {
+     "type": "link",
+     "label": "CCDV-F guide, from Dec 7 (v1.1, Dec 2026)",
+     "url": "https://cc.sj-cdn.net/instructor/6nizmqk8tpzpfjvt6qmmav7rh/public/1794946771/Claude_Certified_Developer_-_Foundations_Exam_Guide_Updated_Dec_7.pdf"
+    },
+    {
+     "type": "link",
+     "label": "CCDV-F guide, through Dec 6 (v1.1, Nov 2026)",
+     "url": "https://cc.sj-cdn.net/instructor/6nizmqk8tpzpfjvt6qmmav7rh/public/1794946716/Claude_Certified_Developer_-_Foundations_Exam_Guide.pdf"
+    },
+    {
+     "type": "link",
+     "label": "CCAR-F guide (v1.1, Nov 2026)",
+     "url": "https://cc.sj-cdn.net/instructor/6nizmqk8tpzpfjvt6qmmav7rh/public/1794946250/Claude_Certified_Architect_-_Foundations_Exam_Guide.pdf"
+    },
+    {
+     "type": "link",
+     "label": "CCDV-P guide (v1.0, Nov 2026)",
+     "url": "https://cc.sj-cdn.net/instructor/6nizmqk8tpzpfjvt6qmmav7rh/public/1794947325/Claude_Certified_Developer-Professional_Exam_Guide.pdf"
+    },
+    {
+     "type": "link",
+     "label": "Anthropic Partner Academy certifications",
+     "url": "https://anthropic-partners.skilljar.com/page/partner-certifications"
+    },
+    {
+     "type": "link",
+     "label": "Source video: aicertguides, Claude Certification Updates Dec 7 (plain-language walkthrough)",
+     "url": "https://www.youtube.com/watch?v=GU3pX7iYjRM"
+    }
+   ]
+  }
+ ]
+}

@@ -584,12 +584,26 @@ Worth knowing before you change things:
 
 The start screen has two tabs, **Exams** (everything else in this document) and **Video Courses**; the choice is remembered in `localStorage` (`ccaf_start_tab`). The tab is a separate, practice-only section: its files under `questions/video-courses/` are fetched only when the tab is opened, are never added to `LEVELS`, the Full Mock pool, the custom-quiz builder or the chapter drill, and a finished video quiz never posts to the leaderboard (it runs as `state.level = 'videoCourse'`, which is not a level). Quizzes use the normal engine with instant feedback on.
 
-A **What changes after Dec 7** button (Video Courses header, and a small one on the Exams hero) opens a modal table from `dec7.json`.
+A **What changes after Dec 7** button (Video Courses header, and a small one on the Exams hero) opens the Updates post `#updates/dec-7-exam-changes` (section 12); its table block reads `dec7.json`. The old modal is gone.
 
 Files in `questions/video-courses/`:
 
 - `index.json`: `{"courses": ["architect", "architect-pro", "developer"], "dec7": "dec7"}` (file names, without `.json`)
 - `<course>.json`: `{"id","title","channel","playlistUrl","episodes":[{"n","title","videoId","seconds","summary","keyPoints":[],"traps":[]}],"questions":[...]}`. Each question has the usual bank shape (`q`, `options`, `correct`, `explain`, `d`, `domain`) plus `"episode": <n>`.
-- `dec7.json`: `{"title","sourceVideoId","sourceUrl","items":[{"area","before","after","examImpact"}]}`
+- `dec7.json`: `{"title","sourceVideoId","sourceUrl","sources":[{"label","url"}],"items":[{"exam","area","before","after","examImpact","source"}]}` (read by the Updates table block; `index.json`'s `dec7` key is no longer read)
 
 Optional "Learn more" fields on a `<course>.json` question: `"learnMore": {"en": "<simple explanation>", "hi": "<same in Hinglish: Hindi in Latin script mixed with English tech terms>"}` and `"source": {"episode": <n>, "t": <seconds>}` (timestamp inside that episode's video). When `learnMore` exists, a **Learn more** button appears beside the explanation once the question is answered (instant feedback) and on the results review; with feedback off it shows on the results review only. It opens an inline panel with **English** (default) and **Hinglish** tabs; the last tab is remembered in `localStorage` (`ccaf_learnmore_lang`, wrapped in try/catch). If `source.t` is set, a "Watch this part" link opens `https://www.youtube.com/watch?v=<episode videoId>&t=<t>s` in a new tab. Questions without `learnMore` (all exam banks) render no button.
+
+---
+
+## 12. Updates (a small blog)
+
+Dated posts about exam changes. Hero button **📰 Updates** (next to How to prepare and Team leaderboard). Data: `questions/updates/index.json`, fetched on first open:
+
+`{"posts":[{"slug","date":"YYYY-MM-DD","title","summary","exams":["CCDV-F",...],"body":[blocks]}]}`
+
+`summary` may hold line breaks (shown as the post's lede). Blocks: `{"type":"p","text"}`, `{"type":"h","text"}`, `{"type":"list","items":[...]}`, `{"type":"table","source":"video-courses/dec7.json"}` (renders that file's `items` as a table with exam filter chips; `source` must be `folder/file.json` under `questions/`), `{"type":"link","label","url"}` (https only). All text is escaped.
+
+**Routing.** Same overlay pattern as the leaderboard (`#upView`, fixed, z-index 150, Back button, Esc). `#updates` lists posts newest first (date, title, summary, exam tags); `#updates/<slug>` shows one post. In-app opens push a history entry with `state.up`, so Back and the browser Back step back (post, list, closed); a deep link has no such entry, so Back rewrites the hash (post to list, list to cleared). Cold loads work after the name gate (`syncUpdatesFromHash`, run at boot and after the gate). Exam keyboard shortcuts are paused while the view is open. At 600px and below the table stacks rows as cards.
+
+**Adding a post.** Add an object to `posts`; nothing else to wire. The first post is `dec-7-exam-changes` (2026-11-28), written only from `dec7.json` (Anthropic guides) and the aicertguides video; where they disagree the guide wins (CCDV-P is a new exam, not a 7 Dec change, 120 minutes).

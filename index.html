@@ -59,6 +59,29 @@
   .lb-view[hidden] { display: none; }
   .lb-view .lb-wrap { max-width: 780px; margin: 0 auto; }
   body.lb-open { overflow: hidden; }
+  /* Updates: same overlay pattern as the leaderboard (#updates, #updates/<slug>). */
+  .up-view { position: fixed; inset: 0; z-index: 150; background: var(--bg); overflow-y: auto; padding: 20px 16px 60px; }
+  .up-view[hidden] { display: none; }
+  .up-view .up-wrap { max-width: 780px; margin: 0 auto; }
+  body.up-open { overflow: hidden; }
+  body.up-open .board-toggle { display: none !important; }
+  .up-post-link { display: block; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; font-family: inherit; color: var(--text); }
+  .up-post-link:hover { border-color: var(--lime); }
+  .up-date { font-size: 0.74rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+  .up-title { font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; margin: 2px 0 4px; }
+  .up-sum { font-size: 0.86rem; color: var(--text-dim); white-space: pre-line; }
+  .up-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .up-tags .chip { padding: 2px 9px; font-size: 0.7rem; }
+  .up-post h1 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; margin: 2px 0 8px; }
+  .up-post .up-lede { background: var(--lime-dim); border-left: 3px solid var(--lime); border-radius: 8px; padding: 10px 14px; margin: 10px 0 16px; white-space: pre-line; font-size: 0.92rem; }
+  .up-post h2 { font-family: var(--font-display); font-size: 1.05rem; margin: 20px 0 8px; }
+  .up-post p { margin: 0 0 10px; line-height: 1.55; }
+  .up-post ul { padding-left: 20px; margin: 0 0 10px; }
+  .up-post li { margin-bottom: 6px; line-height: 1.5; overflow-wrap: anywhere; }
+  .up-post a { color: var(--lime-dark); overflow-wrap: anywhere; }
+  .up-links { list-style: none; padding: 0; }
+  .up-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+  .up-chips .filter-btn { padding: 4px 11px; font-size: 0.78rem; }
   .lb-filter { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
   .lb-filter .filter-btn { padding: 4px 11px; font-size: 0.78rem; }
   /* Wide screens show the explanation in the left column, so hide the inline copy. */
@@ -603,10 +626,6 @@
   .vc-panel[hidden] { display: none; }
   .vc-panel h4 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin-bottom: 2px; }
   .vc-panel ul { padding-left: 18px; }
-  .vc-modal { position: fixed; inset: 0; background: rgba(20,24,28,0.55); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 16px; }
-  .vc-modal-card { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 16px; width: min(900px, 100%); max-height: 88vh; overflow: auto; padding: 18px 20px; }
-  .vc-modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
-  .vc-modal-head h2 { font-family: var(--font-display); font-size: 1.2rem; }
   .vc-table-wrap { overflow-x: auto; }
   .vc-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
   .vc-table th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); padding: 6px 8px; border-bottom: 2px solid var(--border); }
@@ -637,6 +656,15 @@
       <button class="icon-btn" id="lbBack">← Back</button>
     </div>
     <aside class="sidebar" id="board"></aside>
+  </div>
+</div>
+<div class="up-view" id="upView" hidden>
+  <div class="up-wrap">
+    <div class="topbar">
+      <div class="brand">Claude Certification <span>Updates</span></div>
+      <button class="icon-btn" id="upBack">← Back</button>
+    </div>
+    <div id="upBody"></div>
   </div>
 </div>
 <button class="board-toggle" id="boardToggle" aria-label="Open team leaderboard">🏆</button>
@@ -1120,14 +1148,14 @@ document.addEventListener('keydown', (e) => {
   // ←/→ move between questions during an exam — not while typing, and not
   // while a pause/confirm overlay is up.
   if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && state.screen === 'exam'
-      && !e.target.closest('input, textarea, select') && !document.querySelector('.overlay') && lbView.hidden) {
+      && !e.target.closest('input, textarea, select') && !document.querySelector('.overlay') && lbView.hidden && document.getElementById('upView').hidden) {
     e.preventDefault();
     goToQuestion(state.current + (e.key === 'ArrowRight' ? 1 : -1));
   }
   // N next, P previous, F flag for review. Plain keys only (no Ctrl/Cmd/Alt), never while typing,
   // and not while a pause/confirm overlay is up. Works after an answer is locked by instant feedback.
   if (state.screen === 'exam' && !e.ctrlKey && !e.metaKey && !e.altKey && !e.repeat
-      && !(e.target.closest && e.target.closest('input, textarea, select, [contenteditable]')) && !document.querySelector('.overlay') && lbView.hidden) {
+      && !(e.target.closest && e.target.closest('input, textarea, select, [contenteditable]')) && !document.querySelector('.overlay') && lbView.hidden && document.getElementById('upView').hidden) {
     const k = (e.key || '').toLowerCase();
     if (k === 'n') { e.preventDefault(); goToQuestion(state.current + 1); }
     else if (k === 'p') { e.preventDefault(); goToQuestion(state.current - 1); }
@@ -1345,6 +1373,122 @@ document.getElementById('boardToggle')?.addEventListener('click', openLeaderboar
 document.getElementById('lbBack')?.addEventListener('click', closeLeaderboard);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !lbView.hidden) closeLeaderboard(); });
 
+// ---- Updates view (#updates, #updates/<slug>) ----
+// Same overlay pattern as the leaderboard. In-app opens push a history entry (state.up), so the
+// browser Back button steps back; a deep link has no such entry, so Back rewrites the hash instead.
+const UP_BASE = './questions/updates/';
+const upView = document.getElementById('upView');
+const upBody = document.getElementById('upBody');
+let upData = null;
+let upTableCache = {};
+async function loadUpdates() {
+  if (upData) return upData;
+  const r = await fetch(UP_BASE + 'index.json', { cache: 'no-store' });
+  if (!r.ok) throw new Error('updates ' + r.status);
+  const j = await r.json();
+  upData = (j.posts || []).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  return upData;
+}
+function upSlug() {
+  const m = /^#updates(?:\/([\w-]+))?$/.exec(location.hash);
+  return m ? (m[1] || '') : null;
+}
+function fmtPostDate(d) {
+  const t = new Date(d + 'T00:00:00Z');
+  return isNaN(t) ? String(d) : t.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+}
+function upTags(exams) {
+  return (exams && exams.length) ? `<div class="up-tags">${exams.map(e => `<span class="chip">${escapeHtml(e)}</span>`).join('')}</div>` : '';
+}
+function upTableHtml(items, filter) {
+  const rows = items.filter(i => !filter || i.exam === filter);
+  return `<div class="vc-table-wrap"><table class="vc-table">
+    <thead><tr><th>Exam</th><th>Area</th><th>Before</th><th>After</th><th>What it means for the exam</th></tr></thead>
+    <tbody>${rows.map(i => `<tr><td data-h="Exam">${escapeHtml(i.exam || '')}</td><td data-h="Area">${escapeHtml(i.area || '')}</td><td data-h="Before">${escapeHtml(i.before || '')}</td><td data-h="After">${escapeHtml(i.after || '')}</td><td data-h="What it means">${escapeHtml(i.examImpact || '')}</td></tr>`).join('')}</tbody>
+  </table></div>`;
+}
+async function mountUpTable(host, source) {
+  if (!/^[\w-]+\/[\w-]+\.json$/.test(source || '')) { host.innerHTML = '<div class="vc-err">Table source is not valid.</div>'; return; }
+  host.innerHTML = '<p class="vc-note">Loading table…</p>';
+  try {
+    if (!upTableCache[source]) {
+      const r = await fetch('./questions/' + source, { cache: 'no-store' });
+      if (!r.ok) throw new Error(source + ' ' + r.status);
+      upTableCache[source] = (await r.json()).items || [];
+    }
+    const items = upTableCache[source];
+    const exams = [...new Set(items.map(i => i.exam).filter(Boolean))];
+    let f = '';
+    const draw = () => {
+      host.innerHTML = `<div class="up-chips">${['', ...exams].map(e => `<button class="filter-btn${e === f ? ' active' : ''}" data-exam="${escapeHtml(e)}">${e ? escapeHtml(e) : 'All'}</button>`).join('')}</div>` + upTableHtml(items, f);
+      host.querySelectorAll('[data-exam]').forEach(b => b.addEventListener('click', () => { f = b.dataset.exam; draw(); }));
+    };
+    draw();
+  } catch (err) {
+    host.innerHTML = `<div class="vc-err">Could not load the table (${escapeHtml(err.message)}).</div>`;
+  }
+}
+function upBlock(b) {
+  if (b.type === 'h') return `<h2>${escapeHtml(b.text || '')}</h2>`;
+  if (b.type === 'p') return `<p>${escapeHtml(b.text || '')}</p>`;
+  if (b.type === 'list') return `<ul>${(b.items || []).map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ul>`;
+  if (b.type === 'table') return `<div class="up-table" data-source="${escapeHtml(b.source || '')}"></div>`;
+  if (b.type === 'link') return /^https:\/\//.test(b.url || '') ? `<ul class="up-links"><li><a href="${escapeHtml(b.url)}" target="_blank" rel="noopener">${escapeHtml(b.label || b.url)}</a></li></ul>` : '';
+  return '';
+}
+async function renderUpdatesView() {
+  const slug = upSlug();
+  upView.scrollTop = 0;
+  upBody.innerHTML = '<p class="vc-note">Loading…</p>';
+  try {
+    const posts = await loadUpdates();
+    if (upSlug() !== slug) return;  // the hash moved while loading
+    const post = slug ? posts.find(p => p.slug === slug) : null;
+    if (slug && !post) { upBody.innerHTML = '<div class="vc-err">That post does not exist.</div>'; return; }
+    if (!post) {
+      upBody.innerHTML = posts.length ? posts.map(p => `<button class="up-post-link" data-slug="${escapeHtml(p.slug)}">
+        <div class="up-date">${escapeHtml(fmtPostDate(p.date))}</div><div class="up-title">${escapeHtml(p.title)}</div>
+        <div class="up-sum">${escapeHtml(p.summary || '')}</div>${upTags(p.exams)}</button>`).join('') : '<p class="vc-note">No updates yet.</p>';
+      upBody.querySelectorAll('[data-slug]').forEach(b => b.addEventListener('click', () => openUpdates(b.dataset.slug)));
+      return;
+    }
+    // Blocks that carry text from a data file are rendered as HTML strings; tables mount after.
+    // Consecutive link blocks sit in separate lists, which reads fine.
+    upBody.innerHTML = `<article class="up-post"><div class="up-date">${escapeHtml(fmtPostDate(post.date))}</div>
+      <h1>${escapeHtml(post.title)}</h1>${upTags(post.exams)}
+      <div class="up-lede">${escapeHtml(post.summary || '')}</div>${(post.body || []).map(upBlock).join('')}</article>`;
+    upBody.querySelectorAll('.up-table').forEach(h => mountUpTable(h, h.dataset.source));
+  } catch (err) {
+    upBody.innerHTML = `<div class="vc-err">Could not load updates (${escapeHtml(err.message)}).</div>`;
+  }
+}
+function showUpdates(on) {
+  on = Boolean(on && user.name);
+  upView.toggleAttribute('hidden', !on);
+  document.body.classList.toggle('up-open', on);
+  if (on) renderUpdatesView();
+}
+function openUpdates(slug) {
+  if (!user.name) return;
+  const h = '#updates' + (slug ? '/' + slug : '');
+  if (location.hash !== h) history.pushState({ up: 1 }, '', h);
+  showUpdates(true);
+}
+function upBack() {
+  if (history.state && history.state.up) { history.back(); return; }
+  if (upSlug()) { history.replaceState({ up: 0 }, '', '#updates'); showUpdates(true); return; }
+  history.replaceState(null, '', location.pathname + location.search);
+  showUpdates(false);
+}
+function syncUpdatesFromHash() {
+  const want = upSlug() !== null;
+  if (want && !user.name) return;
+  showUpdates(want);
+}
+window.addEventListener('hashchange', syncUpdatesFromHash);
+document.getElementById('upBack')?.addEventListener('click', upBack);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !upView.hidden) upBack(); });
+
 // Names are the only identity this app has, so they must be unique on the board.
 // Compared case- and whitespace-insensitively so "Jagtar Singh" can't shadow
 // "jagtar  singh". `except` lets the change-name flow keep your own name.
@@ -1390,6 +1534,7 @@ function renderNameGate(keepName = null) {
     renderStart();
     refreshBoard();
     syncLbFromHash();
+    syncUpdatesFromHash();
   };
   document.getElementById('nameGo').addEventListener('click', go);
   input.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
@@ -1663,7 +1808,7 @@ async function loadVideoCourses() {
   const get = async f => { const r = await fetch(VC_BASE + f + '.json', { cache: 'no-store' }); if (!r.ok) throw new Error(f + ' ' + r.status); return r.json(); };
   const idx = await get('index');
   const courses = await Promise.all((idx.courses || []).map(get));
-  vc.loaded = { courses, dec7Name: idx.dec7 || 'dec7' };
+  vc.loaded = { courses };
   return vc.loaded;
 }
 function fmtDur(sec) {
@@ -1680,36 +1825,7 @@ function wireTabs() {
   app.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
     setTab(b.dataset.tab); vc.courseId = null; renderStart();
   }));
-  app.querySelectorAll('[data-dec7]').forEach(b => b.addEventListener('click', openDec7));
-}
-
-async function openDec7() {
-  document.getElementById('dec7Modal')?.remove();
-  const m = document.createElement('div');
-  m.className = 'vc-modal'; m.id = 'dec7Modal';
-  m.innerHTML = `<div class="vc-modal-card" role="dialog" aria-modal="true" aria-label="What changes after Dec 7"><div class="vc-note">Loading…</div></div>`;
-  document.body.appendChild(m);
-  const close = () => m.remove();
-  m.addEventListener('click', e => { if (e.target === m) close(); });
-  document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); } });
-  const card = m.firstElementChild;
-  try {
-    const { dec7Name } = await loadVideoCourses();
-    const r = await fetch(VC_BASE + dec7Name + '.json', { cache: 'no-store' });
-    if (!r.ok) throw new Error('dec7 ' + r.status);
-    const d = await r.json();
-    const url = /^https:\/\//.test(d.sourceUrl || '') ? d.sourceUrl : (d.sourceVideoId ? 'https://www.youtube.com/watch?v=' + encodeURIComponent(d.sourceVideoId) : '');
-    card.innerHTML = `
-      <div class="vc-modal-head"><h2>${escapeHtml(d.title || 'What changes after Dec 7')}</h2><button class="icon-btn" id="dec7Close">✕ Close</button></div>
-      ${url ? `<p class="vc-note">Source: <a class="vc-link" href="${escapeHtml(url)}" target="_blank" rel="noopener">Watch the source video</a></p>` : ''}
-      <div class="vc-table-wrap"><table class="vc-table">
-        <thead><tr><th>Area</th><th>Before</th><th>After</th><th>What it means for the exam</th></tr></thead>
-        <tbody>${(d.items || []).map(i => `<tr><td data-h="Area">${escapeHtml(i.area || '')}</td><td data-h="Before">${escapeHtml(i.before || '')}</td><td data-h="After">${escapeHtml(i.after || '')}</td><td data-h="What it means for the exam">${escapeHtml(i.examImpact || '')}</td></tr>`).join('')}</tbody>
-      </table></div>`;
-  } catch (err) {
-    card.innerHTML = `<div class="vc-modal-head"><h2>What changes after Dec 7</h2><button class="icon-btn" id="dec7Close">✕ Close</button></div><div class="vc-err">Could not load this panel (${escapeHtml(err.message)}).</div>`;
-  }
-  document.getElementById('dec7Close')?.addEventListener('click', close);
+  app.querySelectorAll('[data-dec7]').forEach(b => b.addEventListener('click', () => openUpdates('dec-7-exam-changes')));
 }
 
 function startVideoPractice(questions, title, episodes) {
@@ -1864,6 +1980,7 @@ function renderStart() {
       </div>
       <div class="hero-actions">
         <button class="dec7-btn small" data-dec7 title="What changes in the exams after Dec 7">⚡ What changes after Dec 7</button>
+        <button class="btn ghost prep-link" id="updatesLink">📰 Updates</button>
         <button class="btn ghost prep-link" id="boardLink">🏆 Team leaderboard</button>
         ${RESOURCES ? `<button class="btn ghost prep-link" id="prepLink">📚 How to prepare</button>` : ''}
       </div>
@@ -1912,6 +2029,7 @@ function renderStart() {
   });
   document.getElementById('prepLink')?.addEventListener('click', renderPrepPage);
   document.getElementById('boardLink')?.addEventListener('click', openLeaderboard);
+  document.getElementById('updatesLink')?.addEventListener('click', () => openUpdates());
   document.getElementById('changeName')?.addEventListener('click', (e) => {
     e.preventDefault();
     renderNameGate(user.name);
@@ -2772,6 +2890,7 @@ async function boot() {
     renderStart();
     refreshBoard();
     syncLbFromHash();
+    syncUpdatesFromHash();
   } else {
     renderNameGate();
   }
