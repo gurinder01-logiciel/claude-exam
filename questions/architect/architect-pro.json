@@ -1,7 +1,7 @@
 {
   "key": "architectPro",
   "name": "Architect Professional",
-  "desc": "70 random questions from a 100-question CCAR-P bank: constraint-driven architecture trade-offs (multiple-choice and select-N), integration, evals, governance and stakeholder decisions across six Professional scenarios, weighted to the exam's seven-domain blueprint.",
+  "desc": "63 random questions (70 from 7 Dec) from a 100-question CCAR-P bank: constraint-driven architecture trade-offs (multiple-choice and select-N), integration, evals, governance and stakeholder decisions across six Professional scenarios, weighted to the exam's seven-domain blueprint.",
   "ready": true,
   "inPool": false,
   "count": 60,
