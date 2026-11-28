@@ -188,9 +188,9 @@ Turn it off for real exam conditions.
 
 **Start screen.** Compact cards so every exam fits on one screen: the Exam Path
 as three cards in a row, the Mock Exam Bank as a tile grid, then the quiz
-builder. How to prepare is a separate screen (📚 button by the title), and the
-team leaderboard sits at the bottom of the page (`.board-dock`, hidden during an
-exam on wide screens; still the 🏆 drawer at 1080px and below).
+builder. How to prepare and the team leaderboard are separate views, reached from
+the two buttons by the title (📚 How to prepare, 🏆 Team leaderboard); the start
+screen itself carries no leaderboard.
 
 **Moving between questions.** Besides Prev/Next under the card, round ‹ › arrows
 sit on either side of the question card, pinned at mid-screen (sticky inside a
@@ -267,13 +267,25 @@ exam frames them.
 ## 5. Leaderboard
 
 Each person enters a name once (remembered in their browser). Finished exams post
-to `/api/scores`, and the leaderboard (bottom of the start screen) shows **one row
+to `/api/scores`, and the leaderboard (its own view, see below) shows **one row
 per person per exam** — their best score on that exam, labelled `name-CODE` where
 CODE is a readable tag of at least 4 characters from `EXAM_CODES` (DEV-F, DEV-PRO, ARCH-F, ARCH-PRO, CC-FOUND,
 SCENARIO, FULL-MOCK, CORE-DRILL, ARCH-F-ES; Architect Mock N → ARCH-MOCKN). Scores store the exam's display
 name, so `LEGACY_EXAM_NAMES` maps renamed exams (Architect Scenarios, Mock Exam 1–6) to the current name
 before grouping — ranked by score, with
 "best of N" once they have sat it more than once. Your own rows are highlighted.
+When the scores hold more than one exam, a chip row (All + each exam present) filters
+the board; ranks are recomputed inside the filter (`lbFilter`, not remembered).
+
+**Where it lives.** The board is a full-screen view (`#lbView`, a fixed overlay with a
+Back button) at the URL hash **`#leaderboard`**, so it can be linked: opening it from
+the start-screen hero button pushes the hash, and the browser Back button (or the view's
+Back, or Esc) returns to where you were. A deep link to `#leaderboard` opens it right
+after the name gate; Back then clears the hash. It is an overlay rather than a screen so
+the 🏆 shortcut (floating, bottom-left, on the exam, paused and results screens) can open
+it mid-sitting without tearing the exam down; the timer keeps running and the N/P/F and
+arrow shortcuts are ignored while it is open. Code: `openLeaderboard`, `closeLeaderboard`,
+`syncLbFromHash`, `renderBoard`.
 
 Every attempt is retained in Redis, so **My history** — in the account menu at
 the top-right — opens a read-only view for the signed-in name: attempts, best
@@ -297,18 +309,15 @@ change-name flow exempts your own current name. This is a client-side guard
 only — `POST /api/scores` still accepts duplicates. Trade-off: clearing
 localStorage or switching browsers locks a person out of re-using their name.
 
-The sidebar sits on the **left** on desktop; below 1080px it becomes a drawer
-opened by the 🏆 button.
-
 ### Page layout
 
-On wide screens the shell is three columns: leaderboard on the left (`.sidebar`,
-placed there by `order: -1`), the main column in the middle, and the **How to
-prepare** panel on the right (`.prep`, sticky). Both side columns live outside
+On wide screens the shell is the main column plus, during an exam, the explanation
+column on the left (`.left-col`, via `order: -1`) and the question palette on the
+right (`.prep`, sticky). The leaderboard is not part of the shell; it is the `#lbView`
+overlay. Both side columns live outside
 `#app`, so they are not rewritten by the `render*()` functions — `syncPrep()`
 fills the prep panel and is called from `syncUserMenu()`, which already runs on
-every screen transition. The panel shows on the start screen only; during an
-exam it would compete with the question.
+every screen transition. The panel shows during an exam only (the question palette).
 
 Below 1340px there is no room for three columns, so `.prep` wraps to its own
 full-width row beneath the main column. Those overrides are declared *after* the
@@ -333,7 +342,7 @@ Validation: name ≥ 2 chars (trimmed, capped at 40), score a finite number
 
 If the API is unreachable — no Redis env vars, offline, or served from a plain
 static server — the leaderboard falls back to a local-only board and the sidebar
-says *"offline (this browser only)"*. **The exam is never blocked by leaderboard
+view says *"offline (this browser only)"*. **The exam is never blocked by leaderboard
 failure.** That's deliberate.
 
 ### No authentication
