@@ -1,13 +1,333 @@
 {
- "title": "What changes after Dec 7 (placeholder)",
- "sourceVideoId": "dQw4w9WgXcQ",
- "sourceUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+ "title": "What changes after Dec 7, 2026",
+ "sourceVideoId": "GU3pX7iYjRM",
+ "sourceUrl": "https://www.youtube.com/watch?v=GU3pX7iYjRM",
+ "sources": [
+  {
+   "label": "CCAR-P guide, from Dec 7 (v1.1, Dec 2026)",
+   "url": "https://cc.sj-cdn.net/instructor/6nizmqk8tpzpfjvt6qmmav7rh/public/1794946420/Claude_Certified_Architect_-_Professional_Exam_Guide_Updated_Dec_7.pdf"
+  },
+  {
+   "label": "CCAR-P guide, through Dec 6 (v1.1, Nov 2026; v1.0 July 2026 content)",
+   "url": "https://cc.sj-cdn.net/instructor/6nizmqk8tpzpfjvt6qmmav7rh/public/1794946331/Claude_Certified_Architect_-_Professional_Exam_Guide.pdf"
+  },
+  {
+   "label": "CCDV-F guide, from Dec 7 (v1.1, Dec 2026)",
+   "url": "https://cc.sj-cdn.net/instructor/6nizmqk8tpzpfjvt6qmmav7rh/public/1794946771/Claude_Certified_Developer_-_Foundations_Exam_Guide_Updated_Dec_7.pdf"
+  },
+  {
+   "label": "CCDV-F guide, through Dec 6 (v1.1, Nov 2026)",
+   "url": "https://cc.sj-cdn.net/instructor/6nizmqk8tpzpfjvt6qmmav7rh/public/1794946716/Claude_Certified_Developer_-_Foundations_Exam_Guide.pdf"
+  },
+  {
+   "label": "CCAR-F guide (v1.1, Nov 2026)",
+   "url": "https://cc.sj-cdn.net/instructor/6nizmqk8tpzpfjvt6qmmav7rh/public/1794946250/Claude_Certified_Architect_-_Foundations_Exam_Guide.pdf"
+  },
+  {
+   "label": "CCDV-P guide (v1.0, Nov 2026)",
+   "url": "https://cc.sj-cdn.net/instructor/6nizmqk8tpzpfjvt6qmmav7rh/public/1794947325/Claude_Certified_Developer-Professional_Exam_Guide.pdf"
+  },
+  {
+   "label": "Anthropic Partner Academy certifications",
+   "url": "https://anthropic-partners.skilljar.com/page/partner-certifications"
+  }
+ ],
  "items": [
   {
-   "area": "PLACEHOLDER",
-   "before": "PLACEHOLDER",
-   "after": "PLACEHOLDER",
-   "examImpact": "PLACEHOLDER"
+   "exam": "CCAR-P",
+   "area": "Item count",
+   "before": "63 items, all scored",
+   "after": "70 items: 60 scored, 10 unscored, unidentified",
+   "examImpact": "Treat every item as scored; pace about 1m43s per item.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "Item format",
+   "before": "Multiple-choice and multiple-response",
+   "after": "Scenario-based multiple-choice; each item states how many to select",
+   "examImpact": "Practise reading a scenario first; multi-select may still appear.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "Time, fee, pass score",
+   "before": "120 min, $175, 720/1000",
+   "after": "Unchanged",
+   "examImpact": "No change to timing strategy beyond more items.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "Prerequisites",
+   "before": "None",
+   "after": "None; CCAR-F recommended preparation",
+   "examImpact": "Assume CCAR-F scope (agents, MCP, Claude Code, context) as known.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "Domain weights: Integration",
+   "before": "19%",
+   "after": "21%",
+   "examImpact": "Largest domain; spend most study time here.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "Domain weights: Design, Eval, Governance",
+   "before": "17% / 16% / 14%",
+   "after": "18% / 17% / 16%",
+   "examImpact": "Governance gains most (+2); study compliance controls and injection.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "Domain 6 Stakeholder Communication & Lifecycle",
+   "before": "14%",
+   "after": "7%",
+   "examImpact": "Now smallest domain; SLAs, ADRs and handoff completeness need less time.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "Domain 7 and Domain 2 weights",
+   "before": "7% and 13%",
+   "after": "8% and 13%",
+   "examImpact": "Dev productivity +1; model/prompt/context unchanged.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "Objectives structure",
+   "before": "About 38 one-line tasks",
+   "after": "39 named skills with descriptions, phrased as analyse/evaluate/select",
+   "examImpact": "Expect diagnose-and-choose scenarios, not recall of definitions.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "New: deployment surface and agent runtime",
+   "before": "Not listed",
+   "after": "API vs Bedrock, Vertex, Foundry; Messages loop, Agent SDK, Managed Agents",
+   "examImpact": "Learn trade-offs: data residency, session state, sandboxing, custody.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "New: task delegation Claude vs humans",
+   "before": "Not listed",
+   "after": "Assign steps by reversibility, stakes, accountability",
+   "examImpact": "Practise justifying delegate, retain or collaborate per step.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "New: production reliability controls",
+   "before": "Monitoring only",
+   "after": "Rate limits, retry/backoff, idempotency for side effects, fallback routing",
+   "examImpact": "Know how to avoid duplicate effects (e.g. double payment) on retry.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "New: cache breakpoints, effort, context lifecycle",
+   "before": "Caching, token usage",
+   "after": "Cache breakpoints; reasoning effort; context editing, memory tool, compaction",
+   "examImpact": "Study stable-before-dynamic ordering and long-session strategies.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "New: model version migration",
+   "before": "Not listed",
+   "after": "Pin, re-tune prompts, re-baseline evals or defer, using deprecation timeline",
+   "examImpact": "Practise reading regression results against a deprecation date.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "New: LLM-as-judge bias, experiment design",
+   "before": "Eval datasets, A/B testing",
+   "after": "Position, verbosity, self-preference, judge drift; trials per case",
+   "examImpact": "Know how to separate config effect from run-to-run variance.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "New: prompt injection surface",
+   "before": "Guardrails and safety controls",
+   "after": "Retrieved docs, tool results, MCP responses, third-party Skills",
+   "examImpact": "Map untrusted entry points and the controls for each.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "Compliance wording",
+   "before": "Names GDPR, HIPAA, FedRAMP",
+   "after": "Architectural controls: residency, retention/ZDR, PII redaction, audit logs, tenant isolation",
+   "examImpact": "Map an obligation to controls; do not memorise regulations.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "Retrieval and Claude Code",
+   "before": "RAG chunking; Claude Code for teams",
+   "after": "Contextual retrieval; plugins, marketplaces, managed settings, permission modes",
+   "examImpact": "Know the six permission modes and plugin distribution.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-P",
+   "area": "New: accountability for AI-written code",
+   "before": "Debugging support",
+   "after": "Control preserving human ownership of AI-generated code",
+   "examImpact": "Study review gates and ownership for AI-assisted development.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCDV-F",
+   "area": "Item count",
+   "before": "53 items",
+   "after": "70 items: 60 scored, 10 unscored",
+   "examImpact": "Treat every item as scored; about 1m43s per item.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCDV-F",
+   "area": "Format, time, fee, pass score",
+   "before": "MC and multi-response; 120 min; $125; 720",
+   "after": "Scenario-based MC; 120 min; $125; 720",
+   "examImpact": "Timing unchanged; more items, so faster reading.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCDV-F",
+   "area": "Domain: Applications and Integration",
+   "before": "33.1%",
+   "after": "20%",
+   "examImpact": "Largest cut (-13.1); API mechanics matter less, resilience more.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCDV-F",
+   "area": "Domain: Eval, Testing, and Debugging",
+   "before": "2.6%",
+   "after": "10%",
+   "examImpact": "Biggest rise (+7.4); learn eval design and failure diagnosis.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCDV-F",
+   "area": "Domain: Claude Code",
+   "before": "3.1%",
+   "after": "8%",
+   "examImpact": "Now about 5 items; know extension mechanisms and permission modes.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCDV-F",
+   "area": "Domain: Agents; Prompt and Context",
+   "before": "14.7%; 11.0%",
+   "after": "17%; 15%",
+   "examImpact": "Study agent patterns, context management, grounding and structured output.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCDV-F",
+   "area": "Domain: Model Selection; Security; Tools and MCP",
+   "before": "16.8%; 8.1%; 10.6%",
+   "after": "12%; 8%; 10%",
+   "examImpact": "Model selection shrinks; security and tools roughly flat.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCDV-F",
+   "area": "Weighting granularity",
+   "before": "25 skills, each weighted",
+   "after": "8 domains weighted; skills unweighted",
+   "examImpact": "Cover every skill evenly within a domain.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCDV-F",
+   "area": "New: Evaluation Design",
+   "before": "Debugging and error handling only",
+   "after": "Golden sets, regression tests, LLM-judge calibrated to human labels",
+   "examImpact": "Build a small eval and calibrate a judge.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCDV-F",
+   "area": "New: Integration Resilience",
+   "before": "Not listed",
+   "after": "Streaming terminal events; rate-limit, overloaded, invalid, timeout classes; Files API",
+   "examImpact": "Know which Anthropic errors to retry and which to fix.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCDV-F",
+   "area": "New: Grounding and Source Citation",
+   "before": "Not listed",
+   "after": "Answer from documents with citations; return 'not found'; full context vs retrieval",
+   "examImpact": "Practise grounded requests and corpus-size trade-offs.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCDV-F",
+   "area": "Claude Code extension",
+   "before": "Rules, Skills, Commands, Agents listed",
+   "after": "Choose Skill, plugin, rules, hook, subagent or command; package it",
+   "examImpact": "Match each team workflow to the right mechanism.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCDV-F",
+   "area": "Frameworks and runtime",
+   "before": "Strands, LangGraph, PydanticAI named",
+   "after": "Not named; managed sandboxed agent runtime vs self-hosted harness",
+   "examImpact": "Drop framework trivia; learn managed vs self-hosted runtimes.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCDV-F",
+   "area": "Cost and caching",
+   "before": "Cost and Token Management 2.8%",
+   "after": "Cost diagnosis: dominant driver, layered/rolling cache breakpoints, batch",
+   "examImpact": "Read usage data, find the cost driver, quantify the saving.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCAR-F",
+   "area": "Syllabus and format",
+   "before": "60 items, $125, 5 domains",
+   "after": "Unchanged; guide v1.1 edit was registration, ID and support wording",
+   "examImpact": "No new study needed; same guide before and after Dec 7.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCDV-P",
+   "area": "New certification, guide v1.0",
+   "before": "Not available",
+   "after": "70 items (60 scored), 120 min, $175, 720/1000; MC and multi-response",
+   "examImpact": "Soft-launched Nov 2026; same guide before and after Dec 7.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCDV-P",
+   "area": "Domains",
+   "before": "None",
+   "after": "8: Orchestration 17, Integration 20, Observability 12, Debugging 10, Eval 12, Cost 8, Guardrails 11, Fleet Ops 10",
+   "examImpact": "Production-scale focus: observability, incidents, fleet operations.",
+   "source": "guide"
+  },
+  {
+   "exam": "CCDV-P",
+   "area": "Prerequisites",
+   "before": "None",
+   "after": "None; Developer Foundations recommended",
+   "examImpact": "Know CCDV-F content first.",
+   "source": "guide"
   }
  ]
 }
