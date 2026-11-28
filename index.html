@@ -1658,7 +1658,7 @@ async function openDec7() {
 function startVideoPractice(questions, title) {
   if (!questions.length) return;
   const qs = questions.map(q => ({ ...q, domain: q.domain || title }));
-  state.instantFeedback = true;
+  // Follows the user's Instant feedback toggle, like the chapter drill; never changes it.
   startPaper('videoCourse', prepQuestions(qs), false);
 }
 
