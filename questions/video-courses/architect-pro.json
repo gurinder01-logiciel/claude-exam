@@ -1,108 +1,2031 @@
 {
- "id": "architect-pro",
- "title": "Architect Pro course (placeholder)",
- "channel": "PLACEHOLDER channel",
- "playlistUrl": "https://www.youtube.com/",
- "episodes": [
-  {
-   "n": 1,
-   "title": "PLACEHOLDER episode 1",
-   "videoId": "dQw4w9WgXcQ",
-   "seconds": 600,
-   "summary": "PLACEHOLDER summary.",
-   "keyPoints": [
-    "PLACEHOLDER key point"
-   ],
-   "traps": [
-    "PLACEHOLDER trap"
-   ]
-  },
-  {
-   "n": 2,
-   "title": "PLACEHOLDER episode 2",
-   "videoId": "dQw4w9WgXcQ",
-   "seconds": 1200,
-   "summary": "PLACEHOLDER summary.",
-   "keyPoints": [
-    "PLACEHOLDER key point"
-   ],
-   "traps": [
-    "PLACEHOLDER trap"
-   ]
-  }
- ],
- "questions": [
-  {
-   "q": "PLACEHOLDER question 0 for episode 1?",
-   "options": [
-    "Option A",
-    "Option B",
-    "Option C",
-    "Option D"
-   ],
-   "correct": 0,
-   "explain": "PLACEHOLDER explanation.",
-   "d": 2,
-   "domain": "Placeholder domain",
-   "episode": 1,
-   "learnMore": {
-    "en": "PLACEHOLDER simple explanation in English.",
-    "hi": "PLACEHOLDER simple explanation Hinglish mein, Hindi Latin script mein aur tech terms English mein."
-   },
-   "source": {
-    "episode": 1,
-    "t": 95
-   }
-  },
-  {
-   "q": "PLACEHOLDER question 1 for episode 1?",
-   "options": [
-    "Option A",
-    "Option B",
-    "Option C",
-    "Option D"
-   ],
-   "correct": 1,
-   "explain": "PLACEHOLDER explanation.",
-   "d": 2,
-   "domain": "Placeholder domain",
-   "episode": 1,
-   "learnMore": {
-    "en": "PLACEHOLDER simple explanation in English.",
-    "hi": "PLACEHOLDER simple explanation Hinglish mein, Hindi Latin script mein aur tech terms English mein."
-   },
-   "source": {
-    "episode": 1,
-    "t": 95
-   }
-  },
-  {
-   "q": "PLACEHOLDER question 0 for episode 2?",
-   "options": [
-    "Option A",
-    "Option B",
-    "Option C",
-    "Option D"
-   ],
-   "correct": 0,
-   "explain": "PLACEHOLDER explanation.",
-   "d": 2,
-   "domain": "Placeholder domain",
-   "episode": 2
-  },
-  {
-   "q": "PLACEHOLDER question 1 for episode 2?",
-   "options": [
-    "Option A",
-    "Option B",
-    "Option C",
-    "Option D"
-   ],
-   "correct": 1,
-   "explain": "PLACEHOLDER explanation.",
-   "d": 2,
-   "domain": "Placeholder domain",
-   "episode": 2
-  }
- ]
+  "id": "architect-pro",
+  "title": "Claude Certified Architect Professional – Full Course",
+  "channel": "aicertguides",
+  "playlistUrl": "https://www.youtube.com/playlist?list=PLPsBalbS2-zs",
+  "note": "Not included yet: 4 episodes (Ep15 Lifecycle & Docs, Ep16 Developer Productivity, and two practice-question videos). This page covers the first 16 videos.",
+  "episodes": [
+    {
+      "n": 1,
+      "title": "Dec 7 updates",
+      "videoId": "GU3pX7iYjRM",
+      "seconds": 1770,
+      "summary": "The Claude exams get revised guides on 7 December. Developer foundations and architect professional move to version 1.1, while architect foundations is not on the update list. The ideas stay the same; the questions become scenario-based and the domain weights move.",
+      "keyPoints": [
+        "Revised guides came out on 17 November; the revised exams go live on 7 December, and an exam booked before that date is still the old version.",
+        "Developer foundations, architect professional and associate foundations are named in the update; architect foundations is not changed.",
+        "Both revised exams keep 70 items (60 scored, 10 unscored trial items), 120 minutes, a 720 pass mark and the same prices.",
+        "Both are officially scenario-based multiple choice, which formalises what architect professional already was.",
+        "On architect professional, stakeholder communication and lifecycle management halves from 14% to 7%, while technical depth, governance, safety and risk rises from 14% to 16% and integration from 19% to 21%.",
+        "The exam date decides the blueprint: before 7 December use the old guide, on or after it use the new one.",
+        "A new developer professional certification is soft-launched through the partner academy, which needs a company or consultancy email."
+      ],
+      "traps": [
+        "Restarting your prep because of the update; the concepts did not change, only the weighting and the wrapper.",
+        "Changing your prep for architect foundations, which is untouched.",
+        "Skipping an item because it may be an unmarked trial item; trial items cannot be spotted and carry no marks, so answer everything.",
+        "Same 120 minutes with more items: flag-and-move discipline matters more."
+      ]
+    },
+    {
+      "n": 2,
+      "title": "Course launch",
+      "videoId": "uF5QSu6Nw-8",
+      "seconds": 1821,
+      "summary": "The launch video for the free professional course. It compares the foundations and professional exams, stresses the three professional-only domains, and explains the exam logistics such as format, retakes and renewal.",
+      "keyPoints": [
+        "The professional exam tests whether you can own a Claude system end to end, including the stakeholder conversations, not only design it.",
+        "The three professional-only domains are governance, safety and risk (14%), stakeholder communication and lifecycle management (14%), and developer productivity and operational enablement (7%), together 35%.",
+        "Integration is the heaviest domain at 19%.",
+        "The format is 63 questions in 120 minutes, with single-answer and multiple-response items.",
+        "Retakes wait 14 days, then 30, then 90, with at most four attempts in a rolling 12 months; renewal done on time is free and non-proctored.",
+        "The exam is delivered through Pearson VUE, online-proctored or at a test centre, with 12-month validity."
+      ],
+      "traps": [
+        "Multiple-response items are all or nothing, so one wrong choice scores zero.",
+        "Professional items are standalone with no surrounding context, so they can feel harder than the foundations exam.",
+        "A foundations pass does not cover the professional-only domains.",
+        "Guessing is not penalised, so never leave an answer blank."
+      ]
+    },
+    {
+      "n": 3,
+      "title": "Ep01 Solution Design & Architecture",
+      "videoId": "JY0M4RZKh9c",
+      "seconds": 2289,
+      "summary": "Starts domain 1 by turning a business problem into a Claude-based design, working from the problem towards the model. It introduces the four-part architecture, the \"can versus should\" test and the five value pillars as the tiebreaker between valid options.",
+      "keyPoints": [
+        "Professional questions ask which architecture fits a stated business constraint, not what a term means.",
+        "Every cloud solution has four parts: input ingestion, processing, output and a feedback loop.",
+        "The processing layer can use a fast cheap model for classification and a stronger one for resolution, with tools called in between.",
+        "Prefer a deterministic lookup, rules engine or simple classifier when the answer is fixed, latency is hard or accuracy must be perfect.",
+        "The five value pillars are efficiency, transformation, productivity, cost and performance SLAs; the pillar the stakeholder prioritises breaks ties.",
+        "The feedback loop has outcome tracking, quality metrics, operational metrics, user signals and drift detection, each tied to a pillar.",
+        "Scan each stem for the input, the constraint and the feedback loop; this usually removes two options."
+      ],
+      "traps": [
+        "Choosing the most impressive-sounding option instead of the one that meets the stated constraint.",
+        "Adding an LLM to a task a rule or lookup could solve, which adds cost, latency and failure modes.",
+        "A design with no feedback loop is only a demo; logging that is not tied to a business pillar is not a feedback loop.",
+        "A sub-200 ms requirement rules out multi-step agentic designs."
+      ]
+    },
+    {
+      "n": 4,
+      "title": "Ep02 Architecture Patterns",
+      "videoId": "SGR8IWO28Lg",
+      "seconds": 3237,
+      "summary": "How to pick between workflow, agentic and augmented-LLM patterns by matching each to a constraint, and when hub-and-spoke multi-agent is the wrong answer. It also separates prompt chaining from dynamic decomposition and names capability bloat as a tested anti-pattern.",
+      "keyPoints": [
+        "Workflow means the steps are fixed at design time; agentic means the model chooses the next step in a loop; augmented LLM is a single call with retrieval or a tool.",
+        "An agentic loop is perceive, reason, act, observe, repeat: good for open-ended work, but costlier, slower and harder to audit.",
+        "Latency and predictability favour workflow, a cost ceiling favours augmented LLM, and unknown steps favour agentic.",
+        "In hub-and-spoke, a coordinator routes all traffic, decomposes, delegates, aggregates and handles failures; sub-agents never talk to each other.",
+        "Skip multi-agent when one well-prompted agent can do it, when the latency budget is tight, or when you can already decompose the task.",
+        "Use prompt chaining when you know the steps in advance and dynamic decomposition when findings decide the next step.",
+        "Capability bloat: every tool adds prompt tokens and lowers tool-selection accuracy, so give each agent only what it needs.",
+        "Start with augmented LLM, move to workflow when one call is not enough, and go agentic only when steps cannot be predicted."
+      ],
+      "traps": [
+        "Picking agentic because it is the buzzword.",
+        "Treating multi-agent as the default.",
+        "Adding tools or sub-agents \"in case\".",
+        "Using one augmented call when the work has fixed separate stages.",
+        "Calling a single call with a tool an agentic loop; one tool call is not a loop."
+      ]
+    },
+    {
+      "n": 5,
+      "title": "Ep03 Decomposition & Business Value",
+      "videoId": "bYRxZ1Gn52o",
+      "seconds": 2089,
+      "summary": "Closes domain 1 with three ways to split a problem, the over-decomposition anti-pattern and the value pillars as the tiebreaker. It then explains why LLM systems offer statistical rather than per-response SLAs and three patterns for meeting them.",
+      "keyPoints": [
+        "Decomposition comes in functional (by capability), data (by input type) and temporal (by phase) forms, and real systems mix them.",
+        "Over-decomposition adds overhead, latency, error surface and token cost; the right answer is often fewer components.",
+        "Split only when a subtask truly needs something different, such as another model tier, tools or context.",
+        "Efficiency is per unit of work, cost is total spend; transformation, productivity and performance SLAs are the other pillars.",
+        "The pillars conflict, so every architecture is a configuration of trade-offs.",
+        "When two designs are valid, the stakeholder named in the stem decides which pillar wins.",
+        "LLM systems give statistical guarantees over a population of requests, while deterministic code can promise per-request correctness.",
+        "Meet SLAs with confidence-based routing, statistical monitoring over a rolling window and graceful degradation with a fallback."
+      ],
+      "traps": [
+        "Over-decomposing to look elegant.",
+        "Mixing up efficiency (per unit) with cost (total spend).",
+        "Parallelising steps that depend on each other, even if it cuts latency.",
+        "Promising per-response accuracy for an LLM component."
+      ]
+    },
+    {
+      "n": 6,
+      "title": "Ep04 Model Selection & System Prompts",
+      "videoId": "CaXX8l3QlNY",
+      "seconds": 3220,
+      "summary": "Treats model choice as an architectural decision based on task complexity, latency and cost, including tiered multi-model designs. It also covers thinking modes, settings that newer models reject, and how to write production system prompts and place guardrails.",
+      "keyPoints": [
+        "There is no \"best model\" without a constraint set; start with Sonnet and move up only if the task proves too hard.",
+        "Opus gives the highest reasoning at the highest cost and latency, Sonnet is the balanced workhorse, Haiku is fastest and cheapest for classification and routing.",
+        "The three-axis matrix is task complexity, then latency budget, then cost ceiling as the tiebreaker.",
+        "A tiered design uses Haiku as intake, Sonnet for most generation and Opus for the hard minority.",
+        "On newer models, non-default temperature, top P or top K, and a fixed thinking budget, return a 400 error, so old code breaks on migration.",
+        "Replace vague judgment words and self-reported confidence with explicit categorical rules and an exact output format.",
+        "Prompt-level guardrails are probabilistic; hard policies belong in code through pre- and post-tool hooks."
+      ],
+      "traps": [
+        "Defaulting to Opus for every call.",
+        "Carrying temperature or top-K settings from an older model to a newer one.",
+        "Trusting the model's confidence score, which is not calibrated to your team's standards.",
+        "Trust collapse: too many false positives make developers ignore every finding.",
+        "Enforcing a hard policy with a prompt instruction instead of a hook."
+      ]
+    },
+    {
+      "n": 7,
+      "title": "Ep05 Prompt Engineering, Context Windows & Caching",
+      "videoId": "9JqzNnY7cxc",
+      "seconds": 3967,
+      "summary": "Closes domain 2: choosing prompt techniques for a constraint, placing information in the context window, and prompt caching. It also compares skills, which load on demand, with CLAUDE.md, which is always loaded.",
+      "keyPoints": [
+        "Zero-shot suits tight latency or a tight token budget, few-shot suits an exact output format, chain-of-thought suits complex multi-step tasks at a latency cost.",
+        "Use two to four few-shot examples, each with an input, a reason and an output; label-only examples encourage pattern matching.",
+        "Put instructions first, then examples, then retrieved context, with the user's query at the bottom.",
+        "Facts in the middle of a long prompt get less attention, so put critical IDs and amounts at the start or the end.",
+        "The cached prefix runs tools, then system prompt, then messages; cache reads cost about 90% less and a 5-minute write about 25% more.",
+        "The usage object shows cache creation and cache read tokens, which is how you confirm caching works.",
+        "Cache killers are timestamps in the system prompt, reordered tools, a flipped thinking configuration and a TTL that expires between sparse calls.",
+        "A skill shows only its name and description until needed; CLAUDE.md is always loaded."
+      ],
+      "traps": [
+        "Chain-of-thought under a tight latency budget.",
+        "Many few-shot examples on high-variety input.",
+        "Burying key facts in the middle of a long prompt.",
+        "Putting a timestamp in the system prompt, which invalidates the cache.",
+        "Expecting caching to help short prompts or low-traffic endpoints; it fails silently.",
+        "Putting always-needed guidance in a skill instead of CLAUDE.md, or the reverse."
+      ]
+    },
+    {
+      "n": 8,
+      "title": "Ep06 RAG, Chunking & Retrieval",
+      "videoId": "fadDUxsFEMw",
+      "seconds": 3354,
+      "summary": "The RAG pipeline from ingestion to generation, with chunking styles, index types and retrieval strategies matched to the data. It adds re-ranking and the rule that answers going wrong after a data refresh point to the retrieval layer first.",
+      "keyPoints": [
+        "RAG is an architecture choice; for a corpus under about 200,000 tokens you can often put everything in the prompt, especially with caching.",
+        "Offline you ingest, chunk, embed and index; per request you embed the query, retrieve and generate.",
+        "Fixed-size chunking suits uniform text, semantic chunking follows topic shifts, and structure-aware chunking suits legal and technical documents.",
+        "Contextual retrieval adds a short context sentence to each chunk before embedding so it keeps its meaning.",
+        "Pure vector search misses exact codes, so hybrid vector plus BM25 covers both meaning and identifiers.",
+        "Metadata filters handle time, tenant or access scope.",
+        "Re-ranking retrieves many candidates and passes only the best few to Claude.",
+        "After a refresh, check stale embeddings, lost chunk context, index drift and an outdated chunker before blaming the model."
+      ],
+      "traps": [
+        "Blaming the prompt or the model when retrieval changed after a refresh.",
+        "Fixed-size chunks on structured documents.",
+        "Pure vector search for exact error codes.",
+        "Using RAG for a corpus that fits in the prompt.",
+        "Letting the model answer when retrieval found nothing; add an explicit \"context does not contain this\" rule."
+      ]
+    },
+    {
+      "n": 9,
+      "title": "Ep07 MCP, Auth & Capability Bloat",
+      "videoId": "VaCb6AhJcV0",
+      "seconds": 5576,
+      "summary": "How an agent connects to the outside world: which protocol, acting as whom, and with what powers. It covers MCP setup, token rules, least privilege in layers, and why too many tools hurt.",
+      "keyPoints": [
+        "Each integration decision answers how (protocol), as whom (identity) and with what powers (capability).",
+        "MCP is a universal adapter: the client discovers the tools a server offers instead of hard-coding them.",
+        "A server can be offered through STDIO, HTTP, SSE or an in-process SDK.",
+        "Choose by constraint: several clients needing one auth and audit point suggests MCP, a mature CLI suggests using the CLI, another team's autonomous agent suggests agent-to-agent.",
+        "MCP tokens have an audience and must be checked by the server they were issued for; no token pass-through, and credentials stay out of the model's context.",
+        "Prompts are not permission controls; least privilege lives in configuration, credentials and server-side checks, with human approval for high-stakes actions.",
+        "Tool bloat lowers selection reliability, widens what an injected instruction can reach, costs tokens every request and adds audit work.",
+        "Tool choice \"any\" forces some tool call, \"tool\" forces one named tool, \"auto\" lets the model decide."
+      ],
+      "traps": [
+        "Confused deputy: a tool running on an admin identity can do what the user could not.",
+        "\"Never delete customer accounts\" in a system prompt is a request, not a control.",
+        "Forwarding the client's token downstream is forbidden.",
+        "Progressive discovery is not security; deferred tools are still reachable.",
+        "Wrapping a mature CLI in a new MCP server.",
+        "Adding a tool \"just in case\"."
+      ]
+    },
+    {
+      "n": 10,
+      "title": "Ep08 Observability & Latency",
+      "videoId": "AiAAlanHkQE",
+      "seconds": 3527,
+      "summary": "How to see inside an LLM system and justify speed-versus-quality trade-offs. LLM failures are fluent, so a wrong answer still looks like a success, and only a quality layer catches it.",
+      "keyPoints": [
+        "LLM failures are fluent: a wrong answer returns a normal success status, so infrastructure dashboards stay green.",
+        "A trace is one user request; each step is a span sharing a trace ID, and retrieval should be its own span.",
+        "Log trace ID, API request ID, token counts, cache hits, latency per step, tool results, retrieval doc IDs and index version, and stop reason.",
+        "Keep raw personal data out of general logs; capture full conversations only on a separate, sampled, time-limited path.",
+        "Monitoring has three layers: traces, metrics and quality; only the quality layer catches fluent failures.",
+        "Justify a trade-off with a latency budget and a number on each side: cost from traces and benefit from the eval set.",
+        "Take free latency first: static content first with caching, a smaller tier if evals hold, parallel lookups, then streaming.",
+        "Progressive discovery is lean but adds a round trip; monolithic loading is predictable but token-heavy, and large catalogs usually use a hybrid."
+      ],
+      "traps": [
+        "When latency, errors and cost are flat but users complain, look at the quality layer, not the latency alert.",
+        "\"Log every prompt and response indefinitely\" detects nothing and creates a compliance problem.",
+        "Switching everything to the smallest model to hit a latency target quietly degrades accuracy.",
+        "Cutting retrieval depth to save time.",
+        "Putting the date or a user name in the system prompt breaks the cache.",
+        "Streaming does not help a downstream system that needs the full payload.",
+        "Breadth is not bloat: six used tools out of nine is fine."
+      ]
+    },
+    {
+      "n": 11,
+      "title": "Ep09 Evaluation Metrics",
+      "videoId": "9tXDl3QL7Iw",
+      "seconds": 3105,
+      "summary": "Opens domain 4: teams need measured evidence, not a feeling that a change works. It covers the five metric families, golden data sets, stratified sampling, grading methods and the noise floor.",
+      "keyPoints": [
+        "Latency and cost can be read from traces; accuracy, safety and security only show up in tests.",
+        "An aggregate score can hide a failing slice, such as 97% overall with handwritten receipts near 60%.",
+        "Stratified sampling splits traffic into buckets, samples each one, and measures accuracy per category.",
+        "A golden data set is hand-labelled, fixed over time, and includes edge cases and guard rows whose correct answer is null or a refusal.",
+        "Rule-based grading is cheap and reproducible, model grading scales but needs calibration, and humans are the gold standard on a sample.",
+        "A good judge uses explicit criteria, binary verdicts with a short reason, and is checked against human labels.",
+        "Before trusting a score change, re-run the unchanged system to measure the noise floor.",
+        "An evaluation framework is a gate: ship only if overall accuracy holds and no stratum drops more than two points."
+      ],
+      "traps": [
+        "Adding more examples picked the same way gives a bigger, more confident, still wrong number.",
+        "Changing the headline metric on unrepresentative data.",
+        "Swapping the grader instead of fixing the questions.",
+        "Random sampling that hides the failing slice.",
+        "A bad judge is worse than none, because it turns errors into scores."
+      ]
+    },
+    {
+      "n": 12,
+      "title": "Ep10 A/B Testing & Failure Diagnosis",
+      "videoId": "EGy2k34I5VA",
+      "seconds": 2724,
+      "summary": "How to prove a change helped and how to work out what broke. LLM A/B tests need grading, repeated samples and a fixed metric, and failures sort into integration, prompt, hallucination and model mismatch.",
+      "keyPoints": [
+        "LLM quality can drift with no deploy on your side because the provider updates the model underneath you.",
+        "Web-style A/B testing struggles with non-determinism, graded quality and small effect sizes.",
+        "Change one variable per test and keep everything else pinned.",
+        "Both variants use the same frozen eval set, or a random split of live traffic in the same window, with the metric and threshold fixed first.",
+        "Run offline first to kill bad ideas cheaply, then online; do not stop at the first green day.",
+        "The four failure categories are integration, prompt, hallucination and model mismatch.",
+        "Switch the model last, because moving up a tier is a large cost jump.",
+        "Diagnose by stating the symptom with a number, gathering the cheapest evidence, and flipping the suspect that turns the failure on and off.",
+        "Roll out in steps such as 5%, 25%, 100%, watching quality at each step."
+      ],
+      "traps": [
+        "Asking the model which prompt it prefers.",
+        "A one-day 5% canary with no threshold set in advance.",
+        "Picking the metric or threshold after seeing results.",
+        "A festival week or other concurrent event is a confounder.",
+        "Changing the model first because it is the loudest suspect.",
+        "For hallucination, raising effort or model tier instead of grounding and validation.",
+        "Upgrading the whole pipeline when only the hardest 10% fails."
+      ]
+    },
+    {
+      "n": 13,
+      "title": "Ep11 Cost Optimization",
+      "videoId": "SlPSUvWcX4A",
+      "seconds": 4660,
+      "summary": "Closes domain 4 with cost optimisation and monitoring. Cost per request must be tracked from the usage block, and the four levers are caching, model tiering, context discipline and batch.",
+      "keyPoints": [
+        "Every response's usage block carries input, output, cache-read and cache-write tokens; log it on every request.",
+        "Output tokens cost several times more than input tokens.",
+        "Spend is requests times tokens per request times price per token, and each factor has a lever.",
+        "Cache reads are a small fraction of base input price; a prefix cached but never reused is a loss.",
+        "Route by task complexity, and downgrade a slice only after the golden set shows it holds.",
+        "The Message Batches API gives about 50% off for work nobody waits on, processed within 24 hours, single-turn, no streaming, matched by custom_id.",
+        "Ask first whether anyone is waiting; then whether multi-turn tool calls are needed; if neither, use batch.",
+        "Alert on ratios and unit economics such as cost per request, not on raw spend.",
+        "Input drift and behaviour drift are caught by a scheduled golden-set run and by logging model and prompt versions."
+      ],
+      "traps": [
+        "Tracking the monthly total instead of cost per request.",
+        "Choosing batch for the discount when a user or pipeline is waiting.",
+        "A blanket downgrade to the smallest tier.",
+        "Cutting retrieval depth without an accuracy check.",
+        "Buying a one-hour cache TTL for ordinary chat traffic.",
+        "Paging on raw spend when volume rises seasonally.",
+        "Putting dynamic fields such as the date in the cached prefix."
+      ]
+    },
+    {
+      "n": 14,
+      "title": "Ep12 Hooks, Guardrails & Risk",
+      "videoId": "JPkFXFn9zKo",
+      "seconds": 6209,
+      "summary": "Opens the governance part: a system prompt is steering, not a permission system, so guardrails must be enforced in code. It covers four layers of defence, hooks, the risk register, graceful degradation and escalation triggers.",
+      "keyPoints": [
+        "A prompt is probabilistic and steers the model; it does not hold, so guardrails are a system-design concern.",
+        "Four layers: input validation, model constraints, output validation and tool gating.",
+        "Output is treated as untrusted: schema checks, leakage scans and grounding checks.",
+        "A PreToolUse hook can allow, deny or rewrite a call before it runs; a PostToolUse hook can rewrite the result.",
+        "A hook matcher compares only the tool name; the command or arguments are checked inside the hook code.",
+        "Flagging injected text only informs the model; least privilege decides what is possible.",
+        "Tool gating is the strongest layer: a prerequisite gate opens the refund tool for a fact the code established, not for a message saying \"verified\".",
+        "A fallback chain goes primary model, evaluated alternate tier, labelled last-known-good, queued work, then an honest error with a human path.",
+        "Escalate on an explicit request for a human, a policy gap, or inability to progress."
+      ],
+      "traps": [
+        "\"Add a rule to the system prompt\" is the distractor in about half of guardrail questions.",
+        "A matcher written as a command such as \"rm -rf\" never fires.",
+        "Detection is not defence.",
+        "Logging full untrusted ticket text is a leakage risk, not a control.",
+        "Retrying a failing primary endpoint hammers it and hides the outage.",
+        "Silently routing everything to a smaller tier when only simple claims were evaluated.",
+        "Negative sentiment alone is not an escalation trigger."
+      ]
+    },
+    {
+      "n": 15,
+      "title": "Ep13 Compliance, Ethics & HITL",
+      "videoId": "0J6rK8V81HU",
+      "seconds": 2464,
+      "summary": "Finishes domain 5 with human review, compliance rulebooks and ethics. A system can run flawlessly and still not be allowed to run as it does, so someone must be able to answer for each action.",
+      "keyPoints": [
+        "Human in the loop means a person with real authority reviews the output before the outcome stands; someone who only watches is in the audience.",
+        "Review is mandatory for high stakes, irreversible outcomes, regulated review and low confidence.",
+        "A confidence score is a safety signal only after calibration against labelled data, and thresholds are business dials.",
+        "A review queue has arithmetic, so justify it with numbers; \"review everything\" is a cost answer, not a design.",
+        "Which rulebook applies depends on whose data is touched: HIPAA for US health data, FedRAMP for US federal cloud data, GDPR for EU residents' personal data.",
+        "Compliance is a property of the data flow: minimise at intake, log with identity, and keep a deletion path to every store.",
+        "When a rulebook demands isolation, segment the environment instead of routing by rule.",
+        "Bias is detected by stratified evaluation and counterfactual tests where only the identity signal is swapped.",
+        "Transparency means logging the decision, the inputs that drove it, the confidence and any sign-off."
+      ],
+      "traps": [
+        "A random 5% sample does not satisfy a rule requiring review of every denial.",
+        "Negative sentiment is not an escalation trigger.",
+        "Routing all volume to humans is a second call centre, not a design.",
+        "Trusting an aggregate pass rate.",
+        "Stripping names alone leaves proxies such as addresses.",
+        "An \"AI-assisted\" disclosure is not mitigation.",
+        "A shared pipeline with a disclaimer fails once two rulebooks apply."
+      ]
+    },
+    {
+      "n": 16,
+      "title": "Ep14 Stakeholder Communication",
+      "videoId": "CnoSgR8vcYk",
+      "seconds": 2396,
+      "summary": "Opens domain 6: gathering requirements, explaining recommendations and setting promises a real system can keep. The human constraint often decides the architecture as much as the technical one.",
+      "keyPoints": [
+        "Structured discovery runs in order: business objective, success metrics, data landscape, then constraints; solutions come last.",
+        "Ask downside questions in every meeting: what happens when this is wrong, who bears the cost, and what is the escalation path.",
+        "Translate technical facts into consequences: P95 is the worst 5% of moments, and cost per request is the meter.",
+        "Every recommendation travels with its rejected twin and the constraint that killed it.",
+        "An architecture decision record has four parts: the decision, the context, the alternatives rejected, and the reasoning.",
+        "An LLM system promises statistical guarantees over a population, with a measurement and a repair path.",
+        "Promise latency at the tail (P95 or P99) and cost as a range.",
+        "Say limitations early with numbers: the rate per stratum, how you will detect it, and the repair."
+      ],
+      "traps": [
+        "Answering a solution question such as which model to buy before discovery.",
+        "A proof of concept that demonstrates the wrong thing if the objective changes.",
+        "Drafting an SLA before discovery.",
+        "Any option guaranteeing per-response correctness.",
+        "A \"performance may vary\" disclaimer does not rescue an impossible promise.",
+        "An optimisation sprint to hide a gap, or declaring the target impossible in writing."
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "q": "Your developer foundations exam is booked for 5 December and you prepared with guide version 1.0. The revised exams start on 7 December. What is the right move?",
+      "options": [
+        "Cancel and rebook after 7 December so that you study the new weightings first, since the old exam will be retired immediately",
+        "Spend the remaining days relearning every concept, because the update rewrote the ideas behind the exam",
+        "Keep your 1.0 preparation and sit the exam, because the changes only apply from 7 December",
+        "Switch to the architect foundations track, because that is the exam the update changes the most"
+      ],
+      "correct": 2,
+      "explain": "The exam date decides the blueprint: before 7 December the old guide applies. The concepts did not change, only weightings and format.",
+      "d": 1,
+      "domain": "Stakeholder Communication & Lifecycle Management",
+      "episode": 1,
+      "source": {
+        "episode": 1,
+        "t": 511
+      },
+      "learnMore": {
+        "en": "Your exam date decides which guide you need. A 5 December exam is before the change, so your old preparation is still the right one. The ideas stayed the same anyway.",
+        "hi": "Exam ki date decide karti hai ki kaunsa guide lagega. 5 December, 7 December se pehle hai, to purani preparation hi sahi hai. Concepts waise bhi same hain."
+      }
+    },
+    {
+      "q": "During a revised exam you meet an item that feels oddly unrelated to the rest. You suspect it is one of the ten unscored trial items. What should you do?",
+      "options": [
+        "Answer it properly like any other item, since trial items look the same as scored ones",
+        "Skip it quickly to save time for the scored items, since unscored items carry no marks at all and cost you time",
+        "Give it a long careful answer since trial items are weighted more heavily than the rest",
+        "Flag it and leave it blank so the exam board can see you recognised it as a trial item"
+      ],
+      "correct": 0,
+      "explain": "Unmarked trial items cannot be spotted, so every item deserves a real answer.",
+      "d": 2,
+      "domain": "Stakeholder Communication & Lifecycle Management",
+      "episode": 1,
+      "source": {
+        "episode": 1,
+        "t": 391
+      },
+      "learnMore": {
+        "en": "You cannot tell which items are the trial ones. If you skip a normal item by mistake, you lose marks. So answer everything.",
+        "hi": "Trial items pehchaan nahi sakte. Agar normal item skip kar diya to marks jaate hain. Isliye har item ka answer do."
+      }
+    },
+    {
+      "q": "A legal startup must cut contract review from six hours to one hour. Option A is one augmented-LLM call with a checklist, and an associate reviews the flags. Option B is a multi-step agent with a precedent database and a research tool, more thorough but slower and dearer. Which fits, and why?",
+      "options": [
+        "Option B, because more thorough research makes the better design for legal work",
+        "Option B, because multi-step agents are cheaper to run than a single augmented call",
+        "Neither, since contract review should not use a model without a rules engine in front of it",
+        "Option A, because the goal is efficiency and a single call with human review meets it"
+      ],
+      "correct": 3,
+      "explain": "The stem is about efficiency, so the lighter design wins; B would suit a transformation goal.",
+      "d": 2,
+      "domain": "Solution Design & Architecture",
+      "episode": 3,
+      "source": {
+        "episode": 3,
+        "t": 1480
+      },
+      "learnMore": {
+        "en": "The stem says \"save time\", which is the efficiency pillar. One simple call plus a human check does that. The bigger agent is for a different goal.",
+        "hi": "Stem time bachane ki baat karta hai, yaani efficiency pillar. Ek simple call aur human check kaafi hai. Bada agent doosre goal ke liye hota hai."
+      }
+    },
+    {
+      "q": "A healthcare firm summarises 50,000 claims a day in a standard format. The SLA is 3 seconds and accuracy must be above 95%. Which design fits?",
+      "options": [
+        "A multi-step agent that plans, calls tools and checks its own work before writing each summary",
+        "A workflow of deterministic extraction and templates, with Claude only on the narrative parts",
+        "One augmented call with extended thinking switched on, so a single request does all the work",
+        "A parallel multi-agent setup with one sub-agent per section and a coordinator that merges the results"
+      ],
+      "correct": 1,
+      "explain": "The agent and the extended-thinking call break the 3-second SLA, and parallel agents are unnecessary for a fixed format.",
+      "d": 3,
+      "domain": "Solution Design & Architecture",
+      "episode": 3,
+      "source": {
+        "episode": 3,
+        "t": 1775
+      },
+      "learnMore": {
+        "en": "Most of the job is fixed, so do it with plain code and templates. Use Claude only where writing is needed. This keeps it fast and cheap.",
+        "hi": "Zyada kaam fixed hai, to code aur template se karo. Claude sirf narrative hisse mein use karo. Isse speed aur cost dono theek rehte hain."
+      }
+    },
+    {
+      "q": "A financial firm needs sub-200 ms responses with a full audit trail. A teammate proposes an agentic design with autonomous tool use. What is the best response?",
+      "options": [
+        "Accept it, because autonomous tool use gives the most capable and flexible solution for finance",
+        "Reject it, because multi-step agent loops cannot meet the latency and audit constraints",
+        "Accept it but add a larger model so the loop finishes inside the 200 ms limit",
+        "Accept it and rely on streaming to make the responses feel faster to the user"
+      ],
+      "correct": 1,
+      "explain": "A sub-200 ms requirement rules out multi-step agentic designs, and loops are harder to audit.",
+      "d": 2,
+      "domain": "Solution Design & Architecture",
+      "episode": 3,
+      "source": {
+        "episode": 3,
+        "t": 260
+      },
+      "learnMore": {
+        "en": "Each loop step takes time, so a 200 ms limit leaves no room. Loops are also harder to audit. Pick the design that fits the stated limits.",
+        "hi": "Agent loop ke har step mein time lagta hai, 200 ms mein jagah nahi bachti. Audit bhi mushkil hota hai. Jo design limits mein fit ho, wahi chuno."
+      }
+    },
+    {
+      "q": "A team ships a Claude-based triage tool with request logs but nothing connecting its results to the business goal. Reviewers say the design is incomplete. Why?",
+      "options": [
+        "It lacks a larger model tier, so the logs are not processed quickly enough",
+        "It has too many logs, and logging more than input and output hurts latency",
+        "It does not use deterministic rules at each step, which is the required fourth component of a design",
+        "It has no feedback loop tied to a business pillar, so nobody can tell if it delivers value"
+      ],
+      "correct": 3,
+      "explain": "A design without a feedback loop is a demo, and logging not tied to a pillar is not a feedback loop.",
+      "d": 2,
+      "domain": "Solution Design & Architecture",
+      "episode": 3,
+      "source": {
+        "episode": 3,
+        "t": 2102
+      },
+      "learnMore": {
+        "en": "A feedback loop checks results against what the business wants, like whether tickets stayed closed. Logs alone just store data.",
+        "hi": "Feedback loop result ko business goal se jodta hai, jaise ticket band raha ya nahi. Sirf logs data jama karte hain, feedback nahi dete."
+      }
+    },
+    {
+      "q": "A task always has the same fixed answer, latency is hard and accuracy must be perfect. Which approach does the course prefer?",
+      "options": [
+        "A deterministic lookup or rules engine rather than a model",
+        "A frontier model with extended thinking to maximise answer quality on every request",
+        "An agentic loop that can verify the answer several times before replying",
+        "A fine-tuned model that has learned the answers from past examples of the task"
+      ],
+      "correct": 0,
+      "explain": "When the answer is fixed or accuracy must be perfect, adding an LLM adds cost, latency and failure modes.",
+      "d": 1,
+      "domain": "Solution Design & Architecture",
+      "episode": 3,
+      "source": {
+        "episode": 3,
+        "t": 900
+      },
+      "learnMore": {
+        "en": "If the answer never changes, a lookup gives it every time, fast and for free. A model can add errors and delay for no gain.",
+        "hi": "Agar answer hamesha same hai, lookup har baar sahi aur fast deta hai. Model se sirf delay aur galti ka chance badhta hai."
+      }
+    },
+    {
+      "q": "An insurer processes 5,000 claims a day, each needing the same five steps (extract, validate, classify, route, summarise) in under five seconds, with an audit trail and cost pressure. Which design fits?",
+      "options": [
+        "A coordinator with four sub-agents, because splitting the work across agents is faster and more thorough",
+        "One augmented call with policy records pulled by RAG, because one call is always the cheapest option",
+        "A deterministic five-step prompt chain, because the steps are fixed and each one is traceable",
+        "An agentic loop that decides the order of steps for each claim, to handle unusual claims"
+      ],
+      "correct": 2,
+      "explain": "A adds coordination overhead and path variants; C cannot perform five fixed stages in a single call.",
+      "d": 2,
+      "domain": "Solution Design & Architecture",
+      "episode": 4,
+      "source": {
+        "episode": 4,
+        "t": 2900
+      },
+      "learnMore": {
+        "en": "The steps never change, so fix them in a chain. Each step can be checked and timed. Agents or one big call do not help here.",
+        "hi": "Steps fixed hain, to chain banao. Har step check aur time ho sakta hai. Agents ya ek bada call yahan kaam nahi aate."
+      }
+    },
+    {
+      "q": "Before building an agentic workflow, you ask whether you know the steps in advance. You do not, because each finding decides what to look at next. Which approach fits?",
+      "options": [
+        "Prompt chaining, because it is the simplest pattern and works for most tasks",
+        "A single augmented call, because retrieval removes the need to plan steps",
+        "Hub-and-spoke with every sub-agent talking to the others to share what they find along the way",
+        "Dynamic decomposition, where steps are found at runtime from what each result shows"
+      ],
+      "correct": 3,
+      "explain": "Use prompt chaining only when the steps are known ahead of time; use dynamic decomposition when findings drive the next step.",
+      "d": 2,
+      "domain": "Solution Design & Architecture",
+      "episode": 4,
+      "source": {
+        "episode": 4,
+        "t": 2098
+      },
+      "learnMore": {
+        "en": "When you cannot predict the next step, a fixed chain breaks. Let the model decide the next step from what it just found.",
+        "hi": "Jab agla step pehle se pata nahi, fixed chain toot jaati hai. Pichle result dekhkar agla step runtime par decide hone do."
+      }
+    },
+    {
+      "q": "In which situation is a multi-agent hub-and-spoke design the wrong answer?",
+      "options": [
+        "The work has to be split across many independent subtasks that need different tools at large scale and volume",
+        "One well-prompted agent with good tool descriptions can do the job within a tight latency budget",
+        "A coordinator is needed to aggregate results and handle failures from several specialists",
+        "The task is open-ended and the steps cannot be predicted at design time"
+      ],
+      "correct": 1,
+      "explain": "Multi-agent adds coordination overhead and serial calls; skip it when one agent suffices or latency is tight.",
+      "d": 2,
+      "domain": "Solution Design & Architecture",
+      "episode": 4,
+      "source": {
+        "episode": 4,
+        "t": 1814
+      },
+      "learnMore": {
+        "en": "More agents mean more hand-offs and more waiting. If one agent can do the work, extra agents only add delay and cost.",
+        "hi": "Zyada agents ka matlab zyada hand-off aur intezaar. Ek agent kaam kar sakta hai to extra agents sirf delay aur cost badhate hain."
+      }
+    },
+    {
+      "q": "A team keeps adding extra tools to its agent \"in case they are needed\". What problem does this create?",
+      "options": [
+        "Little to worry about, because unused tools are ignored at run time",
+        "Higher cache hit rates, because more tools give the agent more stable context",
+        "Capability bloat: each tool adds prompt tokens and lowers tool-selection accuracy",
+        "Slower training of the model, because each tool must be learned before it can be used"
+      ],
+      "correct": 2,
+      "explain": "Every tool adds tokens to the prompt and makes the right choice harder; give each agent only the tools it needs.",
+      "d": 1,
+      "domain": "Solution Design & Architecture",
+      "episode": 4,
+      "source": {
+        "episode": 4,
+        "t": 2557
+      },
+      "learnMore": {
+        "en": "Each tool description takes space in every request and gives the model one more thing to confuse. Keep only the tools needed.",
+        "hi": "Har tool ka description har request mein jagah leta hai aur model ko confuse karta hai. Sirf zaroori tools rakho."
+      }
+    },
+    {
+      "q": "An engineer calls one model call that uses a single tool an \"agentic loop\". Is that correct?",
+      "options": [
+        "No, because one tool call is not a loop; it is an augmented LLM",
+        "Yes, because using a tool at all makes a design agentic by definition",
+        "Yes, if the model is Opus, since smaller tiers lack the ability to loop",
+        "No, because agentic designs include a retrieval step first"
+      ],
+      "correct": 0,
+      "explain": "An augmented LLM is a single call with retrieval or tools; a loop means perceive, reason, act, observe and repeat.",
+      "d": 1,
+      "domain": "Solution Design & Architecture",
+      "episode": 4,
+      "source": {
+        "episode": 4,
+        "t": 1020
+      },
+      "learnMore": {
+        "en": "A loop keeps going until the model decides it is done. One call with one tool just runs once, so it is an augmented LLM.",
+        "hi": "Loop mein model baar baar soch kar kaam karta hai. Ek call aur ek tool sirf ek baar chalta hai, isliye wo augmented LLM hai."
+      }
+    },
+    {
+      "q": "A legal contract review uses five sequential sub-agents and takes 45 seconds, but the SLA is 20 seconds. Which change best fixes it?",
+      "options": [
+        "Merge the first three agents into one with a well-structured prompt to remove round trips",
+        "Upgrade all five sub-agents to Opus so that every step reasons faster and more accurately than before",
+        "Add prompt caching and run all five agents in parallel to cut the wait",
+        "Add a sixth agent that supervises the other five and skips steps when it can"
+      ],
+      "correct": 0,
+      "explain": "Opus is slower, caching only helps repeated content, and the steps are sequential so they cannot run in parallel.",
+      "d": 3,
+      "domain": "Solution Design & Architecture",
+      "episode": 5,
+      "source": {
+        "episode": 5,
+        "t": 720
+      },
+      "learnMore": {
+        "en": "Each agent hand-off costs a round trip. Merging steps removes those trips. A bigger model or caching does not fix the waiting.",
+        "hi": "Har agent hand-off ek round trip hai. Steps merge karne se trips kam hote hain. Bada model ya caching is waiting ko theek nahi karte."
+      }
+    },
+    {
+      "q": "MedInsure has two valid designs: one cuts cost with the cheapest model on simple appeals, the other guarantees a seven-day turnaround with accuracy. How do you choose?",
+      "options": [
+        "Choose the cheaper design, because cost is the pillar that settles the debate",
+        "Choose the faster design, because SLAs outrank the other value pillars",
+        "Use the pillar the stem names for the stakeholder asking, since both designs are valid",
+        "Combine both designs fully, because the exam expects you to maximise all five pillars at the same time"
+      ],
+      "correct": 2,
+      "explain": "The pillars conflict, so the stakeholder and priority named in the stem decide the answer.",
+      "d": 2,
+      "domain": "Solution Design & Architecture",
+      "episode": 5,
+      "source": {
+        "episode": 5,
+        "t": 1390
+      },
+      "learnMore": {
+        "en": "You cannot win on every pillar. The question tells you who is asking and what they care about. That pillar breaks the tie.",
+        "hi": "Sab pillars par jeet nahi sakte. Question batata hai kaun puch raha hai aur use kya chahiye. Wahi pillar tie todta hai."
+      }
+    },
+    {
+      "q": "A design splits one simple task into six cooperating components \"to look elegant\". What is wrong with it?",
+      "options": [
+        "Nothing is wrong, because more components means a cleaner separation of responsibility between parts",
+        "Over-decomposition adds overhead, latency and token cost; fewer components is often right",
+        "It should be split further, since each component must use its own model tier",
+        "It breaks the temporal pattern, which requires exactly three components for a task that is split up"
+      ],
+      "correct": 1,
+      "explain": "Decompose only when a subtask genuinely needs a different model tier, tools or context.",
+      "d": 2,
+      "domain": "Solution Design & Architecture",
+      "episode": 5,
+      "source": {
+        "episode": 5,
+        "t": 518
+      },
+      "learnMore": {
+        "en": "Every extra part costs time, tokens and a new place to fail. Split only when a part truly needs something different.",
+        "hi": "Har extra part mein time, tokens aur fail hone ki nayi jagah judti hai. Tabhi todo jab part ko sach mein kuch alag chahiye."
+      }
+    },
+    {
+      "q": "A manager says \"this change improves efficiency, so total spend will fall\". What is the mix-up?",
+      "options": [
+        "Nothing is wrong, because efficiency and cost move together in an LLM system of any size",
+        "Efficiency means latency, which is a performance SLA and has no link to cost",
+        "Total spend belongs to the transformation pillar, which covers the cost questions",
+        "Efficiency is per unit of work; total spend is the separate cost pillar"
+      ],
+      "correct": 3,
+      "explain": "Efficiency is time or cost per unit; cost is total spend or ownership. The exam tests that they differ.",
+      "d": 2,
+      "domain": "Solution Design & Architecture",
+      "episode": 5,
+      "source": {
+        "episode": 5,
+        "t": 1011
+      },
+      "learnMore": {
+        "en": "Efficiency asks \"how much per item\". Cost asks \"how much in total\". A cheaper item can still mean a bigger bill if volume grows.",
+        "hi": "Efficiency matlab har item par kitna. Cost matlab kul kitna. Item sasta ho par volume badhe to bill phir bhi bada ho sakta hai."
+      }
+    },
+    {
+      "q": "A client asks you to guarantee that every response from the Claude component is correct. What is the best way to set the SLA?",
+      "options": [
+        "Promise per-response correctness, because that is what a production SLA must mean",
+        "Promise 100% accuracy on average and add a disclaimer in the contract for exceptions that appear",
+        "State a statistical guarantee over many requests, backed by routing, monitoring and a fallback",
+        "Refuse to give an SLA, since model output is too hard to measure against a target"
+      ],
+      "correct": 2,
+      "explain": "Only deterministic code can promise per-request correctness; LLM systems offer population-level guarantees.",
+      "d": 3,
+      "domain": "Solution Design & Architecture",
+      "episode": 5,
+      "source": {
+        "episode": 5,
+        "t": 1762
+      },
+      "learnMore": {
+        "en": "A model can be wrong on a single answer. What you can promise is a rate over many requests, and a plan for the misses.",
+        "hi": "Model ek single answer mein galat ho sakta hai. Tum bahut requests par ek rate promise kar sakte ho, aur misses ka plan."
+      }
+    },
+    {
+      "q": "A help-desk SaaS handles 10,000 queries a day with a 3-second target and a $5,000 monthly AI budget. Everything runs on Opus and customers complain about speed. Which fix fits?",
+      "options": [
+        "A tiered design: Haiku routes simple queries, Sonnet does standard support, Opus takes escalations",
+        "Turn on extended thinking on Opus so each answer is reached with fewer retries and less delay",
+        "Move all traffic to Haiku, because the fastest and cheapest tier solves both complaints at once for the team",
+        "Shorten the system prompt, since prompt length is the main cause of slow replies here"
+      ],
+      "correct": 0,
+      "explain": "The core issue is Opus on every query; shrinking the prompt or thinking harder does not remove it.",
+      "d": 3,
+      "domain": "Claude Models, Prompting & Context Engineering",
+      "episode": 6,
+      "source": {
+        "episode": 6,
+        "t": 3045
+      },
+      "learnMore": {
+        "en": "Most queries are easy, so they do not need the biggest model. Send easy ones to small models and keep Opus for the hard few.",
+        "hi": "Zyada queries aasaan hain, unhe bade model ki zaroorat nahi. Aasaan chhote model ko do, Opus sirf mushkil queries ke liye."
+      }
+    },
+    {
+      "q": "A claims system handles 50,000 claims a day with a two-second classification step and a $0.02 average cost ceiling. Which tier split fits?",
+      "options": [
+        "Opus for every claim, since top reasoning protects against costly assessment mistakes",
+        "Sonnet for classification and Haiku for assessment, because the cheaper tier suits the harder work better",
+        "Haiku for all steps, because the cost ceiling is the only constraint in the stem",
+        "Haiku classifies every claim, Sonnet assesses the bulk, Opus takes only the small complex share"
+      ],
+      "correct": 3,
+      "explain": "All-Opus would overshoot the ceiling by four to five times; tiering keeps the blended cost under it.",
+      "d": 3,
+      "domain": "Claude Models, Prompting & Context Engineering",
+      "episode": 6,
+      "source": {
+        "episode": 6,
+        "t": 2883
+      },
+      "learnMore": {
+        "en": "Use the cheap fast model where the task is simple, and the strong model only where needed. The average cost then stays under the limit.",
+        "hi": "Simple kaam par sasta fast model, mushkil kaam par strong model. Isse average cost limit ke neeche rehta hai."
+      }
+    },
+    {
+      "q": "A team migrates code to a newer Claude model and keeps its old temperature and top-K settings. What happens?",
+      "options": [
+        "The settings are silently ignored, so outputs become a little less varied than they were before",
+        "A 400 error is returned, so the old code breaks instead of degrading",
+        "The model accepts them but halves its thinking budget to compensate",
+        "The settings still work, if adaptive thinking is turned off"
+      ],
+      "correct": 1,
+      "explain": "On newer models, non-default temperature, top P, top K and fixed thinking budgets return an error; steering moves to prompts and effort.",
+      "d": 2,
+      "domain": "Claude Models, Prompting & Context Engineering",
+      "episode": 6,
+      "source": {
+        "episode": 6,
+        "t": 1314
+      },
+      "learnMore": {
+        "en": "Newer models do not accept those settings any more. The call fails with an error. Steer with prompts and the effort setting instead.",
+        "hi": "Naye models in settings ko accept nahi karte, call error deti hai. Ab prompt aur effort setting se steer karo."
+      }
+    },
+    {
+      "q": "A policy says the agent must never issue refunds above a set amount. Where should this be enforced?",
+      "options": [
+        "In the system prompt with strong wording, since the model follows written policy reliably",
+        "In code, with a pre-tool hook that blocks the refund, since prompt rules are only probabilistic",
+        "In the output format section, by asking the model to confirm the limit in each reply",
+        "In the model's own confidence score, by refusing whenever confidence drops under a chosen threshold level"
+      ],
+      "correct": 1,
+      "explain": "Hard policies belong in code; nuanced guidance belongs in the prompt.",
+      "d": 2,
+      "domain": "Claude Models, Prompting & Context Engineering",
+      "episode": 6,
+      "source": {
+        "episode": 6,
+        "t": 2763
+      },
+      "learnMore": {
+        "en": "A prompt asks the model nicely, and it may still slip. Code checks the refund every time. Use code for hard rules.",
+        "hi": "Prompt model se request karta hai, kabhi chook sakta hai. Code har baar refund check karta hai. Hard rule ke liye code use karo."
+      }
+    },
+    {
+      "q": "A code-review prompt says \"be thorough and conservative\" and asks the model to report only findings above 80% confidence. Developers still ignore the output because of false positives. What is the better fix?",
+      "options": [
+        "Raise the confidence threshold to 95%, since a stricter number removes the false positives",
+        "Add stronger adjectives such as \"extremely careful\" to push precision higher",
+        "Switch to Opus, because only the largest model can judge its own confidence correctly",
+        "Replace the judgment words with explicit categorical rules and an exact output format"
+      ],
+      "correct": 3,
+      "explain": "Vague words and self-reported confidence do not improve precision, and the model's confidence is not calibrated to your standards.",
+      "d": 2,
+      "domain": "Claude Models, Prompting & Context Engineering",
+      "episode": 6,
+      "source": {
+        "episode": 6,
+        "t": 2075
+      },
+      "learnMore": {
+        "en": "Words like \"thorough\" mean different things each time. Clear rules say exactly what to report and how. That cuts false alarms.",
+        "hi": "\"Thorough\" jaise words ka matlab har baar badal jata hai. Clear rules batate hain kya report karna hai aur kaise. Isse false alarms kam hote hain."
+      }
+    },
+    {
+      "q": "A pipeline reads 500 claim documents a day, about 5,800 input tokens each (2,000 instructions, 800 tool definitions, 3,000 chunk). Input costs about $12,000 a month. Which change has the most leverage?",
+      "options": [
+        "Cache the stable prefix of tools, system prompt and examples, leaving the chunk uncached",
+        "Move the instructions to the end of the prompt, after the chunk, so that the model reads them last",
+        "Add chain-of-thought to each call so the model needs fewer follow-up requests",
+        "Drop the tool definitions from the request and describe the tools in plain text each time"
+      ],
+      "correct": 0,
+      "explain": "The tools and instructions are identical each call, so caching them cuts input cost by about 40%.",
+      "d": 3,
+      "domain": "Claude Models, Prompting & Context Engineering",
+      "episode": 7,
+      "source": {
+        "episode": 7,
+        "t": 3730
+      },
+      "learnMore": {
+        "en": "Most of the prompt repeats on every call. Cache that part, so you pay much less for it. Only the new chunk is full price.",
+        "hi": "Prompt ka zyada hissa har call mein repeat hota hai. Use cache karo, to kam paise lagte hain. Sirf naya chunk full price hota hai."
+      }
+    },
+    {
+      "q": "A support agent handles 200 requests an hour, with a 3,000-token system prompt and examples plus a 2,000-token history per customer. How do you reduce input cost?",
+      "options": [
+        "Cache the customer history too, because it is the part that changes most between one request and the next",
+        "Remove the examples from the prompt, because the system prompt is too long for caching",
+        "Turn on prompt caching so the system prompt stays cached and only the history is fresh",
+        "Switch to a one-hour cache and put the customer name at the top of the system prompt"
+      ],
+      "correct": 2,
+      "explain": "The system prompt is stable and shared, so it caches well; the per-customer history is unique per call.",
+      "d": 2,
+      "domain": "Claude Models, Prompting & Context Engineering",
+      "episode": 7,
+      "source": {
+        "episode": 7,
+        "t": 3793
+      },
+      "learnMore": {
+        "en": "The shared system prompt is the same for everyone, so cache it. The customer history changes every time, so it stays fresh.",
+        "hi": "System prompt sabke liye same hai, use cache karo. Customer history har baar badalti hai, isliye wo fresh rehti hai."
+      }
+    },
+    {
+      "q": "A team puts the current timestamp at the top of the system prompt, and cache reads suddenly drop to zero. Why?",
+      "options": [
+        "Timestamps are blocked by the cache, so every request that contains one returns an error to the caller",
+        "The prompt now falls below the minimum cacheable size",
+        "The cache only works at night, when the timestamp in the prompt happens to stay the same as before",
+        "The changing timestamp alters the prefix, so every request misses the cache"
+      ],
+      "correct": 3,
+      "explain": "A cache needs an identical prefix; a changing timestamp invalidates it, and no error is raised.",
+      "d": 2,
+      "domain": "Claude Models, Prompting & Context Engineering",
+      "episode": 7,
+      "source": {
+        "episode": 7,
+        "t": 2724
+      },
+      "learnMore": {
+        "en": "The cache matches the start of the prompt exactly. If that start changes each time, nothing matches. Put changing things last.",
+        "hi": "Cache prompt ke shuru ko exact match karta hai. Shuru har baar badle to match nahi hota. Badalne wali cheezein aakhir mein rakho."
+      }
+    },
+    {
+      "q": "A long prompt contains a policy ID and an amount that the answer depends on, buried halfway through the text. Answers are sometimes wrong. What is the likely cause and fix?",
+      "options": [
+        "The model forgets IDs, so replace the policy ID with a long natural-language description",
+        "Facts in the middle get less attention, so move them to the start or the end",
+        "The context window is full, so the facts need to be repeated in the middle several times",
+        "The model prefers retrieved context, so remove the system prompt entirely"
+      ],
+      "correct": 1,
+      "explain": "Information in the middle of a long prompt gets less attention (\"lost in the middle\").",
+      "d": 2,
+      "domain": "Claude Models, Prompting & Context Engineering",
+      "episode": 7,
+      "source": {
+        "episode": 7,
+        "t": 1477
+      },
+      "learnMore": {
+        "en": "Models read the start and the end best. A key fact in the middle can be overlooked. Put important facts at the start or end.",
+        "hi": "Model start aur end sabse achhe se padhta hai. Beech ka fact chhoot sakta hai. Zaroori facts start ya end mein rakho."
+      }
+    },
+    {
+      "q": "You add few-shot examples that only show an input and its label. The model copies the pattern and fails on new cases. What makes better examples?",
+      "options": [
+        "Twenty or more examples that are bare labels, so the model sees each pattern",
+        "Examples that give just the output, since reasons make the prompt too long",
+        "Two to four examples, each with an input, a reason and an output",
+        "One example repeated, so the model gives the same answer each time"
+      ],
+      "correct": 2,
+      "explain": "Label-only examples encourage pattern matching; the reason shows the rule, and many examples fill the window.",
+      "d": 2,
+      "domain": "Claude Models, Prompting & Context Engineering",
+      "episode": 7,
+      "source": {
+        "episode": 7,
+        "t": 668
+      },
+      "learnMore": {
+        "en": "If the example shows why, the model learns the rule, not just the pattern. A few good examples beat many bare ones.",
+        "hi": "Example mein \"kyun\" ho to model rule seekhta hai, sirf pattern nahi. Kuch achhe examples bahut saare simple examples se behtar hain."
+      }
+    },
+    {
+      "q": "A guideline applies to every single interaction in a project, such as a coding convention. Where should it live?",
+      "options": [
+        "In CLAUDE.md, because it is always loaded",
+        "In a skill, because skills are the right home for rules that must apply every time",
+        "In a few-shot example inside each user message",
+        "In a sub-agent that runs once a day and writes the rule back"
+      ],
+      "correct": 0,
+      "explain": "CLAUDE.md is always loaded; a skill shows only its name and description until it is needed.",
+      "d": 2,
+      "domain": "Claude Models, Prompting & Context Engineering",
+      "episode": 7,
+      "source": {
+        "episode": 7,
+        "t": 3493
+      },
+      "learnMore": {
+        "en": "CLAUDE.md is always read. A skill is loaded only when it is needed. A rule for every case belongs in the always-loaded file.",
+        "hi": "CLAUDE.md hamesha load hota hai. Skill zaroorat par load hota hai. Har case ka rule always-loaded file mein jaata hai."
+      }
+    },
+    {
+      "q": "After a quarterly refresh of clinical protocols, the assistant returns outdated answers, while the prompt and model are unchanged. What should you investigate?",
+      "options": [
+        "The retrieval and indexing pipeline, where stale embeddings may compete with new ones",
+        "Rewrite the system prompt to tell the model to prefer the newest protocol every time",
+        "Move to a larger model so that it can reason about which protocol version is the newer one",
+        "Lower the model temperature so older answers become less likely"
+      ],
+      "correct": 0,
+      "explain": "Problems after a data refresh usually sit upstream of the model: stale embeddings, lost chunk context, index drift or an old chunker.",
+      "d": 3,
+      "domain": "Integration",
+      "episode": 8,
+      "source": {
+        "episode": 8,
+        "t": 2181
+      },
+      "learnMore": {
+        "en": "The prompt and model did not change, but the data did. So check how the data was stored and found. Old entries may still be in the index.",
+        "hi": "Prompt aur model nahi badle, data badla. Isliye check karo data kaise store aur search ho raha hai. Purani entries index mein ho sakti hain."
+      }
+    },
+    {
+      "q": "A support bot answers questions from natural-language troubleshooting guides and also from logs full of error codes. Users ask both kinds of question. Which retrieval fits?",
+      "options": [
+        "Pure vector search, because embeddings capture exact error codes as well as meaning",
+        "BM25 alone, since keyword matching handles both kinds of question equally well",
+        "Hybrid retrieval: semantic search for how-to questions and BM25 for exact codes",
+        "Put the whole corpus in the prompt, because hybrid retrieval needs a re-ranker before it can work"
+      ],
+      "correct": 2,
+      "explain": "Dense search matches meaning but can miss exact codes; BM25 handles identifiers; a mixed corpus needs both.",
+      "d": 3,
+      "domain": "Integration",
+      "episode": 8,
+      "source": {
+        "episode": 8,
+        "t": 2254
+      },
+      "learnMore": {
+        "en": "Meaning-based search is good for how-to questions. Keyword search is good for exact codes. Using both covers both kinds.",
+        "hi": "Meaning wali search how-to ke liye achhi hai. Keyword search exact codes ke liye. Dono saath mein dono tarah ke sawal sambhalti hain."
+      }
+    },
+    {
+      "q": "A legal Q&A system answers general termination questions but fails on specific clauses in named contracts. Its chunks are fixed 500-token blocks and the index is pure vector. Which fix is best?",
+      "options": [
+        "Increase the chunk size to 2,000 tokens, keep the pure vector index, and add a longer system prompt for clause questions",
+        "Structure-aware chunking with contextual retrieval, a hybrid index and metadata filters",
+        "Switch to a larger model so that it can reason across the clauses that were split between two chunks",
+        "Add more examples of termination questions to the system prompt"
+      ],
+      "correct": 1,
+      "explain": "Fixed chunks split nested clauses, pure vector search misses contract names, and there were no metadata filters.",
+      "d": 3,
+      "domain": "Integration",
+      "episode": 8,
+      "source": {
+        "episode": 8,
+        "t": 2050
+      },
+      "learnMore": {
+        "en": "Legal documents have a clear structure, so cut them by clauses. Add the contract name to each piece and allow filters. Then specific clauses can be found.",
+        "hi": "Legal documents ka structure clear hota hai, isliye clause ke hisaab se kaato. Har piece mein contract ka naam aur filters jodo. Tab specific clause mil jata hai."
+      }
+    },
+    {
+      "q": "In a RAG demo, a user asks for the company dress code, but the retrieved context has no such information. What is the right behaviour?",
+      "options": [
+        "The model answers from general knowledge about what typical office dress codes tend to look like",
+        "The model retrieves more chunks until some text mentions clothing",
+        "The model politely refuses every question that was not covered in its last training data set",
+        "It says the context does not contain it, because the system prompt has an explicit rule"
+      ],
+      "correct": 3,
+      "explain": "Without an explicit \"the context does not contain this\" rule, the model may guess when retrieval finds nothing.",
+      "d": 2,
+      "domain": "Integration",
+      "episode": 8,
+      "source": {
+        "episode": 8,
+        "t": 2879
+      },
+      "learnMore": {
+        "en": "If the documents do not answer, the safe answer is \"I do not know from these documents\". Tell the model this in the system prompt.",
+        "hi": "Agar documents mein jawab nahi hai, to \"in documents se pata nahi\" kehna safe hai. Model ko system prompt mein yeh batao."
+      }
+    },
+    {
+      "q": "A company has a 60,000-token handbook and plans a full RAG pipeline for it. What does the course suggest?",
+      "options": [
+        "Build RAG anyway, since retrieval is cheaper than putting a long prompt in front of the model",
+        "Split the handbook into one-word chunks to make the retrieval step as exact as it can possibly be",
+        "Consider skipping RAG and putting the whole handbook in the prompt, with caching",
+        "Use RAG after first fine-tuning the model on the handbook text"
+      ],
+      "correct": 2,
+      "explain": "Under about 200,000 tokens you can often skip RAG; it is an architecture choice, not a requirement.",
+      "d": 2,
+      "domain": "Integration",
+      "episode": 8,
+      "source": {
+        "episode": 8,
+        "t": 356
+      },
+      "learnMore": {
+        "en": "A small document fits in the prompt directly. A pipeline adds parts that can fail. With caching, the repeated cost is low too.",
+        "hi": "Chhota document seedha prompt mein aa jata hai. Pipeline mein fail hone wale parts badh jaate hain. Caching ke saath repeat cost bhi kam hota hai."
+      }
+    },
+    {
+      "q": "A fintech compliance lookup is used from Claude Code, a chat app and two custom agents, owned by four teams. Security wants one place to enforce authorisation and audit every call. What should you do?",
+      "options": [
+        "Expose the service as an MCP server so every client goes through one governed point",
+        "Let each team call the REST API directly, because direct calls are always the simplest",
+        "Wrap the service in an autonomous agent that the four teams message through agent-to-agent",
+        "Paste the API documentation into each client's system prompt so every team can query it"
+      ],
+      "correct": 0,
+      "explain": "Several clients needing one auth and audit point is the case for MCP; prompts and A2A do not centralise enforcement.",
+      "d": 3,
+      "domain": "Integration",
+      "episode": 9,
+      "source": {
+        "episode": 9,
+        "t": 3201
+      },
+      "learnMore": {
+        "en": "With four teams and different clients, you want one front door. An MCP server gives one place to check access and log every call.",
+        "hi": "Chaar teams aur alag clients hain, to ek hi darwaza chahiye. MCP server ek jagah access check aur har call ka log deta hai."
+      }
+    },
+    {
+      "q": "A support agent has 14 tools. Two of them, issue refund and delete account, never fired in 90 days of logs. Security wants the risk reduced. What is the best fix?",
+      "options": [
+        "Add a confirmation prompt before each of the two tools runs, so that a person must approve the call",
+        "Add detailed audit logging on every call to those two tools, so any misuse can be traced afterwards",
+        "Add a system prompt rule requiring manager approval before either tool is used",
+        "Remove both tools, since the other controls only wrap a capability that should not exist"
+      ],
+      "correct": 3,
+      "explain": "Confirmation, logging and prompt rules are compensating controls wrapped around a capability that should not exist; an unused tool is pure risk.",
+      "d": 3,
+      "domain": "Integration",
+      "episode": 9,
+      "source": {
+        "episode": 9,
+        "t": 5062
+      },
+      "learnMore": {
+        "en": "If nobody uses a tool, the safest choice is to take it away. Extra checks around a tool you do not need are just more work.",
+        "hi": "Jab koi tool use hi nahi hota, use hata dena sabse safe hai. Bekaar tool ke aas-paas extra checks sirf extra kaam hain."
+      }
+    },
+    {
+      "q": "An IT agent has about 120 tools across six systems, all used weekly. Tool selection is slipping and definitions use a lot of context. It must stay a single agent with no extra coordination hop. What fits?",
+      "options": [
+        "Cut the tools down, since every extra tool is a risk even when it is used every week by the team",
+        "Defer most tools behind tool search, keeping one agent with every tool reachable",
+        "Split into six sub-agents, one for each system, with a coordinator in front",
+        "Merge generic tools into a mode parameter so there are fewer definitions"
+      ],
+      "correct": 1,
+      "explain": "Every tool is used, so cutting breaks work, and splitting adds a coordination hop that the stem rules out.",
+      "d": 3,
+      "domain": "Integration",
+      "episode": 9,
+      "source": {
+        "episode": 9,
+        "t": 5326
+      },
+      "learnMore": {
+        "en": "All the tools are needed, so do not remove them. Load them only when needed through search. The agent stays single.",
+        "hi": "Sab tools kaam aate hain, isliye hatao mat. Search ke through zaroorat par load karo. Agent ek hi rehta hai."
+      }
+    },
+    {
+      "q": "A system prompt says \"never delete customer accounts\", yet the agent holds an admin credential that can do it. Is the account safe?",
+      "options": [
+        "Yes, because the model follows strongly worded rules in the system prompt every time it is asked to",
+        "No, since a prompt is only a request; enforce it in config, credentials or the server",
+        "Yes, as long as the prompt rule is repeated in the user message too",
+        "No, because the rule should be written in a longer format with several worked examples in the prompt"
+      ],
+      "correct": 1,
+      "explain": "Prompts are not permission controls; least privilege lives in config, credentials and server-side authorisation.",
+      "d": 2,
+      "domain": "Integration",
+      "episode": 9,
+      "source": {
+        "episode": 9,
+        "t": 3705
+      },
+      "learnMore": {
+        "en": "A prompt only asks the model. If the credential allows deletion, the delete can still happen. Take the power away at the credential or server.",
+        "hi": "Prompt sirf model se kehta hai. Credential delete allow karta hai to delete ho sakta hai. Power credential ya server par hatao."
+      }
+    },
+    {
+      "q": "An MCP server receives the client's access token and forwards it to a downstream API to save a login step. What is wrong with this?",
+      "options": [
+        "Little, because forwarding the token keeps the user's identity intact",
+        "The token must be made longer-lived so that the downstream API can accept it at some later time",
+        "It is wrong when the token is stored in the model's context window",
+        "Token pass-through is forbidden, since a token is meant for the server that checked it"
+      ],
+      "correct": 3,
+      "explain": "Tokens have an audience and must be validated by the server they were issued for; no token pass-through.",
+      "d": 2,
+      "domain": "Integration",
+      "episode": 9,
+      "source": {
+        "episode": 9,
+        "t": 3496
+      },
+      "learnMore": {
+        "en": "A token is made for one destination. Sending it onward lets another service use it in the wrong place. Get a separate token.",
+        "hi": "Token ek destination ke liye bana hota hai. Aage bhejne par koi aur service use galat jagah laga sakti hai. Alag token lo."
+      }
+    },
+    {
+      "q": "A mature command-line tool already does exactly what an agent needs. A teammate proposes a new MCP server around it. What is the best response?",
+      "options": [
+        "Use the existing CLI, since wrapping a mature CLI in a new server duplicates what works",
+        "Build the MCP server, because every integration should go through MCP by default in every situation",
+        "Replace the CLI with a sub-agent that re-implements the same logic",
+        "Rewrite the CLI in the agent's own language so it can run in process"
+      ],
+      "correct": 0,
+      "explain": "The protocol should follow the constraint; a mature CLI is already a valid answer.",
+      "d": 2,
+      "domain": "Integration",
+      "episode": 9,
+      "source": {
+        "episode": 9,
+        "t": 3123
+      },
+      "learnMore": {
+        "en": "If a tool already works, do not rebuild it. A new wrapper only adds work and one more thing to maintain.",
+        "hi": "Jo tool pehle se kaam kar raha hai use dobara mat banao. Naya wrapper sirf kaam aur maintenance badhata hai."
+      }
+    },
+    {
+      "q": "A support assistant has run for three months. After last Tuesday's knowledge-base re-index, error rate, P95 latency and cost per request are unchanged, yet escalations rise and satisfaction dips. What should the team add?",
+      "options": [
+        "A tighter P95 latency alert, so the team is warned sooner about slower replies that users could see",
+        "An alert on a rise in HTTP 500 errors, so that failures are noticed straight away by the on-call",
+        "Sampled quality checks on production responses, plus retrieval-score tracking with drift alerts",
+        "Logging prompts and responses indefinitely, so engineers can review them later"
+      ],
+      "correct": 2,
+      "explain": "Nothing loud moved; only the quality layer catches fluent failures, and retrieval drift points at the re-index.",
+      "d": 3,
+      "domain": "Integration",
+      "episode": 10,
+      "source": {
+        "episode": 10,
+        "t": 1530
+      },
+      "learnMore": {
+        "en": "The server looks healthy, but the answers got worse. Only a check on answer quality can see this. Retrieval scores show the re-index problem.",
+        "hi": "Server theek dikh raha hai, par answers kharab ho gaye. Sirf answer quality check yeh pakad sakta hai. Retrieval scores re-index ki problem dikhate hain."
+      }
+    },
+    {
+      "q": "An overnight research job makes company briefs in about 90 seconds each, including re-ranking and a figure-verification pass. An engineer proposes removing both to reach 25 seconds. What is the best response?",
+      "options": [
+        "Approve it, because a cut of more than 70% in time is worth a small loss in answer quality on briefs",
+        "Remove verification but keep re-ranking, since one of them is enough",
+        "Switch to streaming, because it makes the overnight job complete faster",
+        "Keep both: latency is not binding overnight and verification guards the costliest failure"
+      ],
+      "correct": 3,
+      "explain": "Nobody waits on an overnight job, so spending time on accuracy is the right trade; streaming does not help batch work.",
+      "d": 3,
+      "domain": "Integration",
+      "episode": 10,
+      "source": {
+        "episode": 10,
+        "t": 2845
+      },
+      "learnMore": {
+        "en": "Speed only matters if someone waits. Overnight, nobody does. So keep the steps that protect accuracy.",
+        "hi": "Speed tab zaroori hai jab koi intezaar kare. Raat ke job mein koi nahi karta. Isliye accuracy bachane wale steps rakho."
+      }
+    },
+    {
+      "q": "A restaurant voice-ordering agent has nine tools, almost all used on every call, and the prefix is already cached. Calls are live. A teammate proposes tool search to save tokens. What should you choose?",
+      "options": [
+        "Defer all nine tools, because progressive discovery is cheaper",
+        "Keep monolithic loading: nothing to save, and discovery adds latency on a voice path",
+        "Adopt tool search but keep the three most-used tools non-deferred",
+        "Remove the least-used tools, since fewer tools means better accuracy for the agent on live calls"
+      ],
+      "correct": 1,
+      "explain": "Breadth is not bloat: with a small, fully used, cached catalog, discovery only adds a round trip.",
+      "d": 3,
+      "domain": "Integration",
+      "episode": 10,
+      "source": {
+        "episode": 10,
+        "t": 3370
+      },
+      "learnMore": {
+        "en": "Tool search saves tokens when the list is long and mostly unused. Here the list is short and all used, so search only adds delay.",
+        "hi": "Tool search tab kaam aata hai jab list lambi aur zyada unused ho. Yahan list chhoti aur sab use hoti hai, to search sirf delay badhata hai."
+      }
+    },
+    {
+      "q": "A claims assistant on live phone calls has a P95 time-to-first-token of 9 seconds against a target of 4. The prompt carries a large repeated prefix, plus today's date and the adjuster's name at the top. What is the best first move?",
+      "options": [
+        "Switch the whole system to the smallest model, since a smaller model is the fastest fix available",
+        "Drop retrieval depth to the minimum, because less context means faster responses",
+        "Move the date and name out of the system prompt so the prefix caches, and parallelise lookups",
+        "Add a verification pass to each claim to raise accuracy before the call"
+      ],
+      "correct": 2,
+      "explain": "Static-first ordering with prompt caching is the usual latency answer; a blanket smaller model risks a fluent accuracy failure.",
+      "d": 2,
+      "domain": "Integration",
+      "episode": 10,
+      "source": {
+        "episode": 10,
+        "t": 2258
+      },
+      "learnMore": {
+        "en": "Put the parts that never change first and the changing parts last. The cache can then reuse the start. Independent lookups can also run together.",
+        "hi": "Jo hissa kabhi nahi badalta use pehle rakho, badalne wala baad mein. Cache shuru reuse kar leta hai. Independent lookups saath chala sakte ho."
+      }
+    },
+    {
+      "q": "A team says its SLA is time to first token, and the users are people chatting live. Which latency tactic helps?",
+      "options": [
+        "Streaming, because it makes the wait feel shorter for a person reading the output",
+        "None, since streaming does not change what the user experiences",
+        "Waiting for the whole answer, because the user needs the complete text before they can start reading",
+        "Batch processing, because it returns the answers together at the end"
+      ],
+      "correct": 0,
+      "explain": "For a chat user the SLA is time to first token and streaming helps; for a downstream system that needs the full payload it does not.",
+      "d": 2,
+      "domain": "Integration",
+      "episode": 10,
+      "source": {
+        "episode": 10,
+        "t": 1982
+      },
+      "learnMore": {
+        "en": "A person starts reading when the first words appear. Streaming brings those words sooner. A machine that needs the whole result gets no benefit.",
+        "hi": "Insaan pehle shabd dikhte hi padhna shuru karta hai. Streaming wo shabd jaldi laata hai. Jis machine ko poora result chahiye use fayda nahi."
+      }
+    },
+    {
+      "q": "A team's extraction system scores 97% on 200 handpicked documents, but production is mostly messy scans, multilingual emails and out-of-scope messages. Which fix is best?",
+      "options": [
+        "Rebuild the set by stratified random sampling of production traffic plus seeded edge cases",
+        "Add 2,000 more examples chosen the same way, so the set is bigger and steadier",
+        "Switch the headline metric to F1, because it handles imbalance better than plain accuracy ever can",
+        "Replace the rule-based grading with a model judge to score messy documents better"
+      ],
+      "correct": 0,
+      "explain": "The defect is coverage, not arithmetic or grader choice; a bigger handpicked set is only a more confident wrong number.",
+      "d": 3,
+      "domain": "Evaluation, Testing & Optimization",
+      "episode": 11,
+      "source": {
+        "episode": 11,
+        "t": 2291
+      },
+      "learnMore": {
+        "en": "The test set does not look like real traffic. Fix that first. A new metric or grader on the same weak data changes nothing.",
+        "hi": "Test set asli traffic jaisa nahi hai. Pehle yeh theek karo. Wahi weak data par naya metric ya grader kuch nahi badalta."
+      }
+    },
+    {
+      "q": "A prompt tweak lifts the golden-set score from 60% to 70% on a 10-document set. Should you ship it?",
+      "options": [
+        "Yes, because a 10-point gain is large enough to be treated as real on any set of documents",
+        "Yes, once you also switch the metric to F1 so that you can confirm the gain is a real one",
+        "Not yet: re-run the unchanged system to measure the noise floor first",
+        "Not yet: add ten more documents chosen by the same team in the same way"
+      ],
+      "correct": 2,
+      "explain": "With only 10 documents, one item moves the score 10 points and non-determinism can flip documents alone.",
+      "d": 2,
+      "domain": "Evaluation, Testing & Optimization",
+      "episode": 11,
+      "source": {
+        "episode": 11,
+        "t": 2153
+      },
+      "learnMore": {
+        "en": "On a tiny set, one document changes the score by 10 points, and the model may answer differently each run. Measure that noise before you trust a gain.",
+        "hi": "Chhote set mein ek document score 10 points badal deta hai, aur model har baar alag answer de sakta hai. Gain par bharosa karne se pehle noise naapo."
+      }
+    },
+    {
+      "q": "A document extraction system reports 97% accuracy overall, yet customers complain about handwritten receipts. Why is the headline number misleading?",
+      "options": [
+        "Handwritten receipts should be left out of the evaluation, since they are rare in the traffic",
+        "The overall number hides a slice where failures cluster, so measure per stratum",
+        "97% is too high to be believed, so the whole evaluation must be repeated",
+        "Accuracy is the wrong family; latency and cost are what traces can show"
+      ],
+      "correct": 1,
+      "explain": "An aggregate score can hide a failing slice; stratified sampling keeps each population visible.",
+      "d": 2,
+      "domain": "Evaluation, Testing & Optimization",
+      "episode": 11,
+      "source": {
+        "episode": 11,
+        "t": 589
+      },
+      "learnMore": {
+        "en": "Most documents are easy and push the average up. A small hard group can still fail a lot. Look at each group separately.",
+        "hi": "Zyada documents aasaan hain aur average upar le jaate hain. Chhota mushkil group phir bhi bahut fail ho sakta hai. Har group alag dekho."
+      }
+    },
+    {
+      "q": "A team uses a model as judge to grade outputs on a 1-to-10 scale, and has never checked it against human labels. What is the best improvement?",
+      "options": [
+        "Keep the 1-to-10 scale but ask the judge to explain its score in more detail each time it grades",
+        "Trust the judge, because a model grading another model is unreliable otherwise in practice",
+        "Replace the judge with a rule-based grader for each kind of quality check",
+        "Explicit rubric criteria and binary verdicts with a reason, calibrated against human labels"
+      ],
+      "correct": 3,
+      "explain": "A model grader is trustworthy only after measured agreement with humans; a bad judge turns errors into scores.",
+      "d": 2,
+      "domain": "Evaluation, Testing & Optimization",
+      "episode": 11,
+      "source": {
+        "episode": 11,
+        "t": 1959
+      },
+      "learnMore": {
+        "en": "A judge is only useful if its verdicts match what humans would say. Check this on labelled examples first. Yes or no with a reason is easier to check than 1 to 10.",
+        "hi": "Judge tabhi kaam ka hai jab uska verdict insaan ke verdict se mile. Pehle labelled examples par check karo. Yes ya no aur reason, 1 se 10 se aasaan hai."
+      }
+    },
+    {
+      "q": "A golden-set row is a customer message asking about a shipment, with no invoice in it, and the expected fields are null. What is this row for?",
+      "options": [
+        "It is an edge case meant to test how well the model reads handwriting",
+        "It is a noise-floor row, used to measure how much the scores change between one run and the next",
+        "A guard row: if the model invents a vendor or invoice number, the check fails",
+        "It is a stratum row, used to give small document types more weight"
+      ],
+      "correct": 2,
+      "explain": "Guard rows have a null or refusal as the correct answer, so fabricated output fails.",
+      "d": 2,
+      "domain": "Evaluation, Testing & Optimization",
+      "episode": 11,
+      "source": {
+        "episode": 11,
+        "t": 2672
+      },
+      "learnMore": {
+        "en": "The right answer here is \"nothing found\". If the model fills in an invoice anyway, it made it up, and the test catches it.",
+        "hi": "Yahan sahi answer \"kuch nahi mila\" hai. Model phir bhi invoice bhar de to usne bana liya, aur test use pakad leta hai."
+      }
+    },
+    {
+      "q": "A support lead wants to roll out a \"sharper\" new system prompt to 100% of 2,000 daily tickets without an evaluation. Which approach is right?",
+      "options": [
+        "Run both prompts on the same frozen golden set, with metric and threshold fixed first",
+        "Ship on volume, since five days of tickets is a large enough sample to be sure of the result",
+        "Ask the model which prompt it prefers and ship the winner that it picks out by itself",
+        "Run a one-day 5% canary and ship the new prompt everywhere if it looks better on that day"
+      ],
+      "correct": 0,
+      "explain": "Ship on volume is not evidence for a vibe; the model is not a valid self-grader; the canary has no pre-declared threshold.",
+      "d": 3,
+      "domain": "Evaluation, Testing & Optimization",
+      "episode": 12,
+      "source": {
+        "episode": 12,
+        "t": 870
+      },
+      "learnMore": {
+        "en": "A fair test uses the same data for both prompts and a pass mark set before the results. Then you can believe the result.",
+        "hi": "Fair test mein dono prompts ko same data milta hai aur pass mark pehle se tay hota hai. Tab result par bharosa ho sakta hai."
+      }
+    },
+    {
+      "q": "A restaurant launches a new menu in festival week and sales rise 40%. Did the menu cause it?",
+      "options": [
+        "Yes, because sales rose right after the launch, so the menu was clearly the cause of it",
+        "Yes, if the rise lasts longer than one full week and the sales stay high afterwards",
+        "No, because a menu change does not affect sales in a measurable way",
+        "Nobody can say: the festival is a confounder; compare both menus in one week"
+      ],
+      "correct": 3,
+      "explain": "Both variants must be compared in the same time window so that outside events hit both equally.",
+      "d": 2,
+      "domain": "Evaluation, Testing & Optimization",
+      "episode": 12,
+      "source": {
+        "episode": 12,
+        "t": 545
+      },
+      "learnMore": {
+        "en": "The festival may have pushed sales up anyway. To judge the menu, test both menus in the same week.",
+        "hi": "Tyohaar ki wajah se bhi sales badh sakti hain. Menu judge karne ke liye dono menus ek hi hafte mein test karo."
+      }
+    },
+    {
+      "q": "A coding assistant's suggestion acceptance fell from 34% to 27% in a week, with latency, errors and cost flat. Three things changed: a provider model update, a shorter system prompt, and larger repo-indexing chunks. How do you find the cause?",
+      "options": [
+        "Roll back the model first, since a provider update is the most likely cause of a drop like this one",
+        "Flip one change at a time on a frozen golden set and find the one that flips the failure",
+        "Rewrite the system prompt again, since it was the change that landed nearest to the drop in acceptance",
+        "Add more chunks to retrieval, since the larger chunks may have lost some of the content in each file"
+      ],
+      "correct": 1,
+      "explain": "In the case study the new model and new prompt kept the baseline; only the larger chunks broke it, by splitting function signatures.",
+      "d": 3,
+      "domain": "Evaluation, Testing & Optimization",
+      "episode": 12,
+      "source": {
+        "episode": 12,
+        "t": 1810
+      },
+      "learnMore": {
+        "en": "When several things changed, test them one by one on the same data. The one that brings back the failure is the cause. The loudest change is not always guilty.",
+        "hi": "Jab kai cheezein badli hon, ek-ek karke same data par test karo. Jo failure wapas laaye wahi karan hai. Sabse loud change doshi nahi hota."
+      }
+    },
+    {
+      "q": "A pipeline gets 91% field accuracy overall, but dense multi-table statements, about 10% of volume, sit at 58%. The prompt was tightened twice and retrieval is verified. The cost ceiling is firm. What next?",
+      "options": [
+        "Rewrite the prompt a third time with even more explicit criteria",
+        "Route the hard class to a larger tier or split it into per-table passes",
+        "Upgrade the whole pipeline to the largest model for every document",
+        "Recalibrate the eval set so that the hard class counts for much less in the overall score reported"
+      ],
+      "correct": 1,
+      "explain": "Prompt and retrieval are already cleared, so the model tier is the remaining suspect, and only for the hard 10%.",
+      "d": 3,
+      "domain": "Evaluation, Testing & Optimization",
+      "episode": 12,
+      "source": {
+        "episode": 12,
+        "t": 2320
+      },
+      "learnMore": {
+        "en": "The easy 90% is fine, so leave it alone. Give only the hard 10% more power. This fixes the weak part within the budget.",
+        "hi": "Aasaan 90% theek hai, use mat chhedo. Sirf mushkil 10% ko zyada power do. Isse budget mein weak part theek hota hai."
+      }
+    },
+    {
+      "q": "After a weekend move to a new document store, a legal assistant cites superseded policy versions. Latency, errors and cost are unchanged, and the old documents are still in the new store. What should you check first?",
+      "options": [
+        "The system prompt, by adding a rule that tells the model to prefer the newest policy version",
+        "A validation pass that rejects any answer which mentions an old version of the policy document",
+        "A larger model, so it can work out which version is current",
+        "Retrieval and its metadata, since the new store may not serve versions correctly"
+      ],
+      "correct": 3,
+      "explain": "After a data change, the retrieval layer is the first suspect; the model comes last.",
+      "d": 2,
+      "domain": "Evaluation, Testing & Optimization",
+      "episode": 12,
+      "source": {
+        "episode": 12,
+        "t": 2160
+      },
+      "learnMore": {
+        "en": "The data moved, so the first thing to check is how it is found and which version comes back. Prompts and models come later.",
+        "hi": "Data move hua, to pehle dekho wo kaise milta hai aur kaunsa version aata hai. Prompt aur model baad mein dekho."
+      }
+    },
+    {
+      "q": "A customer support assistant runs live chat with a 4-second P95 SLA, and finance wants a cut this quarter. Which change is the right one?",
+      "options": [
+        "Move the nightly summary of closed tickets to the Message Batches API",
+        "Send the complex claims questions to the smallest tier too, to cut the model price paid",
+        "Cut retrieval from 12 chunks to 3 and skip re-running the evals",
+        "Buy the one-hour cache TTL for the conversation prefix"
+      ],
+      "correct": 0,
+      "explain": "A nightly job is batch-shaped and nobody waits; the others risk quiet accuracy loss or pay for a TTL chat does not need.",
+      "d": 3,
+      "domain": "Evaluation, Testing & Optimization",
+      "episode": 13,
+      "source": {
+        "episode": 13,
+        "t": 3471
+      },
+      "learnMore": {
+        "en": "Batch is cheaper when nobody waits. The nightly job fits. Changes to live chat risk quality or cost more.",
+        "hi": "Batch tab sasta hai jab koi intezaar nahi karta. Raat ka job fit hai. Live chat mein badlav quality girate hain ya cost badhate hain."
+      }
+    },
+    {
+      "q": "Automated code reviews block PR merges. A developer wants to move them to the Message Batches API to cut cost. What is the main concern?",
+      "options": [
+        "Batch reviews are of lower quality than standard ones because they run at a discount to the user",
+        "Batch does not accept code files, because it takes plain-text chat messages as its input",
+        "Batch gives no delivery guarantee in a useful time, so the pipeline could time out",
+        "Batch reviews are more expensive than standard reviews"
+      ],
+      "correct": 2,
+      "explain": "Anything that blocks a human or a pipeline step cannot use batch, which has a 24-hour window and no latency promise.",
+      "d": 3,
+      "domain": "Evaluation, Testing & Optimization",
+      "episode": 13,
+      "source": {
+        "episode": 13,
+        "t": 2857
+      },
+      "learnMore": {
+        "en": "Batch can take up to a day. If a merge is waiting, that delay blocks the team. Use batch only when nobody waits.",
+        "hi": "Batch mein ek din tak lag sakta hai. Merge ruka ho to team ruk jaati hai. Batch tabhi use karo jab koi intezaar na kare."
+      }
+    },
+    {
+      "q": "Over two weeks, cost per request is up 40% while accuracy is flat and no deploys happened. Cache reads fell from about 70% of input to near zero after a brand refresh added a greeting line to the system prompt. What is the fix?",
+      "options": [
+        "Upgrade to a larger model tier, so each answer needs fewer tokens",
+        "Increase retrieval depth, so the model gets more context per request",
+        "Move the whole service to the Message Batches API so that every call gets the batch discount instead",
+        "Restore the previous system prompt and move changeable text out of the cached prefix"
+      ],
+      "correct": 3,
+      "explain": "A larger tier would spend more against a problem the eval set does not show; the cache broke because the prefix changed.",
+      "d": 3,
+      "domain": "Evaluation, Testing & Optimization",
+      "episode": 13,
+      "source": {
+        "episode": 13,
+        "t": 4400
+      },
+      "learnMore": {
+        "en": "The greeting changed the start of the prompt, so the cache stopped matching. Put the changing text last and the cache works again.",
+        "hi": "Greeting ne prompt ka shuru badal diya, to cache match nahi hua. Badalne wala text aakhir mein rakho, cache phir chalega."
+      }
+    },
+    {
+      "q": "An insurer's claims traffic rises every monsoon, and raw monthly spend rises with it. Should a raw-spend alert page the on-call engineer?",
+      "options": [
+        "Yes, because spend above last month's total should be treated as a possible incident by on-call",
+        "No: volume growth is the business succeeding; alert on cost per request instead",
+        "Yes, on weekends, when the on-call load is lower",
+        "No, because costs should not be monitored with alerts, and are reviewed in the monthly meeting"
+      ],
+      "correct": 1,
+      "explain": "Alert on ratios and unit economics, not on raw counts.",
+      "d": 2,
+      "domain": "Evaluation, Testing & Optimization",
+      "episode": 13,
+      "source": {
+        "episode": 13,
+        "t": 4004
+      },
+      "learnMore": {
+        "en": "More claims mean more spend, and that is normal. Cost per request only rises if something went wrong. So alert on that.",
+        "hi": "Zyada claims matlab zyada kharcha, aur yeh normal hai. Cost per request tabhi badhta hai jab kuch galat ho. Isliye usi par alert karo."
+      }
+    },
+    {
+      "q": "Which factor of the spend equation does the Message Batches API change?",
+      "options": [
+        "The price per token, because batch picks the smallest model tier",
+        "The tokens per request, because batch compresses the prompt automatically",
+        "The shape of the requests, because it processes work later at a discount",
+        "The cache hit ratio, because batch pre-warms the cache before running"
+      ],
+      "correct": 2,
+      "explain": "Spend is requests times tokens per request times price per token; batch shapes requests, caching and context shape tokens, and the model tier sets price.",
+      "d": 2,
+      "domain": "Evaluation, Testing & Optimization",
+      "episode": 13,
+      "source": {
+        "episode": 13,
+        "t": 673
+      },
+      "learnMore": {
+        "en": "Batch does not make a request smaller or change the model. It just runs the work later at a lower price when nobody is waiting.",
+        "hi": "Batch request ko chhota nahi karta, model bhi nahi badalta. Wo bas kaam baad mein sasta chalata hai jab koi intezaar nahi karta."
+      }
+    },
+    {
+      "q": "A support agent has a refund tool, and its system prompt already says never to refund unless the customer is verified. A ticket contains a hidden line saying the customer is already verified. Which fix is most effective?",
+      "options": [
+        "Add a PreToolUse hook that blocks the refund tool unless a verification service confirms status",
+        "Log every tool call with the full ticket text for a weekly manual review",
+        "Remove the ticket-reading tool and have staff forward the relevant lines",
+        "Make the system prompt rule longer and add several examples of fake verification text that it should refuse"
+      ],
+      "correct": 0,
+      "explain": "The hook is an enforcing gate that does not depend on the model; logging detects only after the fact and adds leakage risk, and removing the tool is a heavy manual workaround.",
+      "d": 3,
+      "domain": "Governance, Safety & Risk Management",
+      "episode": 14,
+      "source": {
+        "episode": 14,
+        "t": 5374
+      },
+      "learnMore": {
+        "en": "A gate in code opens only when a real check says \"verified\". The message text cannot fool code. Words in a ticket can fool a model.",
+        "hi": "Code ka gate tabhi khulta hai jab asli check \"verified\" bole. Ticket ka text code ko bewakoof nahi bana sakta, par model ko bana sakta hai."
+      }
+    },
+    {
+      "q": "A developer changes a hook's matcher from \"bash\" to \"rm -rf\" so that it fires only on that command. What happens?",
+      "options": [
+        "It never fires: the matcher compares only the tool name, so every bash call passes",
+        "The hook fires on any bash command that contains \"rm -rf\" somewhere inside its arguments or flags",
+        "The hook fires on every tool, because the matcher is treated as a wildcard when no tool name matches",
+        "The hook is rejected at start-up with a clear configuration error"
+      ],
+      "correct": 0,
+      "explain": "Argument checks belong inside the hook code, not in the matcher.",
+      "d": 2,
+      "domain": "Governance, Safety & Risk Management",
+      "episode": 14,
+      "source": {
+        "episode": 14,
+        "t": 2735
+      },
+      "learnMore": {
+        "en": "The matcher only looks at the tool name, like \"bash\". It never reads the command text. Do the command check inside the hook.",
+        "hi": "Matcher sirf tool ka naam dekhta hai, jaise \"bash\". Wo command ka text nahi padhta. Command check hook ke andar karo."
+      }
+    },
+    {
+      "q": "A hook flags a pull request body that says \"system override, ignore all previous instructions\". What actually stops the agent from approving or merging it?",
+      "options": [
+        "The flag itself, because the model refuses anything the hook has marked",
+        "A reminder in the system prompt telling the model to ignore the text that the hook has flagged earlier",
+        "The agent's tool list never had a merge or approve action, so the instruction has nowhere to go",
+        "The logging of the flagged text, which a reviewer reads each morning"
+      ],
+      "correct": 2,
+      "explain": "Detection is not defence; least privilege decides what is possible.",
+      "d": 3,
+      "domain": "Governance, Safety & Risk Management",
+      "episode": 14,
+      "source": {
+        "episode": 14,
+        "t": 3964
+      },
+      "learnMore": {
+        "en": "Flagging only warns the model. What really protects you is that the agent has no merge power at all.",
+        "hi": "Flag sirf model ko chetavni deta hai. Asli suraksha yeh hai ki agent ke paas merge ki power hai hi nahi."
+      }
+    },
+    {
+      "q": "A claim-summary model endpoint slows down at peak (P95 triples, errors rise). Adjusters read summaries on live calls, a smaller tier has been evaluated only on simple claims, and a nightly batch pipeline exists. Which response fits?",
+      "options": [
+        "Keep retrying the primary endpoint with no change that users can see, until the slowdown has passed",
+        "Fail fast over budget, send simple claims to the evaluated tier, queue the rest, offer a human path",
+        "Silently route all traffic to the smaller tier so that answers keep flowing during the busy peak hours",
+        "Turn off output validation and tool permission checks to save time while the primary endpoint is slow"
+      ],
+      "correct": 1,
+      "explain": "Retrying hammers the endpoint, a blanket downgrade ignores what was evaluated, and guardrails are never shed.",
+      "d": 3,
+      "domain": "Governance, Safety & Risk Management",
+      "episode": 14,
+      "source": {
+        "episode": 14,
+        "t": 6020
+      },
+      "learnMore": {
+        "en": "Keep what is safe running, queue what can wait, and be honest about the rest. Never switch off the checks that keep the system safe.",
+        "hi": "Jo safe hai use chalne do, jo ruk sakta hai use queue karo, baaki ke baare mein sach batao. Safety checks kabhi band mat karo."
+      }
+    },
+    {
+      "q": "During a chat, an angry customer simply asks for a human agent. What does the course say should happen?",
+      "options": [
+        "Keep the bot going until its confidence score drops below a set threshold chosen by the support team",
+        "Escalate if the sentiment of the message is also strongly negative",
+        "Offer a discount first and escalate if the customer asks again",
+        "Escalate, since an explicit request for a human is a trigger no confidence score overrides"
+      ],
+      "correct": 3,
+      "explain": "Explicit request, policy gap and inability to progress are triggers; sentiment and confidence are inputs to a policy, not the policy.",
+      "d": 2,
+      "domain": "Governance, Safety & Risk Management",
+      "episode": 14,
+      "source": {
+        "episode": 14,
+        "t": 5734
+      },
+      "learnMore": {
+        "en": "If a person asks for a human, give them one. A score should not overrule a clear request.",
+        "hi": "Agar insaan human maange to human do. Koi score saaf request ko override nahi kar sakta."
+      }
+    },
+    {
+      "q": "A US telehealth provider drafts about 2,000 prior-authorisation recommendations a day. Compliance requires a licensed clinician to review every one that would deny or delay care. Which design fits?",
+      "options": [
+        "Automate the whole flow and review a random 5% monthly sample of the recommendations that were made",
+        "Route all 2,000 daily documents to clinicians for review, so that nothing is missed by a person",
+        "Auto-complete routine approvals; route deny or delay cases to a clinician queue with audit logs",
+        "Escalate to a human whenever the customer's sentiment turns negative"
+      ],
+      "correct": 2,
+      "explain": "A sample is not a mandate, sending everything defeats the design, and sentiment is not a trigger.",
+      "d": 3,
+      "domain": "Governance, Safety & Risk Management",
+      "episode": 15,
+      "source": {
+        "episode": 15,
+        "t": 1340
+      },
+      "learnMore": {
+        "en": "The rule covers only denials and delays, so send just those to the clinician. The rest can flow. Keep a full log.",
+        "hi": "Rule sirf deny ya delay par lagta hai, to sirf wahi clinician ko bhejo. Baaki chalne do. Poora log rakho."
+      }
+    },
+    {
+      "q": "A resume pre-screening assistant scores 96% on a 500-example evaluation set, but a counterfactual name-swap test shows different pass rates by demographic group. What is the right step?",
+      "options": [
+        "Add slice and counterfactual rows, block release until slices hold, route to human review meanwhile",
+        "Ship it, because the evaluation set passed with a high score of 96% on the 500 examples tested",
+        "Strip names from the prompts and ship, since removing the names also removes the bias from the results",
+        "Keep the system as it is and add an \"AI-assisted\" notice for applicants who are screened by it today"
+      ],
+      "correct": 0,
+      "explain": "The aggregate hid the problem; removing names leaves proxy signals and a disclosure is not mitigation.",
+      "d": 3,
+      "domain": "Governance, Safety & Risk Management",
+      "episode": 15,
+      "source": {
+        "episode": 15,
+        "t": 2230
+      },
+      "learnMore": {
+        "en": "If swapping only the name changes the result, something other than merit is deciding. Test by group and keep humans in the loop until fixed.",
+        "hi": "Sirf naam badalne se result badle to merit ke alawa kuch aur decide kar raha hai. Group-wise test karo aur theek hone tak human review rakho."
+      }
+    },
+    {
+      "q": "A support assistant serves 2 million customers. New deals add EU customers (GDPR) and a US telehealth client whose tickets carry patient data (HIPAA). The plan is one shared pipeline plus a disclaimer. What is wrong with it?",
+      "options": [
+        "Little, because a disclaimer covers both rulebooks at the same time for the customer data in the pipeline",
+        "The pipeline is too small, and it needs a larger model to carry both rulebooks",
+        "The EU rules apply alone, since they are stricter than the US rules",
+        "Patient data mixes in a shared store, with no deletion path, identity trail or clinician gate"
+      ],
+      "correct": 3,
+      "explain": "Which rulebook applies depends on whose data is touched; a shared pipeline with a disclaimer fails once two apply.",
+      "d": 3,
+      "domain": "Governance, Safety & Risk Management",
+      "episode": 15,
+      "source": {
+        "episode": 15,
+        "t": 1440
+      },
+      "learnMore": {
+        "en": "Different data needs different rules. A shared pipeline mixes them. Keep health data separate and give EU data a way to be deleted.",
+        "hi": "Alag data ke alag rules hote hain. Shared pipeline unhe mila deti hai. Health data alag rakho aur EU data ke liye delete ka raasta rakho."
+      }
+    },
+    {
+      "q": "A team routes outputs to human review whenever the model reports high uncertainty, but never checked how its confidence score matches reality. What is the issue?",
+      "options": [
+        "Nothing is wrong, since a model always knows exactly how sure it is of each answer that it gives",
+        "A confidence score is a safety signal only once calibrated against labelled data, slice by slice",
+        "Confidence scores can never be used for routing in any system, however carefully they are checked",
+        "The score should be replaced with random sampling of five percent of all outputs, every single day"
+      ],
+      "correct": 1,
+      "explain": "Uncalibrated confidence is decoration; watch the share routed to review and the share humans overturn.",
+      "d": 2,
+      "domain": "Governance, Safety & Risk Management",
+      "episode": 15,
+      "source": {
+        "episode": 15,
+        "t": 493
+      },
+      "learnMore": {
+        "en": "A score is only useful if it matches how often the model is really right. Check it on labelled examples first.",
+        "hi": "Score tabhi kaam ka hai jab wo asli sahi hone ki dar se mile. Pehle labelled examples par check karo."
+      }
+    },
+    {
+      "q": "A claims extractor handles 10,000 items a day. If 8% go to review at 3 minutes each, about how much reviewer time does that need?",
+      "options": [
+        "About 4 hours a day, roughly half of one full-time reviewer on the team",
+        "About 40 hours a day, roughly five reviewers",
+        "About 400 hours a day, roughly fifty full-time reviewers on the team",
+        "About 8 hours a day, which is one reviewer"
+      ],
+      "correct": 1,
+      "explain": "8% of 10,000 is 800 reviews; at 3 minutes each that is 2,400 minutes, or 40 hours.",
+      "d": 2,
+      "domain": "Governance, Safety & Risk Management",
+      "episode": 15,
+      "source": {
+        "episode": 15,
+        "t": 580
+      },
+      "learnMore": {
+        "en": "8% of 10,000 is 800 items. At 3 minutes each that is 40 hours. So a review queue needs real staff, and you should plan it with numbers.",
+        "hi": "10,000 ka 8% matlab 800 items. Har ek 3 minute, to 40 ghante. Review queue ko asli staff chahiye, numbers se plan karo."
+      }
+    },
+    {
+      "q": "At a regional bank kickoff for a relationship-manager AI assistant, the CEO says \"just tell us which model to buy\". What is the architect's best first step?",
+      "options": [
+        "Recommend the model tier that matches the stated budget and the size of the bank's team",
+        "Build a small proof of concept while the kickoff meetings continue in the background of the project",
+        "Draft the SLA and success criteria so there are targets from day one",
+        "Facilitate structured discovery: objective, success metrics, data landscape, constraints"
+      ],
+      "correct": 3,
+      "explain": "The word \"first\" is the tell: a model choice is a solution with no objective, metric or data; a PoC may demo the wrong thing, and an SLA needs measurements.",
+      "d": 2,
+      "domain": "Stakeholder Communication & Lifecycle Management",
+      "episode": 16,
+      "source": {
+        "episode": 16,
+        "t": 1560
+      },
+      "learnMore": {
+        "en": "Start with what the business wants and how success is measured. Only then pick a model. A model picked first is a guess.",
+        "hi": "Pehle jaano business ko kya chahiye aur success kaise naapi jayegi. Uske baad model chuno. Pehle model chunna sirf andaza hai."
+      }
+    },
+    {
+      "q": "Sales closed a client on \"99% accuracy, always under two seconds\". Measured reality is 94% on the main document type and P95 of 3.1 seconds, and the contract signs in a week. What should you do?",
+      "options": [
+        "Present measured numbers per type and priced options, then renegotiate before signature",
+        "Run an optimisation sprint to close the gap before the client has a chance to notice the difference",
+        "State in writing that architecture does not support the promise and step away",
+        "Proceed with the signature and add a clear disclaimer saying that performance may vary by document"
+      ],
+      "correct": 0,
+      "explain": "A sprint is lying with confidence, refusing does not turn the promise into a choice, and a disclaimer signs a promise you cannot keep.",
+      "d": 3,
+      "domain": "Stakeholder Communication & Lifecycle Management",
+      "episode": 16,
+      "source": {
+        "episode": 16,
+        "t": 2190
+      },
+      "learnMore": {
+        "en": "Show the real numbers and give options with prices. The client can then choose. Hiding it or refusing helps nobody.",
+        "hi": "Asli numbers dikhao aur price ke saath options do. Client phir chun sakta hai. Chhupana ya mana karna kisi ke kaam nahi aata."
+      }
+    },
+    {
+      "q": "Which statement is an honest promise for an LLM-based invoice system?",
+      "options": [
+        "Every invoice will be extracted correctly, backed by a disclaimer in the contract for any rare mistakes",
+        "Average latency will be two seconds, with no limit on the slowest requests in the same period",
+        "Right on 96% of standard invoices, measured monthly on a golden set, with a plan for the rest",
+        "The cost per request will be one fixed price whatever the prompt length"
+      ],
+      "correct": 2,
+      "explain": "An honest promise names a population, a measurement and a repair path; latency lives at the tail and cost is a range.",
+      "d": 2,
+      "domain": "Stakeholder Communication & Lifecycle Management",
+      "episode": 16,
+      "source": {
+        "episode": 16,
+        "t": 1212
+      },
+      "learnMore": {
+        "en": "A good promise says how often it is right, how you measure it, and what happens in the misses. No one can promise zero mistakes.",
+        "hi": "Achha promise batata hai kitni baar sahi, kaise naapa, aur galti par kya hoga. Zero galti ka promise koi nahi de sakta."
+      }
+    },
+    {
+      "q": "A recommendation is presented with no mention of the alternatives, and the room argues about the architect's competence. What should have been included?",
+      "options": [
+        "A longer technical description of the mechanism, written in the same way for any audience in the room",
+        "A list of each model that could have been picked and its price",
+        "A promise that the recommendation will be reviewed once the project has been launched and is running",
+        "The rejected twin: the credible alternative and the constraint that ruled it out"
+      ],
+      "correct": 3,
+      "explain": "Naming the constraint shifts the debate from your competence to the constraint.",
+      "d": 2,
+      "domain": "Stakeholder Communication & Lifecycle Management",
+      "episode": 16,
+      "source": {
+        "episode": 16,
+        "t": 891
+      },
+      "learnMore": {
+        "en": "If people can see the other choice and why it lost, they argue about the constraint, not about you.",
+        "hi": "Agar log dusra option aur uske haarne ki wajah dekh lein, to wo constraint par behas karte hain, aap par nahi."
+      }
+    },
+    {
+      "q": "A team promises \"an average response time of two seconds\". Why is this a weak latency promise?",
+      "options": [
+        "The average is not measured in practice, so it cannot be checked by anyone against the real traffic",
+        "The average hides the slow tail; commit to a tail percentile such as P95",
+        "Two seconds is below what a model today can achieve, so it should be five",
+        "The fastest request is what counts, so promise the best-case time instead"
+      ],
+      "correct": 1,
+      "explain": "The average is a statistic; the tail is what users remember.",
+      "d": 2,
+      "domain": "Stakeholder Communication & Lifecycle Management",
+      "episode": 16,
+      "source": {
+        "episode": 16,
+        "t": 1379
+      },
+      "learnMore": {
+        "en": "Some requests will be much slower than average, and those are the ones people remember. Promise the slow end, like P95.",
+        "hi": "Kuch requests average se bahut slow hongi, aur log wahi yaad rakhte hain. Slow end ka promise do, jaise P95."
+      }
+    }
+  ]
 }

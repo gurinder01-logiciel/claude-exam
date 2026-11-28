@@ -1925,7 +1925,7 @@ async function renderVideoTab() {
   } else {
     const qs = course.questions || [];
     body = `<div class="sec-head"><div class="sec-title">${escapeHtml(course.title)}</div>
-        <div class="sec-sub">${escapeHtml(course.channel || '')}${/^https:\/\//.test(course.playlistUrl || '') ? ` · <a class="vc-link" href="${escapeHtml(course.playlistUrl)}" target="_blank" rel="noopener">Playlist</a>` : ''}</div></div>
+        <div class="sec-sub">${escapeHtml(course.channel || '')}${/^https:\/\//.test(course.playlistUrl || '') ? ` · <a class="vc-link" href="${escapeHtml(course.playlistUrl)}" target="_blank" rel="noopener">Playlist</a>` : ''}</div>${course.note ? `<p class="vc-note">${escapeHtml(course.note)}</p>` : ''}</div>
       <div class="vc-actions">
         <button class="icon-btn" id="vcBack">← All courses</button>
         <button class="btn" id="vcAll" ${qs.length ? '' : 'disabled'}>Practise whole course · ${qs.length} Qs</button>
